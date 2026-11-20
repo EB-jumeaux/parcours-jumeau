@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Créer mon jumeau numérique</title>
+<meta name="description" content="À la fin, ton jumeau tourne sur ton poste et il te connaît. Tu n&#x27;installes que l&#x27;application Claude, et c&#x27;est Claude qui fait le reste, sur Windows comme sur Mac.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;800;900&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+
+
+:root{
+  --ground:#FFFDFD;
+  --surface:#FFFFFF;
+  --surface-2:#F7F4F0;
+  --line:#E6E0D8;
+  --line-strong:#CFC6B9;
+  --ink:#2E3238;
+  --ink-2:#5E656E;
+  --ink-3:#8A919A;
+  --orange:#FF7B14;
+  --orange-ink:#B85300;
+  --creme:#FFF1E4;
+  --bleu:#337AB7;
+  --bleu-ink:#255C8C;
+  --bleu-pale:#F1F5FD;
+  --vert:#2E7D5B;
+  --vert-pale:#EAF5EF;
+  --brique:#A63D2F;
+  --brique-pale:#FBEDEA;
+  --shadow:0 1px 2px rgba(46,50,56,.05), 0 8px 24px -12px rgba(46,50,56,.18);
+  --radius:10px;
+  --mono:"IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --sans:"Mulish", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#14161A; --surface:#1B1E23; --surface-2:#22262C;
+    --line:#2F343B; --line-strong:#434A54;
+    --ink:#E9E7E4; --ink-2:#AAB1BA; --ink-3:#7C848E;
+    --orange:#FF9243; --orange-ink:#FFB075; --creme:#2B2018;
+    --bleu:#6FABDE; --bleu-ink:#96C4EC; --bleu-pale:#1A2430;
+    --vert:#5FBF92; --vert-pale:#16251F;
+    --brique:#E8877A; --brique-pale:#2B1A17;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#14161A; --surface:#1B1E23; --surface-2:#22262C;
+  --line:#2F343B; --line-strong:#434A54;
+  --ink:#E9E7E4; --ink-2:#AAB1BA; --ink-3:#7C848E;
+  --orange:#FF9243; --orange-ink:#FFB075; --creme:#2B2018;
+  --bleu:#6FABDE; --bleu-ink:#96C4EC; --bleu-pale:#1A2430;
+  --vert:#5FBF92; --vert-pale:#16251F;
+  --brique:#E8877A; --brique-pale:#2B1A17;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--ground);color:var(--ink);
+  font-family:var(--sans);font-size:17px;line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.col{max-width:730px}
+
+
+h1,h2,h3,h4{text-wrap:balance;margin:0;font-weight:800;letter-spacing:-.015em;line-height:1.15}
+h1{font-size:clamp(2.3rem,5.6vw,3.8rem);font-weight:900;letter-spacing:-.035em}
+h2{font-size:clamp(1.6rem,3.4vw,2.2rem)}
+h3{font-size:1.22rem}
+h4{font-size:1rem}
+p{margin:0}
+a{color:var(--bleu-ink);text-decoration-thickness:1px;text-underline-offset:2px}
+strong{font-weight:800}
+.eyebrow{font-family:var(--mono);font-size:.72rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.16em;color:var(--ink-3)}
+.lede{font-size:1.14rem;color:var(--ink-2);line-height:1.6}
+.small{font-size:.9rem;color:var(--ink-2)}
+.stack{display:flex;flex-direction:column;gap:1.1rem}
+.stack-s{display:flex;flex-direction:column;gap:.6rem}
+
+
+header.hero{
+  border-bottom:1px solid var(--line);
+  background:radial-gradient(120% 90% at 8% -10%, var(--creme) 0%, transparent 58%), var(--ground);
+}
+.hero-inner{padding:clamp(2.8rem,6.5vw,5rem) 0 clamp(2.2rem,4vw,3.2rem);
+  display:flex;flex-direction:column;gap:1.5rem}
+.hero h1 .k{display:block;color:var(--orange-ink)}
+.hero-meta{display:flex;flex-wrap:wrap;gap:.5rem 1.6rem;font-family:var(--mono);
+  font-size:.8rem;color:var(--ink-2);padding-top:.4rem;border-top:1px solid var(--line)}
+.hero-meta b{color:var(--ink);font-weight:600}
+
+
+.settings{position:sticky;top:0;z-index:40;
+  background:color-mix(in srgb, var(--ground) 88%, transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.settings-inner{display:flex;flex-wrap:wrap;align-items:center;gap:.9rem 1.4rem;padding:.7rem 0}
+.seg{display:flex;align-items:center;gap:.55rem}
+.seg-label{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--ink-3)}
+.seg-btns{display:flex;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:999px;padding:2px}
+.seg-btns button{font-family:var(--sans);font-size:.84rem;font-weight:600;color:var(--ink-2);
+  background:none;border:0;padding:.28rem .78rem;border-radius:999px;cursor:pointer}
+.seg-btns button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.seg-btns button:focus-visible{outline:2px solid var(--bleu);outline-offset:2px}
+.progress{margin-left:auto;display:flex;align-items:center;gap:.6rem;
+  font-family:var(--mono);font-size:.76rem;color:var(--ink-2)}
+.progress-track{width:110px;height:6px;border-radius:999px;background:var(--surface-2);
+  border:1px solid var(--line);overflow:hidden}
+.progress-fill{height:100%;width:0;background:var(--orange);transition:width .3s ease}
+
+
+section{padding:clamp(2.4rem,5vw,4rem) 0;border-bottom:1px solid var(--line)}
+.sec-head{display:flex;flex-direction:column;gap:.5rem;margin-bottom:2rem;max-width:730px}
+.sec-body{display:flex;flex-direction:column;gap:1.6rem}
+
+
+.cartes{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem}
+.carte{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:1.3rem 1.4rem;box-shadow:var(--shadow)}
+.carte h4{display:flex;align-items:baseline;gap:.55rem;margin-bottom:.45rem;flex-wrap:wrap}
+.carte .tag{font-family:var(--mono);font-size:.66rem;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--bleu-ink);background:var(--bleu-pale);
+  border-radius:4px;padding:.1rem .38rem}
+.carte p{font-size:.95rem;color:var(--ink-2)}
+.carte .quand{margin-top:.7rem;font-size:.84rem;font-family:var(--mono);color:var(--ink-3)}
+
+
+dl.lex{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:.1rem 2rem;margin:0;max-width:900px}
+dl.lex > div{padding:.85rem 0;border-top:1px solid var(--line)}
+dl.lex dt{font-weight:800;font-size:.98rem}
+dl.lex dd{margin:.15rem 0 0;font-size:.93rem;color:var(--ink-2)}
+
+
+.step{display:grid;grid-template-columns:64px 1fr;gap:0 1.6rem;position:relative}
+.step + .step{margin-top:2.6rem}
+.rail{display:flex;flex-direction:column;align-items:center;gap:.6rem}
+.rail .num{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;
+  font-family:var(--mono);font-weight:600;font-size:1.05rem;background:var(--surface);
+  color:var(--ink);border:1.5px solid var(--line-strong)}
+.step[data-done="true"] .rail .num{background:var(--orange);border-color:var(--orange);color:#fff}
+.rail .line{flex:1;width:1.5px;background:var(--line);min-height:20px}
+.step-body{padding-bottom:.4rem;max-width:730px;display:flex;flex-direction:column;gap:1.1rem}
+.step-head{display:flex;flex-direction:column;gap:.35rem}
+.step-head .where{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--orange-ink)}
+.step-body ol,.sec-body ol{margin:0;padding-left:1.3rem;display:flex;flex-direction:column;gap:.55rem}
+.step-body ol li::marker,.sec-body ol li::marker{font-weight:800;color:var(--ink-3)}
+.step-body ul,.sec-body ul{margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:.4rem}
+
+
+.copybloc{border:1px solid var(--line-strong);border-radius:var(--radius);
+  overflow:hidden;background:var(--surface-2)}
+.copybloc-head{display:flex;align-items:center;gap:.8rem;padding:.6rem .85rem;
+  border-bottom:1px solid var(--line);background:var(--surface)}
+.copybloc-head .t{font-family:var(--mono);font-size:.74rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ink-2)}
+.copy{margin-left:auto;font-family:var(--sans);font-size:.8rem;font-weight:700;
+  background:var(--orange);color:#fff;border:0;border-radius:6px;
+  padding:.34rem .8rem;cursor:pointer}
+.copy:hover{filter:brightness(1.06)}
+.copy:focus-visible{outline:2px solid var(--bleu);outline-offset:2px}
+.copy[data-state="ok"]{background:var(--vert)}
+.copybloc pre{margin:0;padding:1rem .95rem;overflow-x:auto;font-family:var(--mono);
+  font-size:.83rem;line-height:1.6;color:var(--ink);white-space:pre-wrap;word-break:break-word}
+
+.copybloc.accomp{border:2px solid var(--orange);background:var(--creme);
+  box-shadow:0 8px 28px rgba(255,123,20,.12)}
+.accomp-head{padding:1.4rem 1.5rem 1.2rem;display:flex;flex-direction:column;gap:.55rem}
+.accomp-head .lbl{font-family:var(--mono);font-size:.72rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.14em;color:var(--orange-ink)}
+.accomp-head h3{margin:0;font-size:1.35rem;line-height:1.25;color:var(--ink)}
+.accomp-head p{margin:0;font-size:1rem;line-height:1.55;color:var(--ink-2);max-width:60ch}
+.copy.accomp-btn{margin:.5rem 0 0;align-self:flex-start;font-size:1rem;
+  padding:.7rem 1.4rem;border-radius:8px}
+.accomp-prompt{border-top:1px solid var(--line);background:var(--surface)}
+.accomp-prompt summary{cursor:pointer;padding:.6rem 1.5rem;font-family:var(--mono);
+  font-size:.74rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-2)}
+.accomp-prompt pre{max-height:24rem}
+code.inline{font-family:var(--mono);font-size:.86em;background:var(--surface-2);
+  border:1px solid var(--line);border-radius:5px;padding:.08em .35em}
+
+
+.note{border-radius:var(--radius);padding:.95rem 1.05rem;font-size:.94rem;
+  border:1px solid;display:flex;flex-direction:column;gap:.4rem}
+.note .lbl{font-family:var(--mono);font-size:.7rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.12em}
+.note.piege{background:var(--brique-pale);border-color:color-mix(in srgb,var(--brique) 32%, transparent)}
+.note.piege .lbl{color:var(--brique)}
+.note.reussi{background:var(--vert-pale);border-color:color-mix(in srgb,var(--vert) 30%, transparent)}
+.note.reussi .lbl{color:var(--vert)}
+.note.info{background:var(--bleu-pale);border-color:color-mix(in srgb,var(--bleu) 28%, transparent)}
+.note.info .lbl{color:var(--bleu-ink)}
+.note.reperе,.note.repere{background:var(--creme);border-color:color-mix(in srgb,var(--orange) 30%, transparent)}
+.note.repere .lbl{color:var(--orange-ink)}
+.note.neutre{background:var(--surface-2);border-color:var(--line-strong)}
+.note.neutre .lbl{color:var(--ink-3)}
+
+
+.check{display:flex;gap:.7rem;align-items:flex-start;background:var(--creme);
+  border:1px solid color-mix(in srgb,var(--orange) 26%, transparent);
+  border-radius:var(--radius);padding:.8rem .95rem;cursor:pointer}
+.check input{margin:.28rem 0 0;width:17px;height:17px;accent-color:var(--orange);
+  flex:none;cursor:pointer}
+.check .txt{font-size:.95rem;font-weight:600}
+.check .txt em{display:block;font-style:normal;font-weight:400;color:var(--ink-2);
+  font-size:.9rem;margin-top:.1rem}
+.check:has(input:checked){background:var(--vert-pale);
+  border-color:color-mix(in srgb,var(--vert) 30%, transparent)}
+.check:has(input:checked) .txt{text-decoration:line-through;
+  text-decoration-color:var(--ink-3);color:var(--ink-2)}
+.check:has(input:checked) .txt em{text-decoration:none}
+.checks{display:flex;flex-direction:column;gap:.7rem;max-width:730px}
+
+
+.faq{display:flex;flex-direction:column;gap:.55rem;max-width:840px}
+details.dx{border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--surface);overflow:hidden}
+details.dx[open]{border-color:var(--line-strong);box-shadow:var(--shadow)}
+details.dx summary{cursor:pointer;padding:.85rem 1rem;font-weight:700;font-size:.98rem;
+  display:flex;gap:.7rem;align-items:baseline;list-style:none}
+details.dx summary::-webkit-details-marker{display:none}
+details.dx summary::before{content:"+";font-family:var(--mono);font-weight:600;
+  color:var(--orange);flex:none;width:1ch}
+details.dx[open] summary::before{content:"\2013"}
+details.dx summary:focus-visible{outline:2px solid var(--bleu);outline-offset:-2px}
+.dx-body{padding:0 1rem 1rem 2.4rem;display:flex;flex-direction:column;gap:.7rem;font-size:.95rem}
+.dx-body .quote{font-family:var(--mono);font-size:.82rem;background:var(--surface-2);
+  border-left:2px solid var(--brique);padding:.5rem .7rem;color:var(--ink-2);
+  border-radius:0 5px 5px 0;overflow-x:auto}
+.dx-body .geste{font-weight:700}
+.dx-body .src{font-size:.82rem;color:var(--ink-3);font-family:var(--mono)}
+
+
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--surface);max-width:900px}
+table{border-collapse:collapse;width:100%;font-size:.93rem;min-width:460px}
+th,td{text-align:left;padding:.7rem .9rem;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--ink-3);font-weight:600}
+tr:last-child td{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink-2)}
+
+
+figure.diagram{margin:0;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:1.5rem 1.2rem 1.1rem;box-shadow:var(--shadow);max-width:900px}
+figure.diagram svg{display:block;width:100%;height:auto;max-width:640px;margin:0 auto}
+figcaption{margin-top:1rem;font-size:.88rem;color:var(--ink-2);text-align:center;
+  max-width:52ch;margin-inline:auto}
+
+
+
+
+figure.capture{margin:2rem 0;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:1rem;box-shadow:var(--shadow);
+  width:fit-content;max-width:min(730px,100%)}
+figure.capture img{display:block;width:auto;height:auto;max-width:100%;
+  border-radius:calc(var(--radius) - 4px);border:1px solid var(--line)}
+figure.capture figcaption{margin-top:.9rem}
+
+
+footer{padding:clamp(2.4rem,5vw,3.6rem) 0 4rem;background:var(--surface-2)}
+footer .guichet{border-left:3px solid var(--orange);padding-left:1.1rem}
+.colophon{border-top:1px solid var(--line);padding-top:1.2rem;font-size:.85rem;color:var(--ink-3);
+  font-family:var(--mono)}
+
+
+
+
+@media (max-width:720px){
+  body{font-size:16px}
+  .step{grid-template-columns:40px 1fr;gap:0 1rem}
+  .rail .num{width:36px;height:36px;font-size:.9rem}
+  .dx-body{padding-left:1rem}
+  .progress{width:100%;margin-left:0;order:5}
+}
+@media print{
+  .settings,.copy{display:none}
+  body{font-size:11pt;background:#fff}
+  section{page-break-inside:auto;border-bottom:0}
+  .step{page-break-inside:avoid}
+  details.dx{page-break-inside:avoid}
+  details.dx summary::before{content:""}
+  .dx-body{display:block!important}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}
+
+body:not([data-v-mon-poste]) .v-mon-poste-mac{display:none}
+body[data-v-mon-poste="windows"] .v-mon-poste-mac{display:none}
+body[data-v-mon-poste="mac"] .v-mon-poste-windows{display:none}
+</style>
+<meta name="robots" content="noindex, nofollow"><style>
+:root{--eb-bg:#ffffff;--ink:#1b1f24;--ink-2:#4b5563;--line:#e3e6ea;--accent:#2f5d8a;--accent-ink:#ffffff;--accent-pale:#eef3f8;
+--ok:#1f6f43;--ok-pale:#f1f8f3;--warn:#a85a07;--warn-pale:#fdf6ec;--code-bg:#f5f6f8;
+--sans:Mulish,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Consolas,monospace}
+.eb-bandeau{background:var(--eb-bg);border-bottom:1px solid var(--line)}
+.eb-bandeau-in{max-width:1080px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px 22px;
+ padding:12px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px))}
+.eb-nom{font:800 16px/1.3 var(--sans);color:var(--ink);text-decoration:none}
+.eb-nav{display:flex;flex-wrap:wrap;gap:6px 16px;min-width:0}
+.eb-nav a{color:var(--ink-2);font:600 14px/1.4 var(--sans);text-decoration:none}
+.eb-nav a:hover,.eb-nav a[aria-current]{color:var(--accent)}
+.eb-nav a[aria-current]{text-decoration:underline;text-underline-offset:4px}
+.eb-langue{margin-left:auto;color:var(--accent);font:700 14px/1.4 var(--sans);text-decoration:none}
+.eb-nav a:focus-visible,.eb-nom:focus-visible,.eb-langue:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style></head>
+<body><header class="eb-bandeau"><div class="eb-bandeau-in"><a class="eb-nom" href="index.html">Jumeaux et jumelles EB</a><nav class="eb-nav"><a href="index.html">Par où commencer</a><a href="comprendre-mon-jumeau-numerique.html">1. La mécanique du jumeau</a><a href="creer-mon-compte-github.html">2. Mon compte GitHub</a><a href="demarrer-mon-jumeau-numerique.html" aria-current=page>3. Créer mon jumeau</a><a href="le-chef-de-mon-jumeau.html">Pour aller plus loin : le Chef</a></nav><a class="eb-langue" href="en/demarrer-mon-jumeau-numerique.html" hreflang="en">English</a></div></header>
+<header class="hero"><div class="wrap hero-inner">
+<p class="eyebrow">Le programme des jumeaux numériques</p>
+<h1>Créer mon <span class="k">jumeau numérique</span></h1>
+<p class="lede col">À la fin, <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> tourne sur ton poste et <span class="acc" data-a="il" data-b="elle">il</span> te connaît. Tu n'installes que l'application Claude, et c'est Claude qui fait le reste, sur Windows comme sur Mac.</p>
+<div class="hero-meta"><span><strong>Moins d'une heure</strong> de manipulation</span><span><strong>4 étapes</strong>, une à la fois</span><span><strong>Aucune commande</strong> à taper</span><span><strong>Windows et Mac</strong></span></div>
+</div></header>
+<div class="settings"><div class="wrap settings-inner"><div class="seg"><span class="seg-label">Mon poste</span><div class="seg-btns" role="group" aria-label="Mon poste"><button type="button" data-dim="mon-poste" data-val="windows" aria-pressed="true">Windows</button><button type="button" data-dim="mon-poste" data-val="mac" aria-pressed="false">Mac</button></div></div><div class="seg"><span class="seg-label">On dit</span><div class="seg-btns" role="group" aria-label="Accord"><button type="button" data-acc="a" aria-pressed="true">Jumeau</button><button type="button" data-acc="b" aria-pressed="false">Jumelle</button></div></div><div class="progress"><span>Avancement</span><div class="progress-track"><div class="progress-fill" id="pfill"></div></div><span id="pcount">0 / 0</span></div></div></div>
+<main>
+<section id="ce-que-tu-installes-et-pourquoi"><div class="wrap"><div class="sec-head"><p class="eyebrow">Avant de toucher à quoi que ce soit</p><h2>Ce que tu installes, et pourquoi</h2><p class="lede">Dix minutes de lecture. À la fin, tu sais à quoi sert chaque pièce, où vit <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> et ce que changent les deux réglages de l'étape 1.</p></div><div class="sec-body"><div class="note info"><span class="lbl">Tu as déjà lu « La mécanique du jumeau numérique » ?</span><p>Si oui, survole cette section et reprends à la section « Ton cerveau est à toi, et à personne d'autre ». Elle est là pour qui arrive directement ici.</p></div>
+<div class="note info"><span class="lbl">Demande l&#x27;accès au gabarit maintenant</span><p>Le gabarit est le cerveau de départ, dans un dépôt privé. Son accès est le seul délai du parcours. Accepte l'invitation reçue par courriel de GitHub, comme l'explique la formation « Créer mon compte GitHub ». Tu n'as rien à envoyer.</p></div>
+<div class="col stack"><h3>Un jumeau, c'est un cerveau plus une exécution</h3>
+<p>Le <strong>cerveau</strong> est un dossier de fichiers texte qui t'appartient. Il contient qui tu es, comment tu écris, ce qui compte pour toi, tes dossiers en cours. Il s'enrichit à mesure que tu travailles avec <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span>.</p>
+<p>L'<strong>exécution</strong>, c'est Claude qui lit ce cerveau et agit. Les deux sont séparés exprès. Tu peux changer d'ordinateur ou de modèle d'IA. Tant que le cerveau te suit, <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> te suit.</p>
+<p>Ce cerveau est sauvegardé en ligne, dans un dépôt privé sur ton compte GitHub. C'est <strong>ton dépôt</strong>. L'installation consiste à le créer, puis à en poser une copie de travail sur ton poste.</p></div>
+<figure class="diagram"><svg viewBox="0 0 620 250" role="img" aria-label="Le cerveau, un dossier de fichiers sauvegardé en ligne, est chargé par l'exécution, l'application Claude qui travaille sur ton poste dans son onglet Code.">
+  <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+  <g font-family="IBM Plex Mono, monospace" font-size="11">
+    <rect x="14" y="46" width="250" height="158" rx="10" fill="var(--creme)" stroke="var(--orange)" stroke-width="1.5"/>
+    <text x="26" y="30" fill="var(--orange-ink)" font-size="10" letter-spacing="1.6">LE CERVEAU</text>
+    <text x="26" y="42" fill="var(--ink-3)" font-size="9.5" font-family="Mulish, sans-serif">des fichiers texte, à toi</text>
+    <g fill="var(--ink)">
+      <text x="34" y="72">CLAUDE.md</text><text x="150" y="72" fill="var(--ink-3)" font-size="9.5">ses instructions</text>
+      <text x="34" y="98">profile/</text><text x="150" y="98" fill="var(--ink-3)" font-size="9.5">qui tu es, ta voix</text>
+      <text x="34" y="124">context/</text><text x="150" y="124" fill="var(--ink-3)" font-size="9.5">ton équipe, tes outils</text>
+      <text x="34" y="150">playbooks/</text><text x="150" y="150" fill="var(--ink-3)" font-size="9.5">comment exécuter</text>
+      <text x="34" y="176">dossiers/</text><text x="150" y="176" fill="var(--ink-3)" font-size="9.5">tes sujets en cours</text>
+    </g>
+    <g color="var(--ink-3)" stroke="currentColor" stroke-width="1.4" fill="none"><path d="M272 125 H352" marker-end="url(#ar)"/></g>
+    <text x="278" y="116" fill="var(--ink-3)" font-size="9.5" font-family="Mulish, sans-serif">chargé par</text>
+    <rect x="362" y="46" width="244" height="158" rx="10" fill="var(--bleu-pale)" stroke="var(--bleu)" stroke-width="1.5"/>
+    <text x="374" y="30" fill="var(--bleu-ink)" font-size="10" letter-spacing="1.6">L'EXÉCUTION</text>
+    <text x="374" y="42" fill="var(--ink-3)" font-size="9.5" font-family="Mulish, sans-serif">une session, sur ton poste</text>
+    <g fill="var(--ink)" font-family="Mulish, sans-serif" font-size="12.5">
+      <text x="384" y="80">L'application Claude</text>
+      <text x="384" y="104" font-size="10.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">onglet Code, Jumeau</text>
+      <text x="384" y="140">Elle lit le cerveau,</text>
+      <text x="384" y="160">elle travaille,</text>
+      <text x="384" y="180">elle écrit dans le cerveau.</text>
+    </g>
+  </g>
+</svg><figcaption>Change d'ordinateur, le cerveau te suit. Ce qu'une session n'a pas écrit dans le cerveau est perdu à sa fermeture. <span class="acc" data-a="Ton jumeau" data-b="Ta jumelle">Ton jumeau</span> écrit donc dans ses fichiers tout ce qui compte.</figcaption></figure>
+<div class="col stack"><h3>Les pièces, et à quel moment chacune sert</h3>
+<p>Tu n'installes qu'une seule application, celle de Claude. Claude installe le reste pour toi à l'étape 3.</p></div>
+<div class="cartes"><div class="carte"><h4>L'application Claude <span class="tag">le poste</span></h4><p>L'application de bureau, connectée à ton propre compte Claude. <span class="acc" data-a="Ton jumeau" data-b="Ta jumelle">Ton jumeau</span> vit dans son onglet <strong>Code</strong>, sur un environnement que tu crées une fois et qui s'appelle <strong>Jumeau</strong>.</p><p class="quand">Le seul programme que tu ouvres, tous les jours.</p></div><div class="carte"><h4>Claude Code <span class="tag">le jumeau</span></h4><p>C'est <span class="acc" data-a="ton jumeau lui-même" data-b="ta jumelle elle-même">ton jumeau lui-même</span>, le moteur qui lit le cerveau et agit sur ton poste. Rien à installer, Claude Code est dans l'application et ton abonnement Claude l'inclut.</p><p class="quand">Tourne dans l'onglet Code, à chaque session.</p></div><div class="carte"><h4>Git et GitHub <span class="tag">la sauvegarde</span></h4><p>Git est le mécanisme qui envoie ton cerveau en ligne, GitHub est l'endroit où il est hébergé. Un ordinateur perdu, volé ou remplacé n'emporte pas <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> avec lui. Tu n'y touches pas au quotidien.</p><p class="quand">Claude installe Git à l'étape 3, tu n'y touches plus.</p></div><div class="carte"><h4>L'outil GitHub <span class="tag">l&#x27;identification</span></h4><p>L'outil officiel de GitHub (gh). Il t'identifie chez GitHub par ton navigateur et crée ton dépôt privé. Après l'installation, <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> s'en sert sans toi.</p><p class="quand">Claude l'installe et s'en sert à l'étape 3.</p></div><div class="carte"><h4>Python <span class="tag">le moteur des outils</span></h4><p>Ce qui fait tourner les outils de <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> (lire un courriel avec ses pièces jointes, déposer un fichier, préparer un chiffrier). Tu ne l'utilises jamais directement. Sans lui, <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> n'a pas de mains.</p><p class="quand">Claude l'installe à l'étape 3, tu n'y touches plus.</p></div></div>
+<div class="note piege"><span class="lbl">Trois onglets dans la même application, et un seul est le bon</span><p>L'application Claude a trois onglets, la conversation, <strong>Cowork</strong> et <strong>Code</strong>. <span class="acc" data-a="Ton jumeau" data-b="Ta jumelle">Ton jumeau</span> vit dans <strong>Code</strong>, et nulle part ailleurs. Dans les autres onglets, Claude ne voit pas ton dossier <code class="inline">jumeau</code> et ne peut rien installer sur ton poste. Si tu colles un texte de cette formation au mauvais endroit, il ne se passe rien de grave, tu recommences dans l'onglet Code.</p></div>
+<div class="col stack"><h3>Le geste de tous les jours, et ses deux réglages</h3>
+<p>Ouvrir l'application Claude, aller dans l'onglet <strong>Code</strong>, choisir <strong>Jumeau</strong>, écrire. Il n'y a aucune commande à retenir.</p>
+<p>Deux réglages accompagnent ce geste. Tu les actives une fois, à l'étape 1. Le premier s'explique, parce que son nom inquiète.</p>
+<p>Par défaut, Claude demande ton autorisation avant d'écrire un fichier et avant de lancer une commande. Pour une tâche ordinaire, ça fait des dizaines de questions, et tu finis par répondre oui sans lire. Ça ne protège personne.</p>
+<p>Le réglage <strong>« Autoriser le mode de contournement des autorisations »</strong> permet de choisir, sous la zone de saisie, <strong>« Ignorer les permissions »</strong>. <span class="acc" data-a="Ton jumeau" data-b="Ta jumelle">Ton jumeau</span> travaille alors d'un trait, et son travail défile à l'écran. L'application retient ce choix pour ton dossier <code class="inline">jumeau</code>, tu ne le fais qu'une fois.</p>
+<p>Le réglage <strong>« Connecter les nouvelles sessions à Remote Control »</strong> rend chaque session joignable au-delà de sa fenêtre, depuis le web et depuis ton téléphone. Tu peux ainsi suivre et piloter <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> quand tu n'es pas devant ton poste. Sans lui, la session ne répond qu'à sa propre fenêtre.</p></div>
+<div class="note info"><span class="lbl">Ce que ça change pour toi</span><p>Tu ne valides plus chaque geste, tu surveilles le travail pendant qu'il se fait. Si quelque chose te surprend, tu interromps <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> et tu lui demandes ce qu'<span class="acc" data-a="il" data-b="elle">il</span> fait.</p>
+<p>Ce qui ne change pas, <strong>rien ne sort sans ton accord.</strong> Un courriel, un message, une écriture dans un outil, <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> prépare un brouillon et attend ton feu vert. Cette règle est dans son cerveau, le réglage n'y touche pas.</p></div>
+<div class="col stack"><h3>Le vocabulaire</h3></div>
+<dl class="lex"><div><dt>L'onglet Code</dt><dd>L'endroit de l'application Claude où <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> vit. C'est là que tu colles le prompt de l'étape 3, et là que tu travailles tous les jours.</dd></div><div><dt>Un environnement</dt><dd>Un réglage enregistré de l'onglet Code qui dit sur quel dossier de ton poste Claude travaille. Le tien s'appelle Jumeau et pointe sur ton dossier <code class="inline">jumeau</code>.</dd></div><div><dt>Un prompt</dt><dd>Un texte que tu adresses à Claude. Ceux de cette formation sont préparés, tu les copies en entier sans rien changer, sauf ce qui est entre chevrons.</dd></div><div><dt>Un dépôt</dt><dd>L'espace privé en ligne où ton cerveau est sauvegardé. Claude crée le tien à l'étape 3, sur ton compte GitHub.</dd></div><div><dt>Le gabarit</dt><dd>Le cerveau de départ, sans contenu personnel, dans un dépôt privé d'EB-jumeaux. Ton dépôt en est une copie, que tu fais évoluer. <span class="acc" data-a="Ton jumeau" data-b="Ta jumelle">Ton jumeau</span> y prend ses mises à jour d'outils.</dd></div><div><dt>Cloner</dt><dd>Copier un dépôt sur ton poste pour y travailler. Claude le fait pour toi à l'étape 3, une seule fois.</dd></div><div><dt>Un commit</dt><dd>Une sauvegarde datée du cerveau. <span class="acc" data-a="Ton jumeau" data-b="Ta jumelle">Ton jumeau</span> en fait sans qu'on le lui demande, quand <span class="acc" data-a="il" data-b="elle">il</span> a produit quelque chose qui compte.</dd></div><div><dt>Une session</dt><dd>Une conversation avec <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span>, dans l'onglet Code, sur l'environnement Jumeau. Chaque nouvelle session relit le cerveau en s'ouvrant.</dd></div></dl>
+<div class="checks"><label class="check"><input type="checkbox" data-k="ce-que-tu-installes-et-pourquoi.je-sais-que-le-cerveau-est-un-dossier-de-fichiers-a-moi-sauv" data-n="c1"><span class="txt">Je sais que le cerveau est un dossier de fichiers à moi, sauvegardé dans mon dépôt</span></label><label class="check"><input type="checkbox" data-k="ce-que-tu-installes-et-pourquoi.je-sais-que-ton-jumeau-vit-dans-l-onglet-code-de-l-applicati" data-n="c2"><span class="txt">Je sais que <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> vit dans l'onglet Code de l'application Claude, et nulle part ailleurs</span></label><label class="check"><input type="checkbox" data-k="ce-que-tu-installes-et-pourquoi.je-sais-quel-est-le-geste-de-tous-les-jours-et-ce-que-font-s" data-n="c3"><span class="txt">Je sais quel est le geste de tous les jours, et ce que font ses deux réglages</span></label><label class="check"><input type="checkbox" data-k="ce-que-tu-installes-et-pourquoi.je-sais-que-rien-ne-sort-sans-mon-accord-quel-que-soit-le-re" data-n="c4"><span class="txt">Je sais que rien ne sort sans mon accord, quel que soit le réglage</span></label></div></div></div></section>
+<section id="ton-cerveau-est-a-toi-et-a-personne-d-au"><div class="wrap"><div class="sec-head"><p class="eyebrow">Sécurité</p><h2>Ton cerveau est à toi, et à personne d'autre</h2><p class="lede"><span class="acc" data-a="Ton jumeau" data-b="Ta jumelle">Ton jumeau</span> finira par contenir tes dossiers, ta façon de décider, tes courriels. Voici où ce contenu vit, qui peut le lire et ce qui sort de ton poste.</p></div><div class="sec-body"><div class="col stack"><h3>Deux dépôts, et ils n'appartiennent pas à la même personne</h3>
+<p>Il y a <strong>le gabarit</strong>, un dépôt privé dont EB-jumeaux tient une copie à jour, d'après le modèle conçu par Pascal Jarry. Il contient le squelette, les instructions de départ, les outils, les garde-fous. Pascal Jarry l'améliore régulièrement, et notre copie suit. <strong>Il ne contient le contenu personnel de personne</strong>, ni celui d'Éric, ni celui des autres, ni le tien. C'est une coquille.</p>
+<p>Et il y a <strong>ton dépôt</strong>, que Claude crée à l'étape 3 sur <strong>ton</strong> compte GitHub, en <strong>privé</strong>. C'est là que vit ton cerveau, et il t'appartient. <strong>Personne d'autre que toi n'y a accès</strong>, ni Éric, ni les autres utilisateurs du gabarit. Seul GitHub, qui l'héberge, le détient, comme tout dépôt privé.</p></div>
+<figure class="diagram"><svg viewBox="0 0 640 268" role="img" aria-label="Le gabarit, dépôt d'EB-jumeaux sans contenu personnel, envoie ses outils améliorés vers ton dépôt privé. Rien ne circule dans l'autre sens.">
+  <defs><marker id="fl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+  <g font-family="IBM Plex Mono, monospace" font-size="11">
+    <rect x="10" y="52" width="252" height="150" rx="10" fill="var(--creme)" stroke="var(--orange)" stroke-width="1.5"/>
+    <text x="22" y="30" fill="var(--orange-ink)" font-size="10" letter-spacing="1.6">LE GABARIT</text>
+    <text x="22" y="44" fill="var(--ink-3)" font-size="9.5" font-family="Mulish, sans-serif">le dépôt d'EB-jumeaux</text>
+    <g fill="var(--ink)">
+      <text x="30" y="80">CLAUDE.md</text><text x="140" y="80" fill="var(--ink-3)" font-size="9.5">les réflexes</text>
+      <text x="30" y="104">tools/</text><text x="140" y="104" fill="var(--ink-3)" font-size="9.5">les outils</text>
+      <text x="30" y="128">playbooks/</text><text x="140" y="128" fill="var(--ink-3)" font-size="9.5">les méthodes</text>
+    </g>
+    <text x="30" y="164" fill="var(--orange-ink)" font-size="10" font-family="Mulish, sans-serif" font-weight="700">Aucun contenu personnel.</text>
+    <text x="30" y="182" fill="var(--ink-3)" font-size="9.5" font-family="Mulish, sans-serif">Une coquille, rien d'autre.</text>
+    <g color="var(--vert)" stroke="currentColor" stroke-width="1.6" fill="none"><path d="M270 104 H370" marker-end="url(#fl)"/></g>
+    <text x="272" y="95" fill="var(--ink-2)" font-size="9.5" font-family="Mulish, sans-serif">les outils améliorés</text>
+    <text x="272" y="130" fill="var(--brique)" font-size="9.5" font-family="Mulish, sans-serif">rien ne remonte</text>
+    <g color="var(--brique)" stroke="currentColor" stroke-width="1.6" fill="none" opacity="0.55"><path d="M370 146 H274" stroke-dasharray="5 4"/></g>
+    <g stroke="var(--brique)" stroke-width="2"><path d="M312 138 l16 16 M328 138 l-16 16"/></g>
+    <rect x="378" y="52" width="252" height="150" rx="10" fill="var(--bleu-pale)" stroke="var(--bleu)" stroke-width="1.5"/>
+    <text x="390" y="30" fill="var(--bleu-ink)" font-size="10" letter-spacing="1.6">TON DÉPÔT</text>
+    <text x="390" y="44" fill="var(--ink-3)" font-size="9.5" font-family="Mulish, sans-serif">sur ton compte, en privé</text>
+    <g fill="var(--ink)">
+      <text x="398" y="80">profile/</text><text x="508" y="80" fill="var(--ink-3)" font-size="9.5">qui tu es</text>
+      <text x="398" y="104">dossiers/</text><text x="508" y="104" fill="var(--ink-3)" font-size="9.5">tes sujets</text>
+      <text x="398" y="128">memory/</text><text x="508" y="128" fill="var(--ink-3)" font-size="9.5">ce qui est retenu</text>
+    </g>
+    <text x="398" y="164" fill="var(--bleu-ink)" font-size="10" font-family="Mulish, sans-serif" font-weight="700">Accès réservé à toi.</text>
+    <text x="398" y="182" fill="var(--ink-3)" font-size="9.5" font-family="Mulish, sans-serif">Ni Éric, ni personne.</text>
+    <text x="320" y="236" fill="var(--ink-3)" font-size="9.5" font-family="Mulish, sans-serif" text-anchor="middle">Deux dépôts, deux propriétaires. La frontière ne se traverse que dans un sens.</text>
+  </g>
+</svg><figcaption>Les outils descendent du gabarit, ton contenu ne remonte jamais. C'est le principe du montage.</figcaption></figure>
+<div class="col stack"><h3>Ce qu'Éric voit de ton dépôt</h3>
+<p><strong>Rien.</strong> Ce n'est pas un engagement, c'est une conséquence du montage. Ton dépôt est privé et il est sur ton compte, donc l'accès se donne depuis ton compte, par toi. Tant que tu n'invites personne, personne d'autre ne peut le lire, et tu peux le vérifier à tout moment dans les réglages de ton dépôt sur GitHub.</p>
+<p>L'inverse n'est pas vrai, et c'est voulu. Tu as accès au gabarit en lecture, puisque tu en pars et que <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> y prend ses mises à jour. Mais ce que tu y lis n'appartient à personne en particulier, c'est du squelette.</p></div>
+<div class="note repere"><span class="lbl">La mise à jour ne circule que dans un sens</span><p>À chaque démarrage, <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> consulte le gabarit et <strong>en copie une version en lecture</strong> dans un cache local. <span class="acc" data-a="Il" data-b="Elle">Il</span> compare, récupère les outils améliorés depuis la dernière fois et met à jour sa mécanique.</p>
+<p><strong><span class="acc" data-a="Il" data-b="Elle">Il</span> n'y écrit jamais rien.</strong> Ton accès au gabarit est en lecture seule, GitHub refuserait toute écriture. Ce que tu écris va dans ton dépôt, et s'arrête là.</p>
+<p>La mise à jour ne touche que la <strong>mécanique</strong>, les outils, les réflexes de base. Tes dossiers, ton profil, ta mémoire ne sont jamais remplacés par le gabarit.</p></div>
+<div class="col stack"><h3>Ce qui se passerait si le gabarit disparaissait</h3>
+<p>Rien de grave. Si le dépôt du gabarit fermait demain, ou si son accès t'était retiré, <strong><span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> continuerait de fonctionner exactement pareil</strong>. <span class="acc" data-a="Il" data-b="Elle">Il</span> ne recevrait plus d'améliorations, c'est tout.</p>
+<p>Ton cerveau est dans ton dépôt, ta copie de travail est sur ton disque, ton abonnement Claude est le tien. <strong>Aucune dépendance ne relève d'Éric.</strong></p></div>
+<div class="note info"><span class="lbl">Les secrets ne vont jamais dans le dépôt</span><p><span class="acc" data-a="Ton jumeau" data-b="Ta jumelle">Ton jumeau</span> aura besoin de clés pour travailler, un mot de passe d'application pour lire ta boîte de courriel, par exemple. <strong>Ces valeurs vivent dans un fichier <code class="inline">.env</code> à la racine, qui est exclu du dépôt</strong> et le reste.</p>
+<p>C'est une règle, pas un réglage à vérifier. <strong>Un secret déposé dans git est un secret publié, même sur un dépôt privé.</strong> Il reste dans l'historique, et l'historique voyage avec chaque copie. <span class="acc" data-a="Ton jumeau" data-b="Ta jumelle">Ton jumeau</span> connaît cette règle, <span class="acc" data-a="il" data-b="elle">il</span> t'indiquera quelle ligne remplir et où trouver la valeur, mais <strong>c'est toi qui l'écris, de ta main</strong>. <span class="acc" data-a="Il" data-b="Elle">Il</span> ne te demandera jamais de coller une clé dans la conversation.</p></div>
+<div class="col stack"><h3>Ce qui sort de ton poste</h3>
+<ul><li><strong>Ta conversation, et le contenu des fichiers que <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> lit pour te répondre</strong>, partent chez Anthropic pour être traités, comme pour tout usage de Claude.</li><li><strong>Tes fichiers</strong> sont aussi poussés vers ton dépôt privé sur GitHub, qui l'héberge. Ils ne vont nulle part ailleurs.</li><li><strong>Ce que <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> envoie pour toi</strong>, un courriel, un message, ne part jamais sans que tu aies dit oui. <span class="acc" data-a="Il" data-b="Elle">Il</span> prépare, <span class="acc" data-a="il" data-b="elle">il</span> attend. Cette règle vit dans son cerveau, et elle ne dépend d'aucun réglage technique.</li></ul></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="ton-cerveau-est-a-toi-et-a-personne-d-autre.je-sais-que-mon-depot-est-prive-sur-mon-compte-et-que-rien-d" data-n="c5"><span class="txt">Je sais que mon dépôt est privé, sur mon compte, et que rien de mon contenu ne remonte au gabarit</span></label><label class="check"><input type="checkbox" data-k="ton-cerveau-est-a-toi-et-a-personne-d-autre.je-sais-que-les-secrets-vont-dans-le-fichier-env-jamais-dans" data-n="c6"><span class="txt">Je sais que les secrets vont dans le fichier .env, jamais dans le dépôt ni dans la conversation</span></label></div></div></div></section>
+<section id="deux-comptes-a-creer-un-acces-a-demander"><div class="wrap"><div class="sec-head"><p class="eyebrow">Étape zéro</p><h2>Deux comptes à créer, un accès à demander</h2><p class="lede">Deux comptes sont à toi, un seul accès vient d'Éric Bourbeau. Vérifie les trois avant de commencer.</p></div><div class="sec-body"><div class="checks"><label class="check"><input type="checkbox" data-k="deux-comptes-a-creer-un-acces-a-demander.un-compte-claude-a-toi" data-n="c7"><span class="txt">Un compte Claude, à toi<em>Va sur <a href="https://claude.ai">claude.ai</a> et prends un abonnement. <strong>Pro suffit pour commencer</strong>, Max si tu comptes t'en servir intensivement. C'est toi qui le paies, c'est ton outil, et <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> ne dépend d'aucune organisation.</em></span></label><label class="check"><input type="checkbox" data-k="deux-comptes-a-creer-un-acces-a-demander.un-compte-github-gratuit" data-n="c8"><span class="txt">Un compte GitHub, gratuit<em>C'est là que vivra ton cerveau, dans un dépôt privé qui n'appartient qu'à toi. <strong>La formation précédente, « Créer mon compte GitHub », te guide pas à pas</strong>, dix minutes, et elle montre où lire ton nom de compte, celui qu'on te demandera.</em></span></label><label class="check"><input type="checkbox" data-k="deux-comptes-a-creer-un-acces-a-demander.l-acces-au-gabarit" data-n="c9"><span class="txt">L'accès au gabarit<em>Le cerveau de départ vit dans un dépôt privé. <strong>Envoie ton nom de compte GitHub à Éric Bourbeau par courriel, avec un objet qui commence par Jumeau, puis accepte l'invitation</strong> que GitHub t'enverra. Sans invitation après deux jours ouvrés, relance par le même courriel. Sans ce geste, l'étape 3 s'arrête sur un refus. Tout est détaillé dans « Créer mon compte GitHub ».</em></span></label></div>
+<div class="note piege"><span class="lbl">Le compte GitHub d&#x27;abord, la demande ensuite</span><p>Crée ton compte GitHub <strong>avant</strong> de demander l'accès. Une invitation ne peut pas être envoyée à quelqu'un qui n'a pas encore de compte, il faut le nom de compte pour la poser.</p></div>
+<div class="note info"><span class="lbl">Ce dont tu n&#x27;as pas besoin</span><p><strong>Aucun mot de passe à recevoir de personne.</strong> Tu t'identifies chez GitHub par ton navigateur, avec ton propre compte.</p></div>
+<div class="note info"><span class="lbl">Les droits sur ton poste</span><p>Python s'installe dans ton compte, sans droits d'administrateur. Git, s'il manque, peut faire apparaître une fenêtre du système qui demande ta confirmation. Sur un poste personnel, tu peux accepter. Sur un poste fourni par un employeur, vérifie avant de commencer, et si une installation est refusée, ne contourne rien.</p></div>
+<div class="col stack"><h3>Combien de temps</h3>
+<p>Compte moins d'une heure de manipulation. Le calendrier, lui, se compte en quelques jours, presque entièrement en attente de l'invitation au gabarit.</p>
+<div class="tablewrap"><table><thead><tr><th>Étape</th><th>Où</th><th>Manipulation</th></tr></thead><tbody><tr><td>1. Régler l'application</td><td>Application Claude, Paramètres</td><td class="num">5 min</td></tr><tr><td>2. Créer le dossier</td><td>Sur ton ordinateur</td><td class="num">5 min</td></tr><tr><td>3. Récupérer ton cerveau</td><td>Application Claude, onglet Code</td><td>15 à 20 min</td></tr><tr><td>4. Première session</td><td>Application Claude, onglet Code</td><td>20 à 25 min</td></tr></tbody></table></div></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="deux-comptes-a-creer-un-acces-a-demander.j-ai-verifie-les-trois-choses-de-l-etape-zero-et-l-invitatio" data-n="c10"><span class="txt">J'ai vérifié les trois choses de l'étape zéro, et l'invitation au gabarit est acceptée ou demandée</span></label></div></div></div></section>
+<section id="l-installation"><div class="wrap"><div class="sec-head"><p class="eyebrow">Le parcours</p><h2>L'installation</h2><p class="lede">Chaque étape se termine par un critère de réussite. Tant que tu ne l'as pas constaté, ne passe pas à la suivante et ne recommence pas, signale-le à Éric Bourbeau par courriel.</p></div><div class="step" data-step="1"><div class="rail"><div class="num">1</div><div class="line"></div></div><div class="step-body"><div class="step-head"><span class="where">Dans l'application Claude, Paramètres</span><h3>Régler l'application Claude</h3><p class="small">Cinq minutes, aucun prompt. Deux réglages à activer, une seule fois.</p></div><ol><li>Ouvre l'application Claude sur ton <span class="v-mon-poste-windows">ordinateur</span><span class="v-mon-poste-mac">Mac</span>. Si tu ne l'as pas, va sur <a href="https://claude.ai/download">claude.ai/download</a>, installe-la et connecte-toi avec ton compte Claude.</li><li>Ouvre <strong>Paramètres</strong>, puis <strong>Claude Code</strong>.</li><li>Active <strong>« Autoriser le mode de contournement des autorisations »</strong>. Sans lui, Claude te demanderait une autorisation à chaque geste.</li><li>Active aussi <strong>« Connecter les nouvelles sessions à Remote Control »</strong>. Il te permet de piloter ta session depuis ton téléphone ou le web.</li></ol>
+<div class="note neutre"><span class="lbl">Sur un abonnement personnel</span><p>Ces deux réglages ont été relevés sur un compte d'entreprise. Leur présence sur un abonnement Pro personnel n'a pas encore été vérifiée. Si tu ne les trouves pas, signale-le avant d'aller plus loin.</p></div>
+<div class="note reussi"><span class="lbl">C'est réussi quand</span><p>L'application est ouverte sur ton compte Claude et les deux réglages sont actifs.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="regler-l-application-claude.l-application-claude-est-sur-mon-compte-et-ses-deux-reglages" data-n="c11"><span class="txt">L'application Claude est sur mon compte et ses deux réglages sont actifs</span></label></div></div></div>
+<div class="step" data-step="2"><div class="rail"><div class="num">2</div><div class="line"></div></div><div class="step-body"><div class="step-head"><span class="where">Sur ton ordinateur</span><h3>Créer le dossier de ton jumeau</h3><p class="small">Cinq minutes. Aucun prompt, un dossier à créer là où tu sauras le retrouver.</p></div><p>Le cerveau de <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> vit dans un dossier de ton ordinateur. C'est le seul emplacement que tu auras à connaître.</p>
+<div class="note info"><span class="lbl">Pourquoi tu le crées toi-même</span><p>Tu le crées toi-même pour savoir où il se trouve. C'est ce dossier que tu désignes à l'étape 3.</p></div>
+<p><strong>Tu le mets dans tes Documents, et tu l'appelles <code class="inline">jumeau</code>.</strong> En minuscules, sans espace et sans accent. Sur PC, si tes Documents sont dans OneDrive, mets-le plutôt directement dans ton dossier personnel (<code class=\"inline\">C:\Users\ton nom</code>).</p>
+<ol><li>Ouvre <strong><span class="v-mon-poste-windows">l'Explorateur de fichiers, l'icône de dossier jaune dans ta barre des tâches</span><span class="v-mon-poste-mac">le Finder, l'icône bleue dans ton Dock</span></strong>.</li><li>Dans la colonne de gauche, clique sur <strong>Documents</strong>.</li><li><span class="v-mon-poste-windows">Fais un clic droit dans la zone vide à droite, choisis <strong>Nouveau</strong>, puis <strong>Dossier</strong>.</span><span class="v-mon-poste-mac">Menu <strong>Fichier</strong> tout en haut de l'écran, puis <strong>Nouveau dossier</strong>.</span></li><li>Nomme-le <strong><code class="inline">jumeau</code></strong>, puis appuie sur Entrée.</li></ol>
+<p>Tu viens de créer <code class="inline"><span class="v-mon-poste-windows">Documents\jumeau</span><span class="v-mon-poste-mac">Documents/jumeau</span></code>. Il est vide, c'est normal, Claude le remplit à l'étape 3.</p>
+<div class="note reussi"><span class="lbl">C'est réussi quand</span><p>Tu vois le dossier <code class="inline">jumeau</code> dans tes Documents.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="creer-le-dossier-de-ton-jumeau.le-dossier-jumeau-existe-et-je-sais-ou-il-se-trouve" data-n="c12"><span class="txt">Le dossier <code class="inline">jumeau</code> existe, et je sais où il se trouve</span></label></div></div></div>
+<div class="step" data-step="3"><div class="rail"><div class="num">3</div><div class="line"></div></div><div class="step-body"><div class="step-head"><span class="where">Dans l'application Claude, onglet Code</span><h3>Récupérer ton cerveau</h3><p class="small">Tu crées l'environnement Jumeau, puis tu colles un seul prompt. Claude installe ce qui manque, te fait t'identifier chez GitHub, copie le gabarit, crée ton dépôt privé et s'y rattache. Toi, tu ne fais que t'identifier.</p></div><div class="note piege"><span class="lbl">Vérifie ceci avant de commencer</span><p><strong>L'accès au gabarit doit être ouvert.</strong> C'est la troisième chose de l'étape zéro. Si tu n'as pas encore accepté l'invitation reçue par courriel de la part de GitHub, le clone échoue sur un refus. Va accepter l'invitation d'abord, ça prend dix secondes.</p></div>
+<p><strong>Ouvrir <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> sur ton dossier</strong></p>
+<ol><li>Dans l'application Claude, va dans l'onglet <strong>Code</strong>.</li><li>Dans <strong>« Choisir un environnement »</strong>, crée un nouvel environnement. Dans la fenêtre <strong>« Nouvel environnement »</strong>, reste sur l'onglet <strong>Local</strong>. Inscris <strong>Jumeau</strong> comme nom, choisis <strong>Cet ordinateur</strong> dans <strong>« Exécuter dans »</strong>, puis, sous <strong>Dossiers</strong>, clique sur <strong>« + Ajouter »</strong> et choisis ton dossier <strong><code class="inline">jumeau</code></strong>. Clique sur <strong>« Créer l'environnement »</strong>.</li><li>Ouvre une nouvelle session sur <strong>Jumeau</strong>. Sous la zone de saisie, choisis <strong>« Ignorer les permissions »</strong>. L'application s'en souviendra pour ce dossier.</li></ol>
+<div class="note piege"><span class="lbl">Local, jamais Cloud</span><p>Un environnement <strong>Cloud</strong> tourne sur une machine d'Anthropic, pas sur ton poste. Il ne voit pas ton dossier <code class="inline">jumeau</code> et n'installe rien chez toi. Pour <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span>, c'est toujours <strong>Local</strong>.</p></div>
+<p><strong>Le prompt</strong></p>
+<ol start="4"><li>Copie le bloc ci-dessous en entier et colle-le dans la session, puis appuie sur Entrée.</li></ol>
+<div class="copybloc v-mon-poste-windows"><div class="copybloc-head"><span class="t">Le prompt d&#x27;installation · Windows</span><button class="copy" type="button">Copier</button></div><pre>Bonjour Claude. Je ne suis pas technique, fais le travail pour moi et
+parle-moi simplement, et ne fais rien de destructif. Prépare mon poste et
+installe le cerveau de mon jumeau numérique. Ne me fais rien taper, et
+dis-moi avant chaque fenêtre du système que je vais devoir accepter.
+1. Git. Vérifie s&#x27;il est installé. Sinon, installe-le par
+   winget install --id Git.Git -e --source winget
+2. Python. Installe uv par l&#x27;installateur officiel d&#x27;Astral, dans mon compte,
+   sans droits d&#x27;administrateur, puis Python 3.12 par
+   uv python install 3.12 --default.
+3. L&#x27;outil GitHub. Installe gh par
+   winget install --id GitHub.cli -e --source winget
+   Utilise les chemins complets, mon application ne voit pas encore le
+   nouveau PATH. Vérifie que git, python et gh répondent avec leur version.
+4. Demande-moi mon prénom, mon nom et mon courriel, puis configure git à
+   cette identité.
+5. Connecte gh à GitHub par mon navigateur avec
+   gh auth login --hostname github.com --git-protocol https --web
+   puis gh auth setup-git. Montre-moi le code à usage unique qu&#x27;il affiche,
+   je le saisirai moi-même dans la page de GitHub. Ne me demande jamais un
+   mot de passe ni un jeton dans cette conversation. Si la commande attend
+   une touche que tu ne peux pas donner, arrête-toi et dis-le-moi.
+6. Le dossier de travail est celui de cette session, Documents\jumeau.
+   Avant de cloner, si le chemin de ce dossier contient OneDrive, arrête-toi :
+   propose-moi de créer plutôt le dossier jumeau directement dans mon dossier
+   personnel, hors de OneDrive, et attends mon accord. Clone dedans
+   https://github.com/EB-jumeaux/gabarit-jumeau.git, le contenu
+   directement dans ce dossier, pas dans un sous-dossier. Crée ensuite le fichier .env à partir de .env.exemple et mets-y la ligne
+   GABARIT_DEPOT=https://github.com/EB-jumeaux/gabarit-jumeau.git
+   (ce n'est pas un secret, c'est l'adresse d'où viennent mes mises à jour).
+7. Crée MON dépôt privé à moi avec gh repo create jumeau --private, puis fais pointer le dossier dessus avec git remote set-url
+   origin, et pousse tout. Vérifie que la branche s&#x27;appelle bien main avant
+   de pousser, et qu&#x27;après la poussée git remote -v montre MON dépôt, et
+   plus le modèle.
+8. Vérifie que le dossier contient CLAUDE.md, profile/ et tools/, et que
+   python tools/maj_jumeau.py --verifier répond sans erreur.
+9. Fais-moi un compte rendu en langage simple, une ligne par point. Si un
+   point échoue, montre-moi le message d&#x27;erreur exact pour que je le
+   transmette. Termine en me disant de quitter complètement l&#x27;application
+   Claude et de la rouvrir avant ma première vraie session.</pre></div>
+<div class="copybloc v-mon-poste-mac"><div class="copybloc-head"><span class="t">Le prompt d&#x27;installation · Mac</span><button class="copy" type="button">Copier</button></div><pre>Bonjour Claude. Je ne suis pas technique, fais le travail pour moi et
+parle-moi simplement, et ne fais rien de destructif. Prépare mon poste et
+installe le cerveau de mon jumeau numérique. Ne me fais rien taper, et
+dis-moi avant chaque fenêtre du système que je vais devoir accepter.
+1. Git. Vérifie s&#x27;il est installé. Sinon, lance xcode-select --install et
+   attends que j&#x27;aie accepté la fenêtre d&#x27;Apple et que l&#x27;installation soit
+   finie.
+2. Python. Installe uv par l&#x27;installateur officiel d&#x27;Astral, dans mon compte,
+   sans droits d&#x27;administrateur, puis Python 3.12 par
+   uv python install 3.12 --default.
+3. L&#x27;outil GitHub. Installe gh dans mon compte, sans droits
+   d&#x27;administrateur, depuis l&#x27;archive officielle pour Mac publiée sur
+   github.com/cli/cli/releases, dans ~/.local/bin. Utilise les chemins
+   complets, mon application ne voit pas encore le nouveau PATH. Vérifie
+   que git, python et gh répondent avec leur version.
+4. Demande-moi mon prénom, mon nom et mon courriel, puis configure git à
+   cette identité.
+5. Connecte gh à GitHub par mon navigateur avec
+   gh auth login --hostname github.com --git-protocol https --web
+   puis gh auth setup-git. Montre-moi le code à usage unique qu&#x27;il affiche,
+   je le saisirai moi-même dans la page de GitHub. Ne me demande jamais un
+   mot de passe ni un jeton dans cette conversation. Si la commande attend
+   une touche que tu ne peux pas donner, arrête-toi et dis-le-moi.
+6. Le dossier de travail est celui de cette session, Documents/jumeau. Clone dedans
+   https://github.com/EB-jumeaux/gabarit-jumeau.git, le contenu
+   directement dans ce dossier, pas dans un sous-dossier. Crée ensuite le fichier .env à partir de .env.exemple et mets-y la ligne
+   GABARIT_DEPOT=https://github.com/EB-jumeaux/gabarit-jumeau.git
+   (ce n'est pas un secret, c'est l'adresse d'où viennent mes mises à jour).
+7. Crée MON dépôt privé à moi avec gh repo create jumeau --private, puis fais pointer le dossier dessus avec git remote set-url
+   origin, et pousse tout. Vérifie que la branche s&#x27;appelle bien main avant
+   de pousser, et qu&#x27;après la poussée git remote -v montre MON dépôt, et
+   plus le modèle.
+8. Vérifie que le dossier contient CLAUDE.md, profile/ et tools/, et que
+   python tools/maj_jumeau.py --verifier répond sans erreur.
+9. Fais-moi un compte rendu en langage simple, une ligne par point. Si un
+   point échoue, montre-moi le message d&#x27;erreur exact pour que je le
+   transmette. Termine en me disant de quitter complètement l&#x27;application
+   Claude et de la rouvrir avant ma première vraie session.</pre></div>
+<ol start="5"><li>Appuie sur Entrée. Il n'y a rien à remplacer : Claude te demandera ton nom et ton courriel.</li></ol>
+<div class="note info"><span class="lbl">Quand Claude te montre un code et que le navigateur s&#x27;ouvre</span><p>Claude t'affiche un code de huit caractères et ouvre la page de GitHub dans ton navigateur. Tu t'identifies <strong>toi-même</strong>, avec ton propre compte, tu saisis le code et tu autorises. Si Claude te demande un mot de passe ou un jeton, réponds non et signale-le, ce n'est pas la bonne façon.</p></div>
+<div class="note info"><span class="lbl">Une fenêtre du système va peut-être te demander une confirmation</span><p><span class="v-mon-poste-windows">Si Git ou l'outil GitHub manque, Windows peut afficher une fenêtre qui demande d'autoriser une application à apporter des modifications.</span><span class="v-mon-poste-mac">Si Git manque, ton Mac affiche une fenêtre d'Apple qui propose d'installer les outils de développement.</span> Claude te prévient avant. Accepte-la, c'est normal, et laisse l'installation finir avant de lui répondre.</p></div>
+<div class="note neutre"><span class="lbl">Ce qui n&#x27;a pas encore été vérifié</span><p>L'identification chez GitHub lancée par Claude depuis l'onglet Code, l'installation de l'outil GitHub sans droits sur Mac, et l'installation de Git sur un poste qui ne l'a pas encore n'ont pas encore été faites de bout en bout. Python et le reste de l'installation, oui, sur Windows et sur Mac. Si tu vois autre chose que ce que dit la page, signale-le, c'est précisément ce qui sert aux suivants.</p></div>
+<ol start="6"><li>Quand Claude te dit que c'est bon, <strong>quitte complètement l'application Claude, puis rouvre-la.</strong> Elle voit alors Git, Python et l'outil GitHub, que Claude vient d'installer.</li></ol>
+<div class="note reussi"><span class="lbl">C'est réussi quand</span><p>Claude confirme que le dossier contient <code class="inline">CLAUDE.md</code>, <code class="inline">profile/</code> et <code class="inline">tools/</code>, et que <code class="inline">git remote -v</code> pointe sur <strong>ton</strong> dépôt. Tu peux le vérifier toi-même sur GitHub, ton dépôt <code class="inline">jumeau</code> n'est pas vide. Un dossier qui reste vide n'est pas un succès, même si le compte rendu est optimiste.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="recuperer-ton-cerveau.le-cerveau-est-la-mon-depot-prive-est-sur-mon-compte-github-" data-n="c13"><span class="txt">Le cerveau est là, mon dépôt privé est sur mon compte GitHub, et j'ai rouvert l'application</span></label></div></div></div>
+<div class="step" data-step="4"><div class="rail"><div class="num">4</div></div><div class="step-body"><div class="step-head"><span class="where">Dans l'application Claude, onglet Code</span><h3>Ta première session</h3><p class="small">L'installation est finie. Ce qui suit est une conversation, et c'est elle qui fait la différence entre un assistant générique et un assistant qui écrit comme toi.</p></div><ol><li>Dans l'onglet <strong>Code</strong>, ouvre une <strong>nouvelle session</strong> sur <strong>Jumeau</strong>. Une nouvelle, pas celle de l'installation. C'est en s'ouvrant qu'une session lit le cerveau, et celle de l'installation s'est ouverte sur un dossier vide.</li><li>Vérifie que <strong>« Ignorer les permissions »</strong> est choisi sous la zone de saisie, et écris <strong>Bonjour</strong>.</li><li><span class="acc" data-a="Ton jumeau" data-b="Ta jumelle">Ton jumeau</span> se présente et te pose une série de questions pour bâtir ton profil. Qui tu es, comment tu écris, ce qui compte pour toi.</li><li>Réponds dans ta langue de travail, en phrases ordinaires.</li></ol>
+<div class="note info"><span class="lbl">Prends ton temps ici</span><p>Un jumeau vaut ce que vaut son profil. La partie la plus rentable est celle sur ta voix. Colle trois courriels que tu as écrits toi-même et demande-lui d'en tirer ta façon d'écrire.</p></div>
+<div class="note repere"><span class="lbl">C&#x27;est toi qui décides de sa portée</span><p>Ce cerveau de départ est <strong>neutre</strong>. Dis-lui ce que tu veux qu'<span class="acc" data-a="il" data-b="elle">il</span> couvre, travail, vie personnelle ou les deux.</p></div>
+<div class="note reussi"><span class="lbl">C'est réussi quand</span><p>L'entretien est terminé. <span class="acc" data-a="Ton jumeau" data-b="Ta jumelle">Ton jumeau</span> a écrit tes réponses dans ses fichiers et les a sauvegardées dans ton dépôt. Demande-lui de te le confirmer.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="ta-premiere-session.mon-profil-est-rempli-et-ma-premiere-session-est-faite" data-n="c14"><span class="txt">Mon profil est rempli et ma première session est faite</span></label></div></div></div></div></section>
+<section id="si-ca-coince"><div class="wrap"><div class="sec-head"><p class="eyebrow">Autodiagnostic</p><h2>Si ça coince</h2><p class="lede">Chacun de ces cas est réellement arrivé, ou il est signalé comme non vérifié. Cherche ton symptôme, applique le geste. Deux tentatives au maximum, ensuite tu signales et tu attends, sans rien réparer à l'improviste.</p></div><div class="sec-body"><details class="dx"><summary>« Ignorer les permissions » n'apparaît pas sous la zone de saisie</summary><div class="dx-body"><p>Le choix n'existe que si ce réglage est actif. C'est le premier réglage de l'étape 1.</p><p class="geste">Ouvre Paramètres, Claude Code, et active « Autoriser le mode de contournement des autorisations ». Puis ouvre une nouvelle session sur Jumeau. Si le réglage n'existe pas sur ton abonnement, signale-le.</p></div></details>
+<details class="dx"><summary>Claude me dit qu'il ne peut rien installer, ou qu'il ne voit pas mon dossier</summary><div class="dx-body"><p>Tu écris dans une conversation ordinaire ou dans Cowork. Là, Claude ne travaille pas sur ton poste. Seul l'onglet Code, en Local, voit ton dossier <code class="inline">jumeau</code>.</p><p class="geste">Va dans l'onglet <strong>Code</strong>, choisis l'environnement <strong>Jumeau</strong>, et recolle ton prompt dans une nouvelle session.</p></div></details>
+<details class="dx"><summary>Ma session tourne en Cloud</summary><div class="dx-body"><p>Une session Cloud tourne sur une machine d'Anthropic. Elle ne voit pas ton poste, ni ton dossier, ni tes outils.</p><p class="geste">Ouvre une nouvelle session et choisis l'environnement <strong>Jumeau</strong>, celui que tu as créé en <strong>Local</strong>. Si tu ne le vois pas, refais l'étape 3 depuis le début, onglet Local.</p></div></details>
+<details class="dx"><summary>L'identification GitHub reste bloquée, ou Claude dit qu'il ne peut pas la terminer</summary><div class="dx-body"><p>Cette identification passe par ton navigateur, et Claude ne peut pas répondre à une question posée dans une fenêtre à sa place. C'est le point du parcours qui n'a pas encore été éprouvé de bout en bout, ton signalement sert à le régler.</p><p class="geste">Regarde si une page de GitHub attend dans ton navigateur, ou une fenêtre derrière les autres. Sinon, copie le message de Claude en entier et écris à Éric Bourbeau, sans essayer d'autre chemin.</p></div></details>
+<details class="dx"><summary>Le clone du gabarit est refusé, ou on me dit que le dépôt n'existe pas</summary><div class="dx-body"><div class="quote">Repository not found.</div><p>Un dépôt privé auquel tu n'as pas accès se présente comme un dépôt inexistant, GitHub ne dit jamais « tu n'as pas le droit ». C'est donc presque toujours l'accès qui manque, pas l'adresse qui est fausse.</p><p class="geste">Vérifie deux choses, dans cet ordre. As-tu accepté l'invitation GitHub reçue par courriel, et l'identification chez GitHub s'est-elle terminée pour de bon ? Si les deux sont faites et que ça résiste, signale-le.</p></div></details>
+<details class="dx"><summary>Mon dépôt a été créé mais il paraît vide ou n'a pas de branche main</summary><div class="dx-body"><p>Le cas le plus trompeur, parce que tout semble avoir réussi. La branche se vérifie avant toute autre piste.</p><p class="geste">Demande à Claude de vérifier le nom de la branche, de la renommer en <code class="inline">main</code> si besoin, puis de refaire la poussée. Ne recrée pas le dépôt.</p></div></details>
+<details class="dx"><summary>La session ne me reconnaît pas et répond comme un Claude ordinaire</summary><div class="dx-body"><p>Une session lit le cerveau en s'ouvrant. Celle de l'installation s'est ouverte quand ton dossier était encore vide.</p><p class="geste">Ouvre une nouvelle session sur Jumeau. Si tu viens d'installer, quitte d'abord l'application et rouvre-la.</p></div></details>
+<details class="dx"><summary>Un message dit que le modèle choisi demande des crédits d'usage</summary><div class="dx-body"><p>Le modèle proposé par défaut n'est pas activé sur ton abonnement. Rien n'est cassé, et ce n'est pas une question d'installation. Le libellé exact de ce message dans l'application n'a pas encore été relevé.</p><p class="geste">Dans le sélecteur de modèle, sous la zone de saisie, choisis un modèle disponible sur ton abonnement, puis recolle ton prompt.</p></div></details>
+<details class="dx"><summary>Je dicte avec Wispr Flow et le texte n'entre pas dans la zone de saisie</summary><div class="dx-body"><p>La dictée dans la zone de saisie de l'onglet Code n'a pas encore été vérifiée. Ton signalement permettra de la vérifier.</p><p class="geste">Dis-le à Éric par courriel, avec ton système et la version de l'application Claude.</p></div></details>
+<details class="dx"><summary>Une erreur s'affiche et je ne la comprends pas</summary><div class="dx-body"><p>Tu n'as aucune commande à taper dans cette formation. Si on te demande d'en taper une, quelque chose t'a mal aiguillé.</p><p class="geste">Arrête-toi. Copie le message d'erreur en entier, depuis la première ligne, et envoie-le tel quel à Éric Bourbeau par courriel, avec un objet qui commence par Jumeau. Une capture d'écran seule ne suffit pas, le texte exact est ce qui permet de trancher.</p></div></details>
+<details class="dx"><summary>Le dossier existe déjà, ou le clone s'est arrêté au milieu</summary><div class="dx-body"><p>Ça se répare toujours, à une condition, ne rien supprimer.</p><p class="geste">Signale-le tel quel à Éric Bourbeau. Une installation à moitié faite se reprend sans dommage. Un cerveau effacé par erreur se récupère mal.</p></div></details>
+<details class="dx"><summary>J'ai signalé un blocage et je n'ai pas de réponse</summary><div class="dx-body"><p>Deux règles distinctes. Un blocage signalé se relance dès le lendemain. Une demande d'accès au gabarit se relance après deux jours ouvrés. Une question sans réponse coûte plus de jours que n'importe quel écran d'erreur.</p><p class="geste">Relance dès le lendemain, même courriel, même objet.</p></div></details></div></div></section>
+<section id="le-rythme-de-croisiere"><div class="wrap"><div class="sec-head"><p class="eyebrow">Une fois en place</p><h2>Le rythme de croisière</h2><p class="lede">Ce qui garde <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> utile dans la durée.</p></div><div class="sec-body"><div class="cartes"><div class="carte"><h4>Un seul geste <span class="tag">tous les jours</span></h4><p>Ouvrir l'application Claude, onglet Code, choisir Jumeau, écrire. La synchronisation, la relecture du cerveau, les sauvegardes, <span class="acc" data-a="il" data-b="elle">il</span> s'en occupe sans toi.</p></div><div class="carte"><h4>Mises à jour automatiques <span class="tag">sans rien faire</span></h4><p>À chaque démarrage, <span class="acc" data-a="il" data-b="elle">il</span> consulte le gabarit et récupère les outils améliorés depuis la dernière fois. Ton contenu n'est jamais touché. Tu n'as rien à installer ni à réclamer.</p></div><div class="carte"><h4>Rien ne sort sans ton accord <span class="tag">sécurité</span></h4><p>Un courriel, un message, une écriture dans un outil, <span class="acc" data-a="il" data-b="elle">il</span> prépare un brouillon et attend ton feu vert. Toujours. Quand <span class="acc" data-a="il" data-b="elle">il</span> agit sans demander, c'est un défaut, signale-le à Éric Bourbeau.</p></div><div class="carte"><h4>Corriger dans les fichiers <span class="tag">la méthode</span></h4><p>Quand <span class="acc" data-a="il" data-b="elle">il</span> se trompe de ton ou de méthode, demande-lui de corriger le fichier concerné, pas seulement sa réponse. Sinon <span class="acc" data-a="il" data-b="elle">il</span> refait la même erreur demain.</p></div><div class="carte"><h4>Ce qui compte s'écrit <span class="tag">le principe</span></h4><p>Ce qui vit seulement dans une session est perdu à la fermeture. Ce qui est écrit dans un fichier du cerveau te suit partout.</p></div></div>
+<div class="note info"><span class="lbl">Et ensuite</span><p>Après l'installation, le premier chantier recommandé, ce sont <strong>tes courriels</strong>, qu'<span class="acc" data-a="il" data-b="elle">il</span> lise ta boîte, trie ce qui attend une réponse et te prépare des brouillons. Dis-lui « occupe-toi de mes courriels », <span class="acc" data-a="il" data-b="elle">il</span> te dit quoi faire.</p>
+<p>Compte ensuite deux à trois semaines de rodage. Chaque friction signalée pendant ce rodage améliore <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span>.</p></div>
+<div class="note repere"><span class="lbl">Tu es aussi un banc d&#x27;essai</span><p>Signale tout défaut à Éric Bourbeau par courriel. Ton contenu ne remonte jamais au gabarit, mais un défaut que tu signales y est corrigé, et la correction profite à tous.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="le-rythme-de-croisiere.je-connais-le-geste-de-tous-les-jours" data-n="c15"><span class="txt">Je connais le geste de tous les jours</span></label><label class="check"><input type="checkbox" data-k="le-rythme-de-croisiere.je-sais-que-je-corrige-ton-jumeau-dans-ses-fichiers-pas-seul" data-n="c16"><span class="txt">Je sais que je corrige <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> dans ses fichiers, pas seulement dans sa réponse</span></label></div>
+<div class="copybloc accomp"><div class="accomp-head"><span class="lbl">Avec <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span></span><h3>Te faire accompagner dans cette installation</h3><p>Pour te faire accompagner, étape par étape, dans l'installation de <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span>, copie ce prompt et colle-le au début d'une nouvelle conversation dans l'application Claude, ou dans <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> si l'installation est faite.</p><button class="copy accomp-btn" type="button">Copier le prompt</button></div><details class="accomp-prompt"><summary>Voir le prompt</summary><pre>Tu m&#x27;accompagnes, étape par étape, pour installer mon jumeau numérique sur
+mon poste. Voici ce qu&#x27;on installe, les pièces, les règles, la méthode, et
+comment tu dois travailler avec moi.
+
+CE QU&#x27;ON INSTALLE
+
+Un jumeau numérique, c&#x27;est un cerveau plus une exécution. Le cerveau est un
+dossier de fichiers texte qui m&#x27;appartient, sauvegardé en ligne dans un dépôt
+privé sur MON compte GitHub. L&#x27;exécution, c&#x27;est l&#x27;application Claude, dans
+son onglet Code, qui lit ce cerveau et agit sur mon poste. L&#x27;installation
+part du gabarit, le cerveau de départ, sans contenu
+personnel (https://github.com/EB-jumeaux/gabarit-jumeau), en pose une
+copie dans mon dossier Documents/jumeau, crée mon dépôt privé, bascule
+dessus et lance la première session.
+
+LES PIÈCES
+
+1. L&#x27;application Claude, connectée à mon propre compte Claude. Le jumeau vit
+   dans son onglet Code, sur un environnement Local nommé Jumeau. Les autres
+   onglets (la conversation, Cowork) ne voient pas mon poste.
+2. Git et GitHub, la sauvegarde vers mon dépôt. Python 3.12, le moteur des
+   outils du jumeau. gh, l&#x27;outil de GitHub, pour m&#x27;identifier dans mon
+   navigateur et créer mon dépôt. Claude les installe lui-même par le prompt
+   d&#x27;installation.
+3. Un compte Claude à moi, un compte GitHub à moi, et l&#x27;accès au gabarit,
+   que j&#x27;obtiens en envoyant mon nom de compte GitHub à Éric Bourbeau
+   (ebourbeau@x-telia.com, objet qui commence par Jumeau) et en acceptant
+   l&#x27;invitation reçue de GitHub. Sans invitation après deux jours ouvrés, je
+   relance par le même courriel.
+
+LES RÈGLES
+
+- Je ne te donne jamais un mot de passe ni un jeton dans la conversation, ni
+  par courriel, ni par message. Je m&#x27;identifie moi-même chez GitHub dans mon
+  navigateur, avec le code à usage unique que gh affiche.
+- Tu ne supprimes rien, jamais, même pour réparer. Une installation à moitié
+  faite se reprend, un cerveau effacé se récupère mal.
+- Mon dépôt est privé, sur mon compte GitHub, qui l&#x27;héberge. Mon accès au
+  gabarit est en lecture seule, rien de mon contenu n&#x27;y remonte. Les secrets
+  vont dans un fichier .env exclu du dépôt.
+- Ma conversation, et le contenu des fichiers que le jumeau lit pour me
+  répondre, partent chez Anthropic pour être traités.
+- Toujours Local, jamais Cloud. Une session Cloud ne voit pas mon poste.
+- Je ne tape aucune commande. Les deux réglages de l&#x27;application, dans
+  Paramètres, Claude Code, sont « Autoriser le mode de contournement des
+  autorisations » (qui permet de choisir « Ignorer les permissions » sous la
+  zone de saisie) et « Connecter les nouvelles sessions à Remote Control »
+  (qui permet de piloter ma session depuis mon téléphone ou le web). Ni l&#x27;un
+  ni l&#x27;autre ne retire la règle du cerveau, rien ne sort sans mon accord.
+
+LA MÉTHODE, DANS L&#x27;ORDRE
+
+1. Vérifier les prérequis. Un compte Claude, un compte GitHub, le nom de
+   compte envoyé à Éric Bourbeau et l&#x27;invitation au gabarit acceptée. Si l&#x27;un
+   manque, on le règle avant tout le reste.
+2. Régler l&#x27;application Claude. La connecter à mon compte, puis dans
+   Paramètres, Claude Code, activer les deux réglages.
+3. Créer le dossier jumeau de mes mains, en minuscules, sans espace ni
+   accent, dans Documents.
+4. Récupérer le cerveau. Dans l&#x27;onglet Code, créer l&#x27;environnement Jumeau
+   (onglet Local, Exécuter dans Cet ordinateur, le dossier jumeau ajouté),
+   ouvrir une session en « Ignorer les permissions », coller le prompt
+   d&#x27;installation de la formation, puis appuyer sur Entrée. Il installe Git, uv, Python 3.12 et gh
+   sans droits d&#x27;administrateur quand c&#x27;est possible, configure git à mon
+   identité, connecte gh à GitHub par mon navigateur, clone le gabarit, crée
+   mon dépôt privé jumeau, y bascule et pousse, en vérifiant
+   que la branche s&#x27;appelle main. Réussi quand le dossier contient
+   CLAUDE.md, profile/ et tools/ et que mon dépôt n&#x27;est pas vide sur GitHub.
+   Ensuite, quitter l&#x27;application et la rouvrir.
+5. Première session. Une nouvelle session sur Jumeau, pas celle de
+   l&#x27;installation, puis répondre à l&#x27;interview du jumeau sur qui je suis,
+   comment j&#x27;écris, ce qui compte pour moi, et ce que je veux qu&#x27;il couvre.
+   Réussi quand il a écrit mes réponses dans ses fichiers et les a
+   sauvegardées dans mon dépôt.
+
+COMMENT TU TRAVAILLES AVEC MOI
+
+- Une étape à la fois. Tu ne passes à la suivante que quand j&#x27;ai vu le signe
+  de réussite de celle-ci.
+- Une question à la fois.
+- Je ne suis pas technique. Tu m&#x27;expliques chaque mot avant de l&#x27;employer,
+  et tu ne me fais rien taper.
+- Quand quelque chose échoue, tu me montres le message d&#x27;erreur exact et tu
+  me dis quoi écrire à Éric Bourbeau. Deux tentatives au maximum, ensuite on
+  signale et on attend. Un blocage signalé se relance dès le lendemain.
+- Tu dis ce que tu n&#x27;as pas vérifié. Tu ne présentes jamais une supposition
+  comme un fait.
+- Rien de sortant sans mon accord, aucun message, aucun courriel.
+- Si une consigne de cette méthode se révèle fausse sur mon poste, tu me le
+  dis au lieu de contourner.
+
+Commence par me demander sur quel système je suis, Windows ou Mac, et si
+j&#x27;ai bien mon compte Claude, mon compte GitHub et l&#x27;accès au gabarit.</pre></details></div></div></div></section>
+</main>
+<footer><div class="wrap col stack">
+<div class="guichet stack-s"><p class="eyebrow">Si tu es bloqué, demande à ton jumeau</p><p><strong>Commence par demander à <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span>.</strong> Décris-lui ce qui se passe et colle-lui le message d'erreur exact. La plupart du temps, <span class="acc" data-a="il" data-b="elle">il</span> trouve. <strong>Quand <span class="acc" data-a="il" data-b="elle">il</span> ne trouve pas, c'est <span class="acc" data-a="lui" data-b="elle">lui</span> qui écrit à Pascal Jarry, pas toi</strong>, à <code class="inline">pascaljarry@yapla.com</code>, avec un objet qui commence par le mot Jumeau. Jumeau-Pascal-Jarry relève cette boîte et répond. Tant que <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> n'existe pas encore, c'est toi qui écris. Ne réessaie pas dix fois et ne supprime rien en attendant.</p></div>
+<p class="colophon">Adapté de la formation ouverte de Yapla (Pascal Jarry) · Créer mon jumeau numérique · version 4 · mise à jour 2026-10-18</p>
+</div></footer>
+<script>
+(function(){
+  var body=document.body, PFX="f-creer-mon-jumeau-numeriq-";
+  function get(k){try{return localStorage.getItem(PFX+k)}catch(e){return null}}
+  function set(k,v){try{localStorage.setItem(PFX+k,v)}catch(e){}}
+
+  
+  document.querySelectorAll('[data-dim]').forEach(function(b){
+    b.addEventListener('click',function(){appliquer(b.dataset.dim,b.dataset.val)});
+  });
+  function appliquer(dim,val){
+    body.setAttribute('data-v-'+dim,val);
+    document.querySelectorAll('[data-dim="'+dim+'"]').forEach(function(x){
+      x.setAttribute('aria-pressed', x.dataset.val===val?'true':'false');
+    });
+    set('v-'+dim,val);
+  }
+  appliquer('mon-poste', get('v-mon-poste') || 'windows');
+
+  
+  function accorder(f){
+    document.querySelectorAll('.acc').forEach(function(s){
+      s.textContent = f==='b' ? s.dataset.b : s.dataset.a;
+    });
+    document.querySelectorAll('[data-acc]').forEach(function(x){
+      x.setAttribute('aria-pressed', x.dataset.acc===f?'true':'false');
+    });
+    set('acc',f);
+  }
+  if(document.querySelector('.acc')||document.querySelector('[data-acc]')){
+    accorder(get('acc')||'a');
+    document.querySelectorAll('[data-acc]').forEach(function(b){
+      b.addEventListener('click',function(){accorder(b.dataset.acc)});
+    });
+  }
+
+  
+  var boxes=[].slice.call(document.querySelectorAll('input[type=checkbox][data-k]'));
+  var fill=document.getElementById('pfill'), cnt=document.getElementById('pcount');
+  function rafraichir(){
+    var n=boxes.filter(function(b){return b.checked}).length;
+    if(fill) fill.style.width=(boxes.length?n/boxes.length*100:0)+'%';
+    if(cnt) cnt.textContent=n+' / '+boxes.length;
+    document.querySelectorAll('.step[data-step]').forEach(function(st){
+      var c=st.querySelector('input[type=checkbox][data-k]');
+      st.setAttribute('data-done', c&&c.checked?'true':'false');
+    });
+  }
+  boxes.forEach(function(b){
+    var v=get(b.dataset.k);
+    if(v===null && b.dataset.n){          
+      var ancien=get(b.dataset.n);
+      if(ancien!==null){ v=ancien; set(b.dataset.k,ancien); }
+    }
+    if(v==='1') b.checked=true;
+    b.addEventListener('change',function(){set(b.dataset.k,b.checked?'1':'0');rafraichir()});
+  });
+  rafraichir();
+
+  
+  document.querySelectorAll('.copy').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      
+      var t=btn.closest('.copybloc').querySelector('pre').textContent;
+      function ok(){btn.textContent='Copie';btn.setAttribute('data-state','ok');
+        setTimeout(function(){btn.textContent='Copier';btn.removeAttribute('data-state')},1800)}
+      function repli(){
+        var a=document.createElement('textarea');a.value=t;a.style.position='fixed';
+        a.style.opacity='0';document.body.appendChild(a);a.select();
+        try{document.execCommand('copy');ok()}catch(e){btn.textContent='Selectionne et copie'}
+        document.body.removeChild(a);
+      }
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(t).then(ok,repli);
+      } else { repli(); }
+    });
+  });
+})();
+</script>
+</body>
+</html>

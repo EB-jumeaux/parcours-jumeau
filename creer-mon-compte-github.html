@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Créer mon compte GitHub</title>
+<meta name="description" content="À la fin, tu as un compte GitHub gratuit et l&#x27;accès au cerveau de départ de ton jumeau. L&#x27;invitation est envoyée à l&#x27;adresse de courriel où tu as reçu le lien de cette page. Tu crées ton compte avec cette même adresse, tu acceptes l&#x27;invitation, et tu n&#x27;as rien à nous envoyer, sauf si quelque chose c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;800;900&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+
+
+:root{
+  --ground:#FFFDFD;
+  --surface:#FFFFFF;
+  --surface-2:#F7F4F0;
+  --line:#E6E0D8;
+  --line-strong:#CFC6B9;
+  --ink:#2E3238;
+  --ink-2:#5E656E;
+  --ink-3:#8A919A;
+  --orange:#FF7B14;
+  --orange-ink:#B85300;
+  --creme:#FFF1E4;
+  --bleu:#337AB7;
+  --bleu-ink:#255C8C;
+  --bleu-pale:#F1F5FD;
+  --vert:#2E7D5B;
+  --vert-pale:#EAF5EF;
+  --brique:#A63D2F;
+  --brique-pale:#FBEDEA;
+  --shadow:0 1px 2px rgba(46,50,56,.05), 0 8px 24px -12px rgba(46,50,56,.18);
+  --radius:10px;
+  --mono:"IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --sans:"Mulish", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#14161A; --surface:#1B1E23; --surface-2:#22262C;
+    --line:#2F343B; --line-strong:#434A54;
+    --ink:#E9E7E4; --ink-2:#AAB1BA; --ink-3:#7C848E;
+    --orange:#FF9243; --orange-ink:#FFB075; --creme:#2B2018;
+    --bleu:#6FABDE; --bleu-ink:#96C4EC; --bleu-pale:#1A2430;
+    --vert:#5FBF92; --vert-pale:#16251F;
+    --brique:#E8877A; --brique-pale:#2B1A17;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#14161A; --surface:#1B1E23; --surface-2:#22262C;
+  --line:#2F343B; --line-strong:#434A54;
+  --ink:#E9E7E4; --ink-2:#AAB1BA; --ink-3:#7C848E;
+  --orange:#FF9243; --orange-ink:#FFB075; --creme:#2B2018;
+  --bleu:#6FABDE; --bleu-ink:#96C4EC; --bleu-pale:#1A2430;
+  --vert:#5FBF92; --vert-pale:#16251F;
+  --brique:#E8877A; --brique-pale:#2B1A17;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--ground);color:var(--ink);
+  font-family:var(--sans);font-size:17px;line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.col{max-width:730px}
+
+
+h1,h2,h3,h4{text-wrap:balance;margin:0;font-weight:800;letter-spacing:-.015em;line-height:1.15}
+h1{font-size:clamp(2.3rem,5.6vw,3.8rem);font-weight:900;letter-spacing:-.035em}
+h2{font-size:clamp(1.6rem,3.4vw,2.2rem)}
+h3{font-size:1.22rem}
+h4{font-size:1rem}
+p{margin:0}
+a{color:var(--bleu-ink);text-decoration-thickness:1px;text-underline-offset:2px}
+strong{font-weight:800}
+.eyebrow{font-family:var(--mono);font-size:.72rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.16em;color:var(--ink-3)}
+.lede{font-size:1.14rem;color:var(--ink-2);line-height:1.6}
+.small{font-size:.9rem;color:var(--ink-2)}
+.stack{display:flex;flex-direction:column;gap:1.1rem}
+.stack-s{display:flex;flex-direction:column;gap:.6rem}
+
+
+header.hero{
+  border-bottom:1px solid var(--line);
+  background:radial-gradient(120% 90% at 8% -10%, var(--creme) 0%, transparent 58%), var(--ground);
+}
+.hero-inner{padding:clamp(2.8rem,6.5vw,5rem) 0 clamp(2.2rem,4vw,3.2rem);
+  display:flex;flex-direction:column;gap:1.5rem}
+.hero h1 .k{display:block;color:var(--orange-ink)}
+.hero-meta{display:flex;flex-wrap:wrap;gap:.5rem 1.6rem;font-family:var(--mono);
+  font-size:.8rem;color:var(--ink-2);padding-top:.4rem;border-top:1px solid var(--line)}
+.hero-meta b{color:var(--ink);font-weight:600}
+
+
+.settings{position:sticky;top:0;z-index:40;
+  background:color-mix(in srgb, var(--ground) 88%, transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.settings-inner{display:flex;flex-wrap:wrap;align-items:center;gap:.9rem 1.4rem;padding:.7rem 0}
+.seg{display:flex;align-items:center;gap:.55rem}
+.seg-label{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--ink-3)}
+.seg-btns{display:flex;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:999px;padding:2px}
+.seg-btns button{font-family:var(--sans);font-size:.84rem;font-weight:600;color:var(--ink-2);
+  background:none;border:0;padding:.28rem .78rem;border-radius:999px;cursor:pointer}
+.seg-btns button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.seg-btns button:focus-visible{outline:2px solid var(--bleu);outline-offset:2px}
+.progress{margin-left:auto;display:flex;align-items:center;gap:.6rem;
+  font-family:var(--mono);font-size:.76rem;color:var(--ink-2)}
+.progress-track{width:110px;height:6px;border-radius:999px;background:var(--surface-2);
+  border:1px solid var(--line);overflow:hidden}
+.progress-fill{height:100%;width:0;background:var(--orange);transition:width .3s ease}
+
+
+section{padding:clamp(2.4rem,5vw,4rem) 0;border-bottom:1px solid var(--line)}
+.sec-head{display:flex;flex-direction:column;gap:.5rem;margin-bottom:2rem;max-width:730px}
+.sec-body{display:flex;flex-direction:column;gap:1.6rem}
+
+
+.cartes{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem}
+.carte{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:1.3rem 1.4rem;box-shadow:var(--shadow)}
+.carte h4{display:flex;align-items:baseline;gap:.55rem;margin-bottom:.45rem;flex-wrap:wrap}
+.carte .tag{font-family:var(--mono);font-size:.66rem;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--bleu-ink);background:var(--bleu-pale);
+  border-radius:4px;padding:.1rem .38rem}
+.carte p{font-size:.95rem;color:var(--ink-2)}
+.carte .quand{margin-top:.7rem;font-size:.84rem;font-family:var(--mono);color:var(--ink-3)}
+
+
+dl.lex{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:.1rem 2rem;margin:0;max-width:900px}
+dl.lex > div{padding:.85rem 0;border-top:1px solid var(--line)}
+dl.lex dt{font-weight:800;font-size:.98rem}
+dl.lex dd{margin:.15rem 0 0;font-size:.93rem;color:var(--ink-2)}
+
+
+.step{display:grid;grid-template-columns:64px 1fr;gap:0 1.6rem;position:relative}
+.step + .step{margin-top:2.6rem}
+.rail{display:flex;flex-direction:column;align-items:center;gap:.6rem}
+.rail .num{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;
+  font-family:var(--mono);font-weight:600;font-size:1.05rem;background:var(--surface);
+  color:var(--ink);border:1.5px solid var(--line-strong)}
+.step[data-done="true"] .rail .num{background:var(--orange);border-color:var(--orange);color:#fff}
+.rail .line{flex:1;width:1.5px;background:var(--line);min-height:20px}
+.step-body{padding-bottom:.4rem;max-width:730px;display:flex;flex-direction:column;gap:1.1rem}
+.step-head{display:flex;flex-direction:column;gap:.35rem}
+.step-head .where{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--orange-ink)}
+.step-body ol,.sec-body ol{margin:0;padding-left:1.3rem;display:flex;flex-direction:column;gap:.55rem}
+.step-body ol li::marker,.sec-body ol li::marker{font-weight:800;color:var(--ink-3)}
+.step-body ul,.sec-body ul{margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:.4rem}
+
+
+.copybloc{border:1px solid var(--line-strong);border-radius:var(--radius);
+  overflow:hidden;background:var(--surface-2)}
+.copybloc-head{display:flex;align-items:center;gap:.8rem;padding:.6rem .85rem;
+  border-bottom:1px solid var(--line);background:var(--surface)}
+.copybloc-head .t{font-family:var(--mono);font-size:.74rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ink-2)}
+.copy{margin-left:auto;font-family:var(--sans);font-size:.8rem;font-weight:700;
+  background:var(--orange);color:#fff;border:0;border-radius:6px;
+  padding:.34rem .8rem;cursor:pointer}
+.copy:hover{filter:brightness(1.06)}
+.copy:focus-visible{outline:2px solid var(--bleu);outline-offset:2px}
+.copy[data-state="ok"]{background:var(--vert)}
+.copybloc pre{margin:0;padding:1rem .95rem;overflow-x:auto;font-family:var(--mono);
+  font-size:.83rem;line-height:1.6;color:var(--ink);white-space:pre-wrap;word-break:break-word}
+
+.copybloc.accomp{border:2px solid var(--orange);background:var(--creme);
+  box-shadow:0 8px 28px rgba(255,123,20,.12)}
+.accomp-head{padding:1.4rem 1.5rem 1.2rem;display:flex;flex-direction:column;gap:.55rem}
+.accomp-head .lbl{font-family:var(--mono);font-size:.72rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.14em;color:var(--orange-ink)}
+.accomp-head h3{margin:0;font-size:1.35rem;line-height:1.25;color:var(--ink)}
+.accomp-head p{margin:0;font-size:1rem;line-height:1.55;color:var(--ink-2);max-width:60ch}
+.copy.accomp-btn{margin:.5rem 0 0;align-self:flex-start;font-size:1rem;
+  padding:.7rem 1.4rem;border-radius:8px}
+.accomp-prompt{border-top:1px solid var(--line);background:var(--surface)}
+.accomp-prompt summary{cursor:pointer;padding:.6rem 1.5rem;font-family:var(--mono);
+  font-size:.74rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-2)}
+.accomp-prompt pre{max-height:24rem}
+code.inline{font-family:var(--mono);font-size:.86em;background:var(--surface-2);
+  border:1px solid var(--line);border-radius:5px;padding:.08em .35em}
+
+
+.note{border-radius:var(--radius);padding:.95rem 1.05rem;font-size:.94rem;
+  border:1px solid;display:flex;flex-direction:column;gap:.4rem}
+.note .lbl{font-family:var(--mono);font-size:.7rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.12em}
+.note.piege{background:var(--brique-pale);border-color:color-mix(in srgb,var(--brique) 32%, transparent)}
+.note.piege .lbl{color:var(--brique)}
+.note.reussi{background:var(--vert-pale);border-color:color-mix(in srgb,var(--vert) 30%, transparent)}
+.note.reussi .lbl{color:var(--vert)}
+.note.info{background:var(--bleu-pale);border-color:color-mix(in srgb,var(--bleu) 28%, transparent)}
+.note.info .lbl{color:var(--bleu-ink)}
+.note.reperе,.note.repere{background:var(--creme);border-color:color-mix(in srgb,var(--orange) 30%, transparent)}
+.note.repere .lbl{color:var(--orange-ink)}
+.note.neutre{background:var(--surface-2);border-color:var(--line-strong)}
+.note.neutre .lbl{color:var(--ink-3)}
+
+
+.check{display:flex;gap:.7rem;align-items:flex-start;background:var(--creme);
+  border:1px solid color-mix(in srgb,var(--orange) 26%, transparent);
+  border-radius:var(--radius);padding:.8rem .95rem;cursor:pointer}
+.check input{margin:.28rem 0 0;width:17px;height:17px;accent-color:var(--orange);
+  flex:none;cursor:pointer}
+.check .txt{font-size:.95rem;font-weight:600}
+.check .txt em{display:block;font-style:normal;font-weight:400;color:var(--ink-2);
+  font-size:.9rem;margin-top:.1rem}
+.check:has(input:checked){background:var(--vert-pale);
+  border-color:color-mix(in srgb,var(--vert) 30%, transparent)}
+.check:has(input:checked) .txt{text-decoration:line-through;
+  text-decoration-color:var(--ink-3);color:var(--ink-2)}
+.check:has(input:checked) .txt em{text-decoration:none}
+.checks{display:flex;flex-direction:column;gap:.7rem;max-width:730px}
+
+
+.faq{display:flex;flex-direction:column;gap:.55rem;max-width:840px}
+details.dx{border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--surface);overflow:hidden}
+details.dx[open]{border-color:var(--line-strong);box-shadow:var(--shadow)}
+details.dx summary{cursor:pointer;padding:.85rem 1rem;font-weight:700;font-size:.98rem;
+  display:flex;gap:.7rem;align-items:baseline;list-style:none}
+details.dx summary::-webkit-details-marker{display:none}
+details.dx summary::before{content:"+";font-family:var(--mono);font-weight:600;
+  color:var(--orange);flex:none;width:1ch}
+details.dx[open] summary::before{content:"\2013"}
+details.dx summary:focus-visible{outline:2px solid var(--bleu);outline-offset:-2px}
+.dx-body{padding:0 1rem 1rem 2.4rem;display:flex;flex-direction:column;gap:.7rem;font-size:.95rem}
+.dx-body .quote{font-family:var(--mono);font-size:.82rem;background:var(--surface-2);
+  border-left:2px solid var(--brique);padding:.5rem .7rem;color:var(--ink-2);
+  border-radius:0 5px 5px 0;overflow-x:auto}
+.dx-body .geste{font-weight:700}
+.dx-body .src{font-size:.82rem;color:var(--ink-3);font-family:var(--mono)}
+
+
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--surface);max-width:900px}
+table{border-collapse:collapse;width:100%;font-size:.93rem;min-width:460px}
+th,td{text-align:left;padding:.7rem .9rem;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--ink-3);font-weight:600}
+tr:last-child td{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink-2)}
+
+
+figure.diagram{margin:0;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:1.5rem 1.2rem 1.1rem;box-shadow:var(--shadow);max-width:900px}
+figure.diagram svg{display:block;width:100%;height:auto;max-width:640px;margin:0 auto}
+figcaption{margin-top:1rem;font-size:.88rem;color:var(--ink-2);text-align:center;
+  max-width:52ch;margin-inline:auto}
+
+
+
+
+figure.capture{margin:2rem 0;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:1rem;box-shadow:var(--shadow);
+  width:fit-content;max-width:min(730px,100%)}
+figure.capture img{display:block;width:auto;height:auto;max-width:100%;
+  border-radius:calc(var(--radius) - 4px);border:1px solid var(--line)}
+figure.capture figcaption{margin-top:.9rem}
+
+
+footer{padding:clamp(2.4rem,5vw,3.6rem) 0 4rem;background:var(--surface-2)}
+footer .guichet{border-left:3px solid var(--orange);padding-left:1.1rem}
+.colophon{border-top:1px solid var(--line);padding-top:1.2rem;font-size:.85rem;color:var(--ink-3);
+  font-family:var(--mono)}
+
+
+
+
+@media (max-width:720px){
+  body{font-size:16px}
+  .step{grid-template-columns:40px 1fr;gap:0 1rem}
+  .rail .num{width:36px;height:36px;font-size:.9rem}
+  .dx-body{padding-left:1rem}
+  .progress{width:100%;margin-left:0;order:5}
+}
+@media print{
+  .settings,.copy{display:none}
+  body{font-size:11pt;background:#fff}
+  section{page-break-inside:auto;border-bottom:0}
+  .step{page-break-inside:avoid}
+  details.dx{page-break-inside:avoid}
+  details.dx summary::before{content:""}
+  .dx-body{display:block!important}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}
+
+
+</style>
+<meta name="robots" content="noindex, nofollow"><style>
+:root{--eb-bg:#ffffff;--ink:#1b1f24;--ink-2:#4b5563;--line:#e3e6ea;--accent:#2f5d8a;--accent-ink:#ffffff;--accent-pale:#eef3f8;
+--ok:#1f6f43;--ok-pale:#f1f8f3;--warn:#a85a07;--warn-pale:#fdf6ec;--code-bg:#f5f6f8;
+--sans:Mulish,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Consolas,monospace}
+.eb-bandeau{background:var(--eb-bg);border-bottom:1px solid var(--line)}
+.eb-bandeau-in{max-width:1080px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px 22px;
+ padding:12px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px))}
+.eb-nom{font:800 16px/1.3 var(--sans);color:var(--ink);text-decoration:none}
+.eb-nav{display:flex;flex-wrap:wrap;gap:6px 16px;min-width:0}
+.eb-nav a{color:var(--ink-2);font:600 14px/1.4 var(--sans);text-decoration:none}
+.eb-nav a:hover,.eb-nav a[aria-current]{color:var(--accent)}
+.eb-nav a[aria-current]{text-decoration:underline;text-underline-offset:4px}
+.eb-langue{margin-left:auto;color:var(--accent);font:700 14px/1.4 var(--sans);text-decoration:none}
+.eb-nav a:focus-visible,.eb-nom:focus-visible,.eb-langue:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style></head>
+<body><header class="eb-bandeau"><div class="eb-bandeau-in"><a class="eb-nom" href="index.html">Jumeaux et jumelles EB</a><nav class="eb-nav"><a href="index.html">Par où commencer</a><a href="comprendre-mon-jumeau-numerique.html">1. La mécanique du jumeau</a><a href="creer-mon-compte-github.html" aria-current=page>2. Mon compte GitHub</a><a href="demarrer-mon-jumeau-numerique.html">3. Créer mon jumeau</a><a href="le-chef-de-mon-jumeau.html">Pour aller plus loin : le Chef</a></nav><a class="eb-langue" href="en/creer-mon-compte-github.html" hreflang="en">English</a></div></header>
+<header class="hero"><div class="wrap hero-inner">
+<p class="eyebrow">Le programme des jumeaux numériques</p>
+<h1>Créer mon <span class="k">compte GitHub</span></h1>
+<p class="lede col">À la fin, tu as un compte GitHub gratuit et l'accès au cerveau de départ de <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span>. L'invitation est envoyée à l'adresse de courriel où tu as reçu le lien de cette page. Tu crées ton compte avec cette même adresse, tu acceptes l'invitation, et tu n'as rien à nous envoyer, sauf si quelque chose coince.</p>
+<div class="hero-meta"><span><strong>10 min</strong></span><span><strong>Gratuit</strong></span><span><strong>2 étapes</strong></span><span><strong>La même adresse partout</strong></span></div>
+</div></header>
+<div class="settings"><div class="wrap settings-inner"><div class="seg"><span class="seg-label">On dit</span><div class="seg-btns" role="group" aria-label="Accord"><button type="button" data-acc="a" aria-pressed="true">Jumeau</button><button type="button" data-acc="b" aria-pressed="false">Jumelle</button></div></div><div class="progress"><span>Avancement</span><div class="progress-track"><div class="progress-fill" id="pfill"></div></div><span id="pcount">0 / 0</span></div></div></div>
+<main>
+<section id="github-c-est-quoi-et-pourquoi-on-te-le-d"><div class="wrap"><div class="sec-head"><p class="eyebrow">Avant de cliquer</p><h2>GitHub, c'est quoi, et pourquoi on te le demande</h2><p class="lede">Un compte à créer, une invitation à accepter. Tu n'auras rien d'autre à faire sur GitHub.</p></div><div class="sec-body"><div class="col stack"><p><strong>GitHub est un endroit où des fichiers sont rangés, sauvegardés, et où chaque modification est conservée.</strong> Les développeurs s'en servent pour du code, et l'outil garde aussi bien des notes.</p>
+<p>Il sert à deux choses pour toi. D'abord, <strong>lire le cerveau de départ</strong> de <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span>, rangé dans le dépôt privé du programme des jumeaux numériques, où tu as un accès en lecture. Ensuite, <strong>héberger ton propre cerveau</strong>, dans un espace privé qui n'appartient qu'à toi.</p></div>
+<div class="note repere"><span class="lbl">Ce que ça t&#x27;apporte, concrètement</span><p><strong>Ton ordinateur peut tomber en panne, <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> s'en remet.</strong> Tout ce qu'<span class="acc" data-a="il" data-b="elle">il</span> a appris est sauvegardé ailleurs, et se récupère sur un poste neuf en quelques minutes.</p>
+<p><strong>Rien n'est perdu par erreur.</strong> Chaque modification est conservée avec sa date. Une fausse manœuvre se retrouve et s'annule.</p>
+<p><strong>Et c'est à toi.</strong> Le compte est le tien, ton espace est privé, et personne d'autre n'y a accès.</p></div>
+<div class="note info"><span class="lbl">Ce que tu n&#x27;auras PAS à faire</span><p>Tu n'apprendras <strong>jamais</strong> à te servir de GitHub. Tu n'y créeras aucun dossier, tu n'y déposeras aucun fichier à la main, et tu n'ouvriras sans doute plus le site après aujourd'hui.</p>
+<p><strong>C'est <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> qui s'en occupe</strong>, à chaque fois qu'<span class="acc" data-a="il" data-b="elle">il</span> sauvegarde. Créer le compte et accepter l'invitation sont les seuls gestes qui demandent tes mains.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="github-c-est-quoi-et-pourquoi-on-te-le-demande.je-sais-que-github-me-donne-acces-au-cerveau-de-depart-et-he" data-n="c1"><span class="txt">Je sais que GitHub me donne accès au cerveau de départ et héberge ensuite le mien dans un espace privé, et que je n'aurai plus à m'en servir après aujourd'hui</span></label></div></div></div></section>
+<section id="creer-le-compte-avec-l-adresse-invitee"><div class="wrap"><div class="sec-head"><p class="eyebrow">Étape 1</p><h2>Créer le compte, avec l'adresse invitée</h2><p class="lede">Dix minutes, gratuit, aucune carte de crédit. Utilise l'adresse de courriel qui a reçu l'invitation.</p></div><div class="sec-body"><div class="col stack"><p>L'invitation au cerveau de départ est envoyée <strong>à une adresse de courriel précise</strong>, celle où tu as reçu le lien de cette page. C'est <strong>cette adresse</strong> que tu utilises pour créer ton compte. L'invitation t'attend à cette adresse.</p></div>
+<div class="note info"><span class="lbl">Le courriel de GitHub est peut-être déjà là</span><p>Cherche dans ta boîte un courriel de GitHub qui t'invite au dépôt <code class="inline">EB-jumeaux/gabarit-jumeau</code>, et regarde tes indésirables. S'il est là, tu peux partir de son lien, il mène aussi à l'inscription. Sinon, commence par l'inscription, le courriel attendra.</p></div>
+<div class="col stack"><p>Va sur <strong><a href="https://github.com/signup">github.com/signup</a></strong>. GitHub te demande les éléments suivants, dans un ordre qui peut varier.</p>
+<ol><li><strong>Ton adresse de courriel</strong>, celle qui a reçu l'invitation.</li><li><strong>Un mot de passe.</strong> Choisis-le solide et <strong>conserve-le dans ton gestionnaire de mots de passe</strong>, pas sur un papier.</li><li><strong>Un nom de compte</strong>, celui que GitHub appelle <em>username</em>.</li><li><strong>Un code de vérification</strong> envoyé à ton courriel, à recopier. C'est lui qui prouve que l'adresse est la tienne, ne le saute pas.</li><li>Un contrôle anti-robot, du genre « fais glisser » ou « choisis les images ». GitHub le demande à tout le monde.</li></ol></div>
+<div class="note info"><span class="lbl">Une autre adresse, ou un compte qui existe déjà</span><p>L'invitation est liée à l'adresse qui l'a reçue. Avec une autre adresse, rien ne garantit que ton compte la retrouve.</p>
+<p><strong>Tu as déjà un compte GitHub, sous une autre adresse ?</strong> Ne crée pas de second compte. Écris à Éric Bourbeau en donnant ton <strong>nom de compte</strong>, et l'invitation te sera renvoyée directement sur ce compte.</p></div>
+<div class="note info"><span class="lbl">Le nom de compte te suit</span><p>Il apparaît dans l'adresse de ton espace, et le changer plus tard casse les liens vers ton espace. Prends quelque chose de <strong>sobre et durable</strong>, ton prénom et ton nom, ou une variante lisible. Évite un surnom, une date de naissance ou le nom de ton employeur actuel.</p>
+<p>Si le nom est déjà pris, ajoute un chiffre à la fin, c'est la solution la plus courante.</p></div>
+<div class="note piege"><span class="lbl">On ne te demande pas de payer, ni de créer une organisation</span><p><strong>Le plan.</strong> Le compte gratuit suffit <strong>entièrement</strong>. Si un écran présente des formules payantes, cherche l'option gratuite, elle existe toujours.</p>
+<p><strong>Une organisation.</strong> Si on te propose de créer une « organisation » ou de rejoindre une équipe, <strong>passe</strong>. Tu veux un compte personnel, rien d'autre.</p></div>
+<div class="note info"><span class="lbl">La vérification en deux étapes</span><p>GitHub peut te demander d'activer une <strong>double authentification</strong>, par exemple un code envoyé sur ton téléphone. Accepte, c'est ce qui protège ton espace.</p>
+<p>Note bien où tu ranges les codes de secours qu'il te donne. C'est <strong>ton</strong> compte, personne ne pourra te le rouvrir à ta place.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="creer-le-compte-avec-l-adresse-invitee.mon-compte-github-existe-cree-avec-l-adresse-qui-a-recu-l-in" data-n="c2"><span class="txt">Mon compte GitHub existe, créé avec l'adresse qui a reçu l'invitation, et cette adresse est vérifiée</span></label></div></div></div></section>
+<section id="accepter-l-invitation"><div class="wrap"><div class="sec-head"><p class="eyebrow">Étape 2</p><h2>Accepter l'invitation</h2><p class="lede">Une minute. C'est ce geste qui ouvre réellement l'accès au cerveau de départ. Fais-le sans attendre, une invitation ne reste pas valide indéfiniment.</p></div><div class="sec-body"><div class="col stack"><ol><li><strong>Retrouve le courriel de GitHub</strong> qui t'invite au dépôt <code class="inline">EB-jumeaux/gabarit-jumeau</code>. Il est arrivé à l'adresse invitée. <strong>Regarde tes indésirables</strong> si tu ne le vois pas, les courriels automatiques y tombent souvent.</li><li><strong>Ouvre le lien de l'invitation</strong>, avec ta session GitHub ouverte, et clique sur <strong>Accept invitation</strong>.</li></ol></div>
+<div class="note reussi"><span class="lbl">Tu sais que c&#x27;est fait quand</span><p>GitHub t'affiche la page du dépôt <code class="inline">EB-jumeaux/gabarit-jumeau</code>, sans message d'erreur. Tu n'as rien à y faire. Tu peux fermer la page et passer à la formation suivante, celle qui installe <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span>.</p></div>
+<div class="note neutre"><span class="lbl">Ce qui n&#x27;a pas encore été éprouvé</span><p>Deux points. L'acceptation d'une invitation par un compte créé après son envoi, et la durée de validité d'une invitation. Fais les deux étapes sans attendre. Si le lien échoue ou a expiré, écris à Éric Bourbeau avec ton nom de compte.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="accepter-l-invitation.j-ai-accepte-l-invitation-et-github-m-affiche-le-depot-du-ce" data-n="c3"><span class="txt">J'ai accepté l'invitation, et GitHub m'affiche le dépôt du cerveau de départ</span></label></div></div></div></section>
+<section id="si-ca-coince"><div class="wrap"><div class="sec-head"><p class="eyebrow">Autodiagnostic</p><h2>Si ça coince</h2><p class="lede">Les cas connus, dans les mots où tu les verras. Dans tous les cas, ne crée pas de second compte.</p></div><div class="sec-body"><details class="dx"><summary>Le lien de l'invitation affiche une page introuvable (404) ou une erreur</summary><div class="dx-body"><p>L'invitation n'a pas retrouvé ton compte, ou elle a expiré. Une invitation envoyée au nom de compte règle les deux cas.</p><p class="geste">Écris à Éric Bourbeau, objet commençant par Jumeau, en donnant ton nom de compte. Une nouvelle invitation part directement sur ce compte.</p></div></details>
+<details class="dx"><summary>Je n'ai reçu aucun courriel d'invitation de GitHub</summary><div class="dx-body"><p>L'invitation est peut-être partie à une autre adresse que celle que tu consultes, ou pas encore partie.</p><p class="geste">Regarde tes indésirables, puis écris à Éric Bourbeau en donnant l'adresse de courriel de ton compte et ton nom de compte.</p></div></details>
+<details class="dx"><summary>Je ne sais pas quel est mon nom de compte</summary><div class="dx-body"><p>Ce n'est ni ton adresse de courriel, ni le nom affiché sur ta page.</p><p class="geste">Clique sur ton avatar en haut à droite, puis sur <strong>Your profile</strong>. La barre d'adresse affiche <code class="inline">github.com/</code> suivi de ton nom de compte.</p></div></details></div></div></section>
+<section id="ce-qu-il-faut-retenir"><div class="wrap"><div class="sec-head"><p class="eyebrow">En trois lignes</p><h2>Ce qu'il faut retenir</h2><p class="lede">Trois faits, à garder pour la suite.</p></div><div class="sec-body"><div class="cartes"><div class="carte"><h4>La même adresse partout <span class="tag">l&#x27;adresse</span></h4><p>L'invitation part à une adresse de courriel. Tu crées le compte avec cette même adresse, puis tu acceptes l'invitation.</p></div><div class="carte"><h4>C'est ton espace <span class="tag">la propriété</span></h4><p>Le compte est le tien, ton espace est privé, personne d'autre n'y a accès. C'est ce qui fait qu'un ordinateur perdu n'emporte pas <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> avec lui.</p></div><div class="carte"><h4>Tu n'y reviendras plus <span class="tag">après aujourd&#x27;hui</span></h4><p>Tu n'apprendras jamais à te servir de GitHub. C'est <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> qui sauvegarde, à chaque fois qu'<span class="acc" data-a="il" data-b="elle">il</span> a produit quelque chose qui compte.</p></div></div>
+<div class="note neutre"><span class="lbl">Cette page décrit une interface qui n&#x27;est pas la nôtre</span><p>GitHub fait évoluer ses écrans sans nous prévenir. Les noms de boutons ou l'ordre des questions peuvent différer un peu de ce qui est écrit ici.</p>
+<p><strong>Le fond ne change pas</strong>, une adresse de courriel, un mot de passe, un nom de compte, une vérification, une invitation à accepter. Si un écran te surprend, ne devine pas et écris à Éric Bourbeau en disant ce que tu vois.</p></div>
+<div class="copybloc accomp"><div class="accomp-head"><span class="lbl">Avec <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span></span><h3>Te faire accompagner pour créer ton compte</h3><p>Si tu veux qu'on te guide écran par écran, copie ce prompt et colle-le au début d'une nouvelle conversation dans l'application Claude. Avant l'installation, c'est Claude qui te guide.</p><button class="copy accomp-btn" type="button">Copier le prompt</button></div><details class="accomp-prompt"><summary>Voir le prompt</summary><pre>Tu vas m&#x27;accompagner, écran par écran, pour créer mon compte GitHub et
+accepter l&#x27;invitation qui m&#x27;ouvre l&#x27;accès au cerveau de départ du programme
+des jumeaux numériques. Je ne suis pas technique. Voici ce qu&#x27;il faut savoir
+et la méthode.
+
+CE QU&#x27;ON FAIT
+
+Un compte GitHub gratuit et personnel, pas une organisation, pas de formule
+payante. Il me sert à lire le cerveau de départ, dans le dépôt privé
+EB-jumeaux/gabarit-jumeau où j&#x27;ai un accès en lecture, puis à héberger mon
+propre cerveau dans un dépôt privé à moi. Je n&#x27;aurai plus à me servir de
+GitHub après aujourd&#x27;hui.
+
+L&#x27;invitation est envoyée à l&#x27;adresse de courriel où j&#x27;ai reçu le lien de la
+formation. Le point décisif, créer le compte avec cette même adresse. Je n&#x27;ai
+rien à envoyer, sauf si quelque chose coince.
+
+LA MÉTHODE, DANS L&#x27;ORDRE
+
+1. Chercher dans ma boîte, indésirables compris, un courriel de GitHub qui
+   m&#x27;invite au dépôt EB-jumeaux/gabarit-jumeau. S&#x27;il est là, je peux partir de
+   son lien, il mène aussi à l&#x27;inscription.
+2. Sur github.com/signup, l&#x27;adresse de courriel qui a reçu l&#x27;invitation, un
+   mot de passe solide que je garde dans mon gestionnaire de mots de passe, un
+   nom de compte sobre et durable (mon prénom et mon nom, ou une variante
+   lisible, un chiffre à la fin si le nom est pris), le code de vérification
+   reçu par courriel, le contrôle anti-robot. Si on me propose un plan payant
+   ou une organisation, je passe. Si on me propose la vérification en deux
+   étapes, j&#x27;accepte et je note où je range les codes de secours.
+3. Si j&#x27;ai déjà un compte GitHub sous une autre adresse, je n&#x27;en crée pas un
+   second. J&#x27;écris à ebourbeau@x-telia.com, avec un objet qui commence par le
+   mot Jumeau, en donnant mon nom de compte.
+4. Ouvrir le lien de l&#x27;invitation, avec ma session GitHub ouverte, et cliquer
+   sur Accept invitation. C&#x27;est réussi quand GitHub m&#x27;affiche la page du dépôt
+   sans erreur. Je le fais sans attendre, une invitation ne reste pas valide
+   indéfiniment.
+5. Si le lien donne une page introuvable ou une erreur, ou si l&#x27;invitation
+   n&#x27;est pas venue, je ne recrée pas de compte. J&#x27;écris à la même adresse,
+   objet commençant par Jumeau, en disant ce que je vois et en donnant mon nom
+   de compte (avatar en haut à droite, Your profile, la barre d&#x27;adresse montre
+   github.com/ suivi du nom de compte).
+
+COMMENT TU TRAVAILLES AVEC MOI
+
+Une étape à la fois, et tu me dis ce que je dois voir à l&#x27;écran pour savoir
+qu&#x27;elle est réussie. Une question à la fois. Tu ne me demandes jamais mon
+mot de passe. Si un écran ne ressemble pas à ce que tu attends, tu me
+demandes de te le décrire au lieu de deviner. Deux points ne sont pas encore
+éprouvés, l&#x27;acceptation d&#x27;une invitation par un compte créé après son envoi,
+et la durée de validité d&#x27;une invitation. Si quelque chose échoue, tu ne
+contournes pas, tu me fais écrire à l&#x27;adresse ci-dessus. Rien ne s&#x27;envoie sans
+que je l&#x27;aie relu.
+
+Commence par me demander à quelle adresse de courriel j&#x27;ai reçu le lien de la
+formation, et si j&#x27;ai déjà un compte GitHub.</pre></details></div></div></div></section>
+</main>
+<footer><div class="wrap col stack">
+<div class="guichet stack-s"><p class="eyebrow">Si quelque chose ne se passe pas comme écrit</p><p>Ne t'acharne pas et n'invente pas de contournement. Écris à Éric Bourbeau, <code class="inline">ebourbeau@x-telia.com</code>, avec un objet qui commence par le mot Jumeau, et dis simplement ce que tu vois à l'écran. Une inscription qui coince se débloque, et si l'interface a changé depuis que ce document a été écrit, c'est utile de le savoir.</p></div>
+<p class="colophon">Adapté de la formation ouverte de Yapla (Pascal Jarry) · Créer mon compte GitHub · version 3 · mise à jour 2026-10-26</p>
+</div></footer>
+<script>
+(function(){
+  var body=document.body, PFX="f-creer-mon-compte-github-";
+  function get(k){try{return localStorage.getItem(PFX+k)}catch(e){return null}}
+  function set(k,v){try{localStorage.setItem(PFX+k,v)}catch(e){}}
+
+  
+  document.querySelectorAll('[data-dim]').forEach(function(b){
+    b.addEventListener('click',function(){appliquer(b.dataset.dim,b.dataset.val)});
+  });
+  function appliquer(dim,val){
+    body.setAttribute('data-v-'+dim,val);
+    document.querySelectorAll('[data-dim="'+dim+'"]').forEach(function(x){
+      x.setAttribute('aria-pressed', x.dataset.val===val?'true':'false');
+    });
+    set('v-'+dim,val);
+  }
+  
+
+  
+  function accorder(f){
+    document.querySelectorAll('.acc').forEach(function(s){
+      s.textContent = f==='b' ? s.dataset.b : s.dataset.a;
+    });
+    document.querySelectorAll('[data-acc]').forEach(function(x){
+      x.setAttribute('aria-pressed', x.dataset.acc===f?'true':'false');
+    });
+    set('acc',f);
+  }
+  if(document.querySelector('.acc')||document.querySelector('[data-acc]')){
+    accorder(get('acc')||'a');
+    document.querySelectorAll('[data-acc]').forEach(function(b){
+      b.addEventListener('click',function(){accorder(b.dataset.acc)});
+    });
+  }
+
+  
+  var boxes=[].slice.call(document.querySelectorAll('input[type=checkbox][data-k]'));
+  var fill=document.getElementById('pfill'), cnt=document.getElementById('pcount');
+  function rafraichir(){
+    var n=boxes.filter(function(b){return b.checked}).length;
+    if(fill) fill.style.width=(boxes.length?n/boxes.length*100:0)+'%';
+    if(cnt) cnt.textContent=n+' / '+boxes.length;
+    document.querySelectorAll('.step[data-step]').forEach(function(st){
+      var c=st.querySelector('input[type=checkbox][data-k]');
+      st.setAttribute('data-done', c&&c.checked?'true':'false');
+    });
+  }
+  boxes.forEach(function(b){
+    var v=get(b.dataset.k);
+    if(v===null && b.dataset.n){          
+      var ancien=get(b.dataset.n);
+      if(ancien!==null){ v=ancien; set(b.dataset.k,ancien); }
+    }
+    if(v==='1') b.checked=true;
+    b.addEventListener('change',function(){set(b.dataset.k,b.checked?'1':'0');rafraichir()});
+  });
+  rafraichir();
+
+  
+  document.querySelectorAll('.copy').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      
+      var t=btn.closest('.copybloc').querySelector('pre').textContent;
+      function ok(){btn.textContent='Copie';btn.setAttribute('data-state','ok');
+        setTimeout(function(){btn.textContent='Copier';btn.removeAttribute('data-state')},1800)}
+      function repli(){
+        var a=document.createElement('textarea');a.value=t;a.style.position='fixed';
+        a.style.opacity='0';document.body.appendChild(a);a.select();
+        try{document.execCommand('copy');ok()}catch(e){btn.textContent='Selectionne et copie'}
+        document.body.removeChild(a);
+      }
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(t).then(ok,repli);
+      } else { repli(); }
+    });
+  });
+})();
+</script>
+</body>
+</html>

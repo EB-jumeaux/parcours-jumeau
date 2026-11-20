@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create my digital twin</title>
+<meta name="description" content="By the end, your twin runs on your computer and it knows you. You only install the Claude app, and Claude does the rest, on Windows and Mac alike.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;800;900&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+
+
+:root{
+  --ground:#FFFDFD;
+  --surface:#FFFFFF;
+  --surface-2:#F7F4F0;
+  --line:#E6E0D8;
+  --line-strong:#CFC6B9;
+  --ink:#2E3238;
+  --ink-2:#5E656E;
+  --ink-3:#8A919A;
+  --orange:#FF7B14;
+  --orange-ink:#B85300;
+  --creme:#FFF1E4;
+  --bleu:#337AB7;
+  --bleu-ink:#255C8C;
+  --bleu-pale:#F1F5FD;
+  --vert:#2E7D5B;
+  --vert-pale:#EAF5EF;
+  --brique:#A63D2F;
+  --brique-pale:#FBEDEA;
+  --shadow:0 1px 2px rgba(46,50,56,.05), 0 8px 24px -12px rgba(46,50,56,.18);
+  --radius:10px;
+  --mono:"IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --sans:"Mulish", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#14161A; --surface:#1B1E23; --surface-2:#22262C;
+    --line:#2F343B; --line-strong:#434A54;
+    --ink:#E9E7E4; --ink-2:#AAB1BA; --ink-3:#7C848E;
+    --orange:#FF9243; --orange-ink:#FFB075; --creme:#2B2018;
+    --bleu:#6FABDE; --bleu-ink:#96C4EC; --bleu-pale:#1A2430;
+    --vert:#5FBF92; --vert-pale:#16251F;
+    --brique:#E8877A; --brique-pale:#2B1A17;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#14161A; --surface:#1B1E23; --surface-2:#22262C;
+  --line:#2F343B; --line-strong:#434A54;
+  --ink:#E9E7E4; --ink-2:#AAB1BA; --ink-3:#7C848E;
+  --orange:#FF9243; --orange-ink:#FFB075; --creme:#2B2018;
+  --bleu:#6FABDE; --bleu-ink:#96C4EC; --bleu-pale:#1A2430;
+  --vert:#5FBF92; --vert-pale:#16251F;
+  --brique:#E8877A; --brique-pale:#2B1A17;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--ground);color:var(--ink);
+  font-family:var(--sans);font-size:17px;line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.col{max-width:730px}
+
+
+h1,h2,h3,h4{text-wrap:balance;margin:0;font-weight:800;letter-spacing:-.015em;line-height:1.15}
+h1{font-size:clamp(2.3rem,5.6vw,3.8rem);font-weight:900;letter-spacing:-.035em}
+h2{font-size:clamp(1.6rem,3.4vw,2.2rem)}
+h3{font-size:1.22rem}
+h4{font-size:1rem}
+p{margin:0}
+a{color:var(--bleu-ink);text-decoration-thickness:1px;text-underline-offset:2px}
+strong{font-weight:800}
+.eyebrow{font-family:var(--mono);font-size:.72rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.16em;color:var(--ink-3)}
+.lede{font-size:1.14rem;color:var(--ink-2);line-height:1.6}
+.small{font-size:.9rem;color:var(--ink-2)}
+.stack{display:flex;flex-direction:column;gap:1.1rem}
+.stack-s{display:flex;flex-direction:column;gap:.6rem}
+
+
+header.hero{
+  border-bottom:1px solid var(--line);
+  background:radial-gradient(120% 90% at 8% -10%, var(--creme) 0%, transparent 58%), var(--ground);
+}
+.hero-inner{padding:clamp(2.8rem,6.5vw,5rem) 0 clamp(2.2rem,4vw,3.2rem);
+  display:flex;flex-direction:column;gap:1.5rem}
+.hero h1 .k{display:block;color:var(--orange-ink)}
+.hero-meta{display:flex;flex-wrap:wrap;gap:.5rem 1.6rem;font-family:var(--mono);
+  font-size:.8rem;color:var(--ink-2);padding-top:.4rem;border-top:1px solid var(--line)}
+.hero-meta b{color:var(--ink);font-weight:600}
+
+
+.settings{position:sticky;top:0;z-index:40;
+  background:color-mix(in srgb, var(--ground) 88%, transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.settings-inner{display:flex;flex-wrap:wrap;align-items:center;gap:.9rem 1.4rem;padding:.7rem 0}
+.seg{display:flex;align-items:center;gap:.55rem}
+.seg-label{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--ink-3)}
+.seg-btns{display:flex;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:999px;padding:2px}
+.seg-btns button{font-family:var(--sans);font-size:.84rem;font-weight:600;color:var(--ink-2);
+  background:none;border:0;padding:.28rem .78rem;border-radius:999px;cursor:pointer}
+.seg-btns button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.seg-btns button:focus-visible{outline:2px solid var(--bleu);outline-offset:2px}
+.progress{margin-left:auto;display:flex;align-items:center;gap:.6rem;
+  font-family:var(--mono);font-size:.76rem;color:var(--ink-2)}
+.progress-track{width:110px;height:6px;border-radius:999px;background:var(--surface-2);
+  border:1px solid var(--line);overflow:hidden}
+.progress-fill{height:100%;width:0;background:var(--orange);transition:width .3s ease}
+
+
+section{padding:clamp(2.4rem,5vw,4rem) 0;border-bottom:1px solid var(--line)}
+.sec-head{display:flex;flex-direction:column;gap:.5rem;margin-bottom:2rem;max-width:730px}
+.sec-body{display:flex;flex-direction:column;gap:1.6rem}
+
+
+.cartes{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem}
+.carte{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:1.3rem 1.4rem;box-shadow:var(--shadow)}
+.carte h4{display:flex;align-items:baseline;gap:.55rem;margin-bottom:.45rem;flex-wrap:wrap}
+.carte .tag{font-family:var(--mono);font-size:.66rem;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--bleu-ink);background:var(--bleu-pale);
+  border-radius:4px;padding:.1rem .38rem}
+.carte p{font-size:.95rem;color:var(--ink-2)}
+.carte .quand{margin-top:.7rem;font-size:.84rem;font-family:var(--mono);color:var(--ink-3)}
+
+
+dl.lex{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:.1rem 2rem;margin:0;max-width:900px}
+dl.lex > div{padding:.85rem 0;border-top:1px solid var(--line)}
+dl.lex dt{font-weight:800;font-size:.98rem}
+dl.lex dd{margin:.15rem 0 0;font-size:.93rem;color:var(--ink-2)}
+
+
+.step{display:grid;grid-template-columns:64px 1fr;gap:0 1.6rem;position:relative}
+.step + .step{margin-top:2.6rem}
+.rail{display:flex;flex-direction:column;align-items:center;gap:.6rem}
+.rail .num{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;
+  font-family:var(--mono);font-weight:600;font-size:1.05rem;background:var(--surface);
+  color:var(--ink);border:1.5px solid var(--line-strong)}
+.step[data-done="true"] .rail .num{background:var(--orange);border-color:var(--orange);color:#fff}
+.rail .line{flex:1;width:1.5px;background:var(--line);min-height:20px}
+.step-body{padding-bottom:.4rem;max-width:730px;display:flex;flex-direction:column;gap:1.1rem}
+.step-head{display:flex;flex-direction:column;gap:.35rem}
+.step-head .where{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--orange-ink)}
+.step-body ol,.sec-body ol{margin:0;padding-left:1.3rem;display:flex;flex-direction:column;gap:.55rem}
+.step-body ol li::marker,.sec-body ol li::marker{font-weight:800;color:var(--ink-3)}
+.step-body ul,.sec-body ul{margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:.4rem}
+
+
+.copybloc{border:1px solid var(--line-strong);border-radius:var(--radius);
+  overflow:hidden;background:var(--surface-2)}
+.copybloc-head{display:flex;align-items:center;gap:.8rem;padding:.6rem .85rem;
+  border-bottom:1px solid var(--line);background:var(--surface)}
+.copybloc-head .t{font-family:var(--mono);font-size:.74rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ink-2)}
+.copy{margin-left:auto;font-family:var(--sans);font-size:.8rem;font-weight:700;
+  background:var(--orange);color:#fff;border:0;border-radius:6px;
+  padding:.34rem .8rem;cursor:pointer}
+.copy:hover{filter:brightness(1.06)}
+.copy:focus-visible{outline:2px solid var(--bleu);outline-offset:2px}
+.copy[data-state="ok"]{background:var(--vert)}
+.copybloc pre{margin:0;padding:1rem .95rem;overflow-x:auto;font-family:var(--mono);
+  font-size:.83rem;line-height:1.6;color:var(--ink);white-space:pre-wrap;word-break:break-word}
+
+.copybloc.accomp{border:2px solid var(--orange);background:var(--creme);
+  box-shadow:0 8px 28px rgba(255,123,20,.12)}
+.accomp-head{padding:1.4rem 1.5rem 1.2rem;display:flex;flex-direction:column;gap:.55rem}
+.accomp-head .lbl{font-family:var(--mono);font-size:.72rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.14em;color:var(--orange-ink)}
+.accomp-head h3{margin:0;font-size:1.35rem;line-height:1.25;color:var(--ink)}
+.accomp-head p{margin:0;font-size:1rem;line-height:1.55;color:var(--ink-2);max-width:60ch}
+.copy.accomp-btn{margin:.5rem 0 0;align-self:flex-start;font-size:1rem;
+  padding:.7rem 1.4rem;border-radius:8px}
+.accomp-prompt{border-top:1px solid var(--line);background:var(--surface)}
+.accomp-prompt summary{cursor:pointer;padding:.6rem 1.5rem;font-family:var(--mono);
+  font-size:.74rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-2)}
+.accomp-prompt pre{max-height:24rem}
+code.inline{font-family:var(--mono);font-size:.86em;background:var(--surface-2);
+  border:1px solid var(--line);border-radius:5px;padding:.08em .35em}
+
+
+.note{border-radius:var(--radius);padding:.95rem 1.05rem;font-size:.94rem;
+  border:1px solid;display:flex;flex-direction:column;gap:.4rem}
+.note .lbl{font-family:var(--mono);font-size:.7rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.12em}
+.note.piege{background:var(--brique-pale);border-color:color-mix(in srgb,var(--brique) 32%, transparent)}
+.note.piege .lbl{color:var(--brique)}
+.note.reussi{background:var(--vert-pale);border-color:color-mix(in srgb,var(--vert) 30%, transparent)}
+.note.reussi .lbl{color:var(--vert)}
+.note.info{background:var(--bleu-pale);border-color:color-mix(in srgb,var(--bleu) 28%, transparent)}
+.note.info .lbl{color:var(--bleu-ink)}
+.note.reperе,.note.repere{background:var(--creme);border-color:color-mix(in srgb,var(--orange) 30%, transparent)}
+.note.repere .lbl{color:var(--orange-ink)}
+.note.neutre{background:var(--surface-2);border-color:var(--line-strong)}
+.note.neutre .lbl{color:var(--ink-3)}
+
+
+.check{display:flex;gap:.7rem;align-items:flex-start;background:var(--creme);
+  border:1px solid color-mix(in srgb,var(--orange) 26%, transparent);
+  border-radius:var(--radius);padding:.8rem .95rem;cursor:pointer}
+.check input{margin:.28rem 0 0;width:17px;height:17px;accent-color:var(--orange);
+  flex:none;cursor:pointer}
+.check .txt{font-size:.95rem;font-weight:600}
+.check .txt em{display:block;font-style:normal;font-weight:400;color:var(--ink-2);
+  font-size:.9rem;margin-top:.1rem}
+.check:has(input:checked){background:var(--vert-pale);
+  border-color:color-mix(in srgb,var(--vert) 30%, transparent)}
+.check:has(input:checked) .txt{text-decoration:line-through;
+  text-decoration-color:var(--ink-3);color:var(--ink-2)}
+.check:has(input:checked) .txt em{text-decoration:none}
+.checks{display:flex;flex-direction:column;gap:.7rem;max-width:730px}
+
+
+.faq{display:flex;flex-direction:column;gap:.55rem;max-width:840px}
+details.dx{border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--surface);overflow:hidden}
+details.dx[open]{border-color:var(--line-strong);box-shadow:var(--shadow)}
+details.dx summary{cursor:pointer;padding:.85rem 1rem;font-weight:700;font-size:.98rem;
+  display:flex;gap:.7rem;align-items:baseline;list-style:none}
+details.dx summary::-webkit-details-marker{display:none}
+details.dx summary::before{content:"+";font-family:var(--mono);font-weight:600;
+  color:var(--orange);flex:none;width:1ch}
+details.dx[open] summary::before{content:"\2013"}
+details.dx summary:focus-visible{outline:2px solid var(--bleu);outline-offset:-2px}
+.dx-body{padding:0 1rem 1rem 2.4rem;display:flex;flex-direction:column;gap:.7rem;font-size:.95rem}
+.dx-body .quote{font-family:var(--mono);font-size:.82rem;background:var(--surface-2);
+  border-left:2px solid var(--brique);padding:.5rem .7rem;color:var(--ink-2);
+  border-radius:0 5px 5px 0;overflow-x:auto}
+.dx-body .geste{font-weight:700}
+.dx-body .src{font-size:.82rem;color:var(--ink-3);font-family:var(--mono)}
+
+
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--surface);max-width:900px}
+table{border-collapse:collapse;width:100%;font-size:.93rem;min-width:460px}
+th,td{text-align:left;padding:.7rem .9rem;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--ink-3);font-weight:600}
+tr:last-child td{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink-2)}
+
+
+figure.diagram{margin:0;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:1.5rem 1.2rem 1.1rem;box-shadow:var(--shadow);max-width:900px}
+figure.diagram svg{display:block;width:100%;height:auto;max-width:640px;margin:0 auto}
+figcaption{margin-top:1rem;font-size:.88rem;color:var(--ink-2);text-align:center;
+  max-width:52ch;margin-inline:auto}
+
+
+
+
+figure.capture{margin:2rem 0;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:1rem;box-shadow:var(--shadow);
+  width:fit-content;max-width:min(730px,100%)}
+figure.capture img{display:block;width:auto;height:auto;max-width:100%;
+  border-radius:calc(var(--radius) - 4px);border:1px solid var(--line)}
+figure.capture figcaption{margin-top:.9rem}
+
+
+footer{padding:clamp(2.4rem,5vw,3.6rem) 0 4rem;background:var(--surface-2)}
+footer .guichet{border-left:3px solid var(--orange);padding-left:1.1rem}
+.colophon{border-top:1px solid var(--line);padding-top:1.2rem;font-size:.85rem;color:var(--ink-3);
+  font-family:var(--mono)}
+
+
+
+
+@media (max-width:720px){
+  body{font-size:16px}
+  .step{grid-template-columns:40px 1fr;gap:0 1rem}
+  .rail .num{width:36px;height:36px;font-size:.9rem}
+  .dx-body{padding-left:1rem}
+  .progress{width:100%;margin-left:0;order:5}
+}
+@media print{
+  .settings,.copy{display:none}
+  body{font-size:11pt;background:#fff}
+  section{page-break-inside:auto;border-bottom:0}
+  .step{page-break-inside:avoid}
+  details.dx{page-break-inside:avoid}
+  details.dx summary::before{content:""}
+  .dx-body{display:block!important}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}
+
+body:not([data-v-mon-poste]) .v-mon-poste-mac{display:none}
+body[data-v-mon-poste="windows"] .v-mon-poste-mac{display:none}
+body[data-v-mon-poste="mac"] .v-mon-poste-windows{display:none}
+</style>
+<meta name="robots" content="noindex, nofollow"><style>
+:root{--eb-bg:#ffffff;--ink:#1b1f24;--ink-2:#4b5563;--line:#e3e6ea;--accent:#2f5d8a;--accent-ink:#ffffff;--accent-pale:#eef3f8;
+--ok:#1f6f43;--ok-pale:#f1f8f3;--warn:#a85a07;--warn-pale:#fdf6ec;--code-bg:#f5f6f8;
+--sans:Mulish,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Consolas,monospace}
+.eb-bandeau{background:var(--eb-bg);border-bottom:1px solid var(--line)}
+.eb-bandeau-in{max-width:1080px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px 22px;
+ padding:12px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px))}
+.eb-nom{font:800 16px/1.3 var(--sans);color:var(--ink);text-decoration:none}
+.eb-nav{display:flex;flex-wrap:wrap;gap:6px 16px;min-width:0}
+.eb-nav a{color:var(--ink-2);font:600 14px/1.4 var(--sans);text-decoration:none}
+.eb-nav a:hover,.eb-nav a[aria-current]{color:var(--accent)}
+.eb-nav a[aria-current]{text-decoration:underline;text-underline-offset:4px}
+.eb-langue{margin-left:auto;color:var(--accent);font:700 14px/1.4 var(--sans);text-decoration:none}
+.eb-nav a:focus-visible,.eb-nom:focus-visible,.eb-langue:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.seg:has([data-acc]){display:none}</style></head>
+<body><header class="eb-bandeau"><div class="eb-bandeau-in"><a class="eb-nom" href="index.html">EB twins</a><nav class="eb-nav"><a href="index.html">Where to start</a><a href="comprendre-mon-jumeau-numerique.html">1. How the twin works</a><a href="creer-mon-compte-github.html">2. My GitHub account</a><a href="demarrer-mon-jumeau-numerique.html" aria-current=page>3. Create my twin</a><a href="le-chef-de-mon-jumeau.html">Going further: the Chef</a></nav><a class="eb-langue" href="../demarrer-mon-jumeau-numerique.html" hreflang="fr">Français</a></div></header>
+<header class="hero"><div class="wrap hero-inner">
+<p class="eyebrow">The digital twins program</p>
+<h1>Create my <span class="k">digital twin</span></h1>
+<p class="lede col">By the end, your twin runs on your computer and it knows you. You only install the Claude app, and Claude does the rest, on Windows and Mac alike.</p>
+<div class="hero-meta"><span><strong>Less than an hour</strong> of hands-on work</span><span><strong>4 steps</strong>, one at a time</span><span><strong>No commands</strong> to type</span><span><strong>Windows and Mac</strong></span></div>
+</div></header>
+<div class="settings"><div class="wrap settings-inner"><div class="seg"><span class="seg-label">My computer</span><div class="seg-btns" role="group" aria-label="My computer"><button type="button" data-dim="mon-poste" data-val="windows" aria-pressed="true">Windows</button><button type="button" data-dim="mon-poste" data-val="mac" aria-pressed="false">Mac</button></div></div><div class="seg"><span class="seg-label">We say</span><div class="seg-btns" role="group" aria-label="Wording"><button type="button" data-acc="a" aria-pressed="true">Twin</button><button type="button" data-acc="b" aria-pressed="false">Twin</button></div></div><div class="progress"><span>Progress</span><div class="progress-track"><div class="progress-fill" id="pfill"></div></div><span id="pcount">0 / 0</span></div></div></div>
+<main>
+<section id="ce-que-tu-installes-et-pourquoi"><div class="wrap"><div class="sec-head"><p class="eyebrow">Before you touch anything</p><h2>What you're installing, and why</h2><p class="lede">A ten-minute read. By the end, you'll know what each piece is for, where your twin lives, and what the two settings in step 1 change.</p></div><div class="sec-body"><div class="note info"><span class="lbl">Have you already read "How the digital twin works"?</span><p>If so, skim this section and pick up again at the section "Your brain is yours, and no one else's". It's here for anyone who came straight to this page.</p></div>
+<div class="note info"><span class="lbl">Request access to the template now</span><p>The template is the starting brain, in a private repository. Getting access to it is the only wait in the whole process. Accept the invitation GitHub sent you by email, as explained in the "Create my GitHub account" training. You have nothing to send.</p></div>
+<div class="col stack"><h3>A twin is a brain plus execution</h3>
+<p>The <strong>brain</strong> is a folder of text files that belongs to you. It holds who you are, how you write, what matters to you, and your current projects. It grows as you work with your twin.</p>
+<p><strong>Execution</strong> is Claude reading that brain and acting. The two are kept apart on purpose. You can change computers or AI models. As long as the brain follows you, your twin follows you.</p>
+<p>This brain is backed up online, in a private repository on your GitHub account. It's <strong>your repository</strong>. The installation consists of creating it, then putting a working copy on your computer.</p></div>
+<figure class="diagram"><svg viewBox="0 0 620 250" role="img" aria-label="The brain, a folder of files backed up online, is loaded by the execution, the Claude app working on your computer in its Code tab.">
+  <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+  <g font-family="IBM Plex Mono, monospace" font-size="11">
+    <rect x="14" y="46" width="250" height="158" rx="10" fill="var(--creme)" stroke="var(--orange)" stroke-width="1.5"/>
+    <text x="26" y="30" fill="var(--orange-ink)" font-size="10" letter-spacing="1.6">THE BRAIN</text>
+    <text x="26" y="42" fill="var(--ink-3)" font-size="9.5" font-family="Mulish, sans-serif">text files, all yours</text>
+    <g fill="var(--ink)">
+      <text x="34" y="72">CLAUDE.md</text><text x="150" y="72" fill="var(--ink-3)" font-size="9.5">its instructions</text>
+      <text x="34" y="98">profile/</text><text x="150" y="98" fill="var(--ink-3)" font-size="9.5">who you are, your voice</text>
+      <text x="34" y="124">context/</text><text x="150" y="124" fill="var(--ink-3)" font-size="9.5">your team, your tools</text>
+      <text x="34" y="150">playbooks/</text><text x="150" y="150" fill="var(--ink-3)" font-size="9.5">how to carry things out</text>
+      <text x="34" y="176">dossiers/</text><text x="150" y="176" fill="var(--ink-3)" font-size="9.5">your current topics</text>
+    </g>
+    <g color="var(--ink-3)" stroke="currentColor" stroke-width="1.4" fill="none"><path d="M272 125 H352" marker-end="url(#ar)"/></g>
+    <text x="278" y="116" fill="var(--ink-3)" font-size="9.5" font-family="Mulish, sans-serif">loaded by</text>
+    <rect x="362" y="46" width="244" height="158" rx="10" fill="var(--bleu-pale)" stroke="var(--bleu)" stroke-width="1.5"/>
+    <text x="374" y="30" fill="var(--bleu-ink)" font-size="10" letter-spacing="1.6">THE EXECUTION</text>
+    <text x="374" y="42" fill="var(--ink-3)" font-size="9.5" font-family="Mulish, sans-serif">a session, on your computer</text>
+    <g fill="var(--ink)" font-family="Mulish, sans-serif" font-size="12.5">
+      <text x="384" y="80">The Claude app</text>
+      <text x="384" y="104" font-size="10.5" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">Code tab, Jumeau</text>
+      <text x="384" y="140">It reads the brain,</text>
+      <text x="384" y="160">it works,</text>
+      <text x="384" y="180">it writes to the brain.</text>
+    </g>
+  </g>
+</svg><figcaption>Change computers and the brain follows you. Whatever a session hasn't written to the brain is lost when it closes. So your twin writes everything that matters to its files.</figcaption></figure>
+<div class="col stack"><h3>The pieces, and when each one is used</h3>
+<p>You only install one application, Claude. Claude installs the rest for you in step 3.</p></div>
+<div class="cartes"><div class="carte"><h4>The Claude app <span class="tag">the computer</span></h4><p>The desktop app, signed in to your own Claude account. Your twin lives in its <strong>Code</strong> tab, on an environment you create once, called <strong>Jumeau</strong>.</p><p class="quand">The only program you open, every day.</p></div><div class="carte"><h4>Claude Code <span class="tag">the twin</span></h4><p>This is your twin itself, the engine that reads the brain and acts on your computer. There's nothing to install. Claude Code is in the app and your Claude subscription includes it.</p><p class="quand">Runs in the Code tab, at every session.</p></div><div class="carte"><h4>Git and GitHub <span class="tag">the backup</span></h4><p>Git is the mechanism that sends your brain online, and GitHub is where it's hosted. A lost, stolen or replaced computer doesn't take your twin with it. You don't touch any of this day to day.</p><p class="quand">Claude installs Git in step 3, and you never touch it again.</p></div><div class="carte"><h4>The GitHub tool <span class="tag">sign-in</span></h4><p>GitHub's official tool (gh). It signs you in to GitHub through your browser and creates your private repository. After the installation, your twin uses it without you.</p><p class="quand">Claude installs it and uses it in step 3.</p></div><div class="carte"><h4>Python <span class="tag">the engine for the tools</span></h4><p>What runs your twin's tools (reading an email with its attachments, saving a file, preparing a spreadsheet). You never use it directly. Without it, your twin has no hands.</p><p class="quand">Claude installs it in step 3, and you never touch it again.</p></div></div>
+<div class="note piege"><span class="lbl">Three tabs in the same app, and only one is the right one</span><p>The Claude app has three tabs: chat, <strong>Cowork</strong> and <strong>Code</strong>. Your twin lives in <strong>Code</strong>, and nowhere else. In the other tabs, Claude can't see your <code class="inline">jumeau</code> folder and can't install anything on your computer. If you paste a text from this training in the wrong place, nothing serious happens. Just start again in the Code tab.</p></div>
+<div class="col stack"><h3>The everyday routine, and its two settings</h3>
+<p>Open the Claude app, go to the <strong>Code</strong> tab, choose <strong>Jumeau</strong>, and write. There are no commands to remember.</p>
+<p>Two settings go with this routine. You turn them on once, in step 1. The first one needs explaining, because its name sounds alarming.</p>
+<p>By default, Claude asks for your permission before writing a file and before running a command. For an ordinary task, that's dozens of questions, and you end up saying yes without reading. That protects no one.</p>
+<p>The <strong>"Allow bypass permissions mode"</strong> setting lets you choose <strong>"Bypass permissions"</strong> below the input box. Your twin then works in one go, and its work scrolls by on screen. The app remembers this choice for your <code class="inline">jumeau</code> folder, so you only do it once.</p>
+<p>The <strong>"Connect new sessions to Remote Control"</strong> setting makes every session reachable beyond its window, from the web and from your phone. That way you can follow and steer your twin when you're away from your computer. Without it, the session only responds to its own window.</p></div>
+<div class="note info"><span class="lbl">What this changes for you</span><p>You no longer approve each action. You watch the work as it happens. If something surprises you, you interrupt your twin and ask it what it's doing.</p>
+<p>What doesn't change: <strong>nothing goes out without your approval.</strong> An email, a message, an entry in a tool: your twin prepares a draft and waits for your go-ahead. This rule is in its brain, and the setting doesn't touch it.</p></div>
+<div class="col stack"><h3>Vocabulary</h3></div>
+<dl class="lex"><div><dt>The Code tab</dt><dd>The part of the Claude app where your twin lives. It's where you paste the prompt in step 3, and where you work every day.</dd></div><div><dt>An environment</dt><dd>A saved setting in the Code tab that says which folder on your computer Claude works on. Yours is called Jumeau and points to your <code class="inline">jumeau</code> folder.</dd></div><div><dt>A prompt</dt><dd>A text you address to Claude. The ones in this training are ready-made. You copy them in full without changing anything, except what's between angle brackets.</dd></div><div><dt>A repository</dt><dd>The private online space where your brain is backed up. Claude creates yours in step 3, on your GitHub account.</dd></div><div><dt>The template</dt><dd>The starting brain, with no personal content, in a private EB-jumeaux repository. Your repository is a copy of it, which you make your own. Your twin gets its tool updates from it.</dd></div><div><dt>Clone</dt><dd>To copy a repository to your computer so you can work on it. Claude does it for you in step 3, just once.</dd></div><div><dt>A commit</dt><dd>A dated backup of the brain. Your twin makes them without being asked, whenever it has produced something that matters.</dd></div><div><dt>A session</dt><dd>A conversation with your twin, in the Code tab, on the Jumeau environment. Each new session rereads the brain as it opens.</dd></div></dl>
+<div class="checks"><label class="check"><input type="checkbox" data-k="ce-que-tu-installes-et-pourquoi.je-sais-que-le-cerveau-est-un-dossier-de-fichiers-a-moi-sauv" data-n="c1"><span class="txt">I know the brain is a folder of files that belongs to me, backed up in my repository</span></label><label class="check"><input type="checkbox" data-k="ce-que-tu-installes-et-pourquoi.je-sais-que-ton-jumeau-vit-dans-l-onglet-code-de-l-applicati" data-n="c2"><span class="txt">I know my twin lives in the Code tab of the Claude app, and nowhere else</span></label><label class="check"><input type="checkbox" data-k="ce-que-tu-installes-et-pourquoi.je-sais-quel-est-le-geste-de-tous-les-jours-et-ce-que-font-s" data-n="c3"><span class="txt">I know what the everyday routine is, and what its two settings do</span></label><label class="check"><input type="checkbox" data-k="ce-que-tu-installes-et-pourquoi.je-sais-que-rien-ne-sort-sans-mon-accord-quel-que-soit-le-re" data-n="c4"><span class="txt">I know nothing goes out without my approval, whatever the setting</span></label></div></div></div></section>
+<section id="ton-cerveau-est-a-toi-et-a-personne-d-au"><div class="wrap"><div class="sec-head"><p class="eyebrow">Security</p><h2>Your brain is yours, and no one else's</h2><p class="lede">Your twin will end up holding your projects, the way you make decisions, your emails. Here is where that content lives, who can read it, and what leaves your computer.</p></div><div class="sec-body"><div class="col stack"><h3>Two repositories, and they don't belong to the same person</h3>
+<p>There is <strong>the template</strong>, a private repository EB-jumeaux keeps as an up-to-date copy of the model designed by Pascal Jarry. It contains the skeleton, the starting instructions, the tools and the safeguards. Pascal Jarry improves it regularly, and our copy follows. <strong>It contains no one's personal content</strong>, not Éric's, not anyone else's, not yours. It's a shell.</p>
+<p>And there is <strong>your repository</strong>, which Claude creates in step 3 on <strong>your</strong> GitHub account, as <strong>private</strong>. That's where your brain lives, and it belongs to you. <strong>No one but you has access to it</strong>, not Éric, not the template's other users. Only GitHub, which hosts it, holds it, as with any private repository.</p></div>
+<figure class="diagram"><svg viewBox="0 0 640 268" role="img" aria-label="The template, an EB-jumeaux repository with no personal content, sends its improved tools to your private repository. Nothing flows the other way.">
+  <defs><marker id="fl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+  <g font-family="IBM Plex Mono, monospace" font-size="11">
+    <rect x="10" y="52" width="252" height="150" rx="10" fill="var(--creme)" stroke="var(--orange)" stroke-width="1.5"/>
+    <text x="22" y="30" fill="var(--orange-ink)" font-size="10" letter-spacing="1.6">THE TEMPLATE</text>
+    <text x="22" y="44" fill="var(--ink-3)" font-size="9.5" font-family="Mulish, sans-serif">the EB-jumeaux repository</text>
+    <g fill="var(--ink)">
+      <text x="30" y="80">CLAUDE.md</text><text x="140" y="80" fill="var(--ink-3)" font-size="9.5">the reflexes</text>
+      <text x="30" y="104">tools/</text><text x="140" y="104" fill="var(--ink-3)" font-size="9.5">the tools</text>
+      <text x="30" y="128">playbooks/</text><text x="140" y="128" fill="var(--ink-3)" font-size="9.5">the methods</text>
+    </g>
+    <text x="30" y="164" fill="var(--orange-ink)" font-size="10" font-family="Mulish, sans-serif" font-weight="700">No personal content.</text>
+    <text x="30" y="182" fill="var(--ink-3)" font-size="9.5" font-family="Mulish, sans-serif">A shell, nothing else.</text>
+    <g color="var(--vert)" stroke="currentColor" stroke-width="1.6" fill="none"><path d="M270 104 H370" marker-end="url(#fl)"/></g>
+    <text x="272" y="95" fill="var(--ink-2)" font-size="9.5" font-family="Mulish, sans-serif">improved tools</text>
+    <text x="272" y="130" fill="var(--brique)" font-size="9.5" font-family="Mulish, sans-serif">nothing goes up</text>
+    <g color="var(--brique)" stroke="currentColor" stroke-width="1.6" fill="none" opacity="0.55"><path d="M370 146 H274" stroke-dasharray="5 4"/></g>
+    <g stroke="var(--brique)" stroke-width="2"><path d="M312 138 l16 16 M328 138 l-16 16"/></g>
+    <rect x="378" y="52" width="252" height="150" rx="10" fill="var(--bleu-pale)" stroke="var(--bleu)" stroke-width="1.5"/>
+    <text x="390" y="30" fill="var(--bleu-ink)" font-size="10" letter-spacing="1.6">YOUR REPOSITORY</text>
+    <text x="390" y="44" fill="var(--ink-3)" font-size="9.5" font-family="Mulish, sans-serif">on your account, private</text>
+    <g fill="var(--ink)">
+      <text x="398" y="80">profile/</text><text x="508" y="80" fill="var(--ink-3)" font-size="9.5">who you are</text>
+      <text x="398" y="104">dossiers/</text><text x="508" y="104" fill="var(--ink-3)" font-size="9.5">your topics</text>
+      <text x="398" y="128">memory/</text><text x="508" y="128" fill="var(--ink-3)" font-size="9.5">what is remembered</text>
+    </g>
+    <text x="398" y="164" fill="var(--bleu-ink)" font-size="10" font-family="Mulish, sans-serif" font-weight="700">Access for you alone.</text>
+    <text x="398" y="182" fill="var(--ink-3)" font-size="9.5" font-family="Mulish, sans-serif">Not Éric, not anyone.</text>
+    <text x="320" y="236" fill="var(--ink-3)" font-size="9.5" font-family="Mulish, sans-serif" text-anchor="middle">Two repositories, two owners. The boundary can only be crossed one way.</text>
+  </g>
+</svg><figcaption>The tools come down from the template, and your content never goes up. That's how it's built.</figcaption></figure>
+<div class="col stack"><h3>What Éric sees of your repository</h3>
+<p><strong>Nothing.</strong> This isn't a promise, it's a consequence of how things are built. Your repository is private and on your account, so access can only be granted from your account, by you. As long as you invite no one, no one else can read it, and you can check this at any time in your repository's settings on GitHub.</p>
+<p>The reverse isn't true, and that's intentional. You have read access to the template, since you start from it and your twin gets its updates there. But what you read there belongs to no one in particular. It's just skeleton.</p></div>
+<div class="note repere"><span class="lbl">Updates only flow one way</span><p>At every startup, your twin checks the template and <strong>copies a read-only version of it</strong> to a local cache. It compares, picks up the tools improved since last time, and updates its mechanics.</p>
+<p><strong>It never writes anything there.</strong> Your access to the template is read-only, and GitHub would refuse any write. What you write goes to your repository, and stops there.</p>
+<p>The update only touches the <strong>mechanics</strong>: the tools and the basic reflexes. Your projects, your profile and your memory are never replaced by the template.</p></div>
+<div class="col stack"><h3>What would happen if the template disappeared</h3>
+<p>Nothing serious. If the template's repository closed tomorrow, or your access to it were withdrawn, <strong>your twin would keep working exactly the same</strong>. It just wouldn't receive any more improvements.</p>
+<p>Your brain is in your repository, your working copy is on your disk, and your Claude subscription is yours. <strong>Nothing depends on Éric.</strong></p></div>
+<div class="note info"><span class="lbl">Secrets never go in the repository</span><p>Your twin will need keys to work, for example an app password to read your mailbox. <strong>These values live in a <code class="inline">.env</code> file at the root, which is excluded from the repository</strong> and stays that way.</p>
+<p>This is a rule, not a setting to check. <strong>A secret put in git is a published secret, even on a private repository.</strong> It stays in the history, and the history travels with every copy. Your twin knows this rule. It will tell you which line to fill in and where to find the value, but <strong>you write it yourself, by hand</strong>. It will never ask you to paste a key into the conversation.</p></div>
+<div class="col stack"><h3>What leaves your computer</h3>
+<ul><li><strong>Your conversation, and the content of the files your twin reads to answer you</strong>, go to Anthropic to be processed, as with any use of Claude.</li><li><strong>Your files</strong> are also pushed to your private repository on GitHub, which hosts it. They go nowhere else.</li><li><strong>What your twin sends for you</strong>, an email or a message, never goes out until you've said yes. It prepares, it waits. This rule lives in its brain, and it doesn't depend on any technical setting.</li></ul></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="ton-cerveau-est-a-toi-et-a-personne-d-autre.je-sais-que-mon-depot-est-prive-sur-mon-compte-et-que-rien-d" data-n="c5"><span class="txt">I know my repository is private, on my account, and that none of my content goes up to the template</span></label><label class="check"><input type="checkbox" data-k="ton-cerveau-est-a-toi-et-a-personne-d-autre.je-sais-que-les-secrets-vont-dans-le-fichier-env-jamais-dans" data-n="c6"><span class="txt">I know secrets go in the .env file, never in the repository or the conversation</span></label></div></div></div></section>
+<section id="deux-comptes-a-creer-un-acces-a-demander"><div class="wrap"><div class="sec-head"><p class="eyebrow">Step zero</p><h2>Two accounts to create, one access to request</h2><p class="lede">Two accounts are yours, and only one access comes from Éric Bourbeau. Check all three before you start.</p></div><div class="sec-body"><div class="checks"><label class="check"><input type="checkbox" data-k="deux-comptes-a-creer-un-acces-a-demander.un-compte-claude-a-toi" data-n="c7"><span class="txt">A Claude account of your own<em>Go to <a href="https://claude.ai">claude.ai</a> and get a subscription. <strong>Pro is enough to start</strong>, Max if you plan to use it intensively. You pay for it, it's your tool, and your twin doesn't depend on any organization.</em></span></label><label class="check"><input type="checkbox" data-k="deux-comptes-a-creer-un-acces-a-demander.un-compte-github-gratuit" data-n="c8"><span class="txt">A free GitHub account<em>This is where your brain will live, in a private repository that belongs only to you. <strong>The previous training, "Create my GitHub account", guides you step by step</strong>, in ten minutes, and shows you where to find your username, the one you'll be asked for.</em></span></label><label class="check"><input type="checkbox" data-k="deux-comptes-a-creer-un-acces-a-demander.l-acces-au-gabarit" data-n="c9"><span class="txt">Access to the template<em>The starting brain lives in a private repository. <strong>Send your GitHub username to Éric Bourbeau by email, with a subject that starts with Jumeau, then accept the invitation</strong> GitHub sends you. If you have no invitation after two business days, follow up with the same email. Without this, step 3 stops on a refusal. It's all detailed in "Create my GitHub account".</em></span></label></div>
+<div class="note piege"><span class="lbl">GitHub account first, request second</span><p>Create your GitHub account <strong>before</strong> requesting access. An invitation can't be sent to someone who doesn't have an account yet. The username is needed to issue it.</p></div>
+<div class="note info"><span class="lbl">What you don&#x27;t need</span><p><strong>No password to receive from anyone.</strong> You sign in to GitHub through your browser, with your own account.</p></div>
+<div class="note info"><span class="lbl">Permissions on your computer</span><p>Python installs in your account, without administrator rights. Git, if it's missing, may bring up a system window asking for your confirmation. On a personal computer, you can accept. On a computer provided by an employer, check before you start, and if an installation is refused, don't work around it.</p></div>
+<div class="col stack"><h3>How long it takes</h3>
+<p>Allow less than an hour of hands-on work. On the calendar, it takes a few days, almost all of it waiting for the invitation to the template.</p>
+<div class="tablewrap"><table><thead><tr><th>Step</th><th>Where</th><th>Hands-on time</th></tr></thead><tbody><tr><td>1. Configure the app</td><td>Claude app, Settings</td><td class="num">5 min</td></tr><tr><td>2. Create the folder</td><td>On your computer</td><td class="num">5 min</td></tr><tr><td>3. Retrieve your brain</td><td>Claude app, Code tab</td><td>15 to 20 min</td></tr><tr><td>4. First session</td><td>Claude app, Code tab</td><td>20 to 25 min</td></tr></tbody></table></div></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="deux-comptes-a-creer-un-acces-a-demander.j-ai-verifie-les-trois-choses-de-l-etape-zero-et-l-invitatio" data-n="c10"><span class="txt">I've checked the three things in step zero, and the invitation to the template is accepted or requested</span></label></div></div></div></section>
+<section id="l-installation"><div class="wrap"><div class="sec-head"><p class="eyebrow">The path</p><h2>The installation</h2><p class="lede">Each step ends with a success check. Until you've seen it for yourself, don't move on to the next one and don't start over. Let Éric Bourbeau know by email.</p></div><div class="step" data-step="1"><div class="rail"><div class="num">1</div><div class="line"></div></div><div class="step-body"><div class="step-head"><span class="where">In the Claude app, Settings</span><h3>Configure the Claude app</h3><p class="small">Five minutes, no prompt. Two settings to turn on, just once.</p></div><ol><li>Open the Claude app on your <span class="v-mon-poste-windows">computer</span><span class="v-mon-poste-mac">Mac</span>. If you don't have it, go to <a href="https://claude.ai/download">claude.ai/download</a>, install it and sign in with your Claude account.</li><li>Open <strong>Settings</strong>, then <strong>Claude Code</strong>.</li><li>Turn on <strong>"Allow bypass permissions mode"</strong>. Without it, Claude would ask your permission for every action.</li><li>Also turn on <strong>"Connect new sessions to Remote Control"</strong>. It lets you steer your session from your phone or the web.</li></ol>
+<div class="note neutre"><span class="lbl">On a personal subscription</span><p>These two settings were noted on a business account. Whether they appear on a personal Pro subscription hasn't been checked yet. If you can't find them, report it before going any further.</p></div>
+<div class="note reussi"><span class="lbl">You&#x27;re done when</span><p>The app is open on your Claude account and both settings are on.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="regler-l-application-claude.l-application-claude-est-sur-mon-compte-et-ses-deux-reglages" data-n="c11"><span class="txt">The Claude app is on my account and both its settings are on</span></label></div></div></div>
+<div class="step" data-step="2"><div class="rail"><div class="num">2</div><div class="line"></div></div><div class="step-body"><div class="step-head"><span class="where">On your computer</span><h3>Create your twin's folder</h3><p class="small">Five minutes. No prompt, just one folder to create where you'll be able to find it again.</p></div><p>Your twin's brain lives in a folder on your computer. It's the only location you'll need to know.</p>
+<div class="note info"><span class="lbl">Why you create it yourself</span><p>You create it yourself so you know where it is. This is the folder you point to in step 3.</p></div>
+<p><strong>Put it in your Documents and name it <code class="inline">jumeau</code>.</strong> All lowercase, with no spaces and no accents. On a PC, if your Documents are in OneDrive, put it directly in your personal folder instead (<code class=\"inline\">C:\Users\your name</code>).</p>
+<ol><li>Open <strong><span class="v-mon-poste-windows">File Explorer, the yellow folder icon in your taskbar</span><span class="v-mon-poste-mac">Finder, the blue icon in your Dock</span></strong>.</li><li>In the left column, click <strong>Documents</strong>.</li><li><span class="v-mon-poste-windows">Right-click in the empty area on the right, choose <strong>New</strong>, then <strong>Folder</strong>.</span><span class="v-mon-poste-mac">Open the <strong>File</strong> menu at the very top of the screen, then choose <strong>New Folder</strong>.</span></li><li>Name it <strong><code class="inline">jumeau</code></strong>, then press Enter.</li></ol>
+<p>You've just created <code class="inline"><span class="v-mon-poste-windows">Documents\jumeau</span><span class="v-mon-poste-mac">Documents/jumeau</span></code>. It's empty, which is normal. Claude fills it in step 3.</p>
+<div class="note reussi"><span class="lbl">You&#x27;re done when</span><p>You can see the <code class="inline">jumeau</code> folder in your Documents.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="creer-le-dossier-de-ton-jumeau.le-dossier-jumeau-existe-et-je-sais-ou-il-se-trouve" data-n="c12"><span class="txt">The <code class="inline">jumeau</code> folder exists, and I know where it is</span></label></div></div></div>
+<div class="step" data-step="3"><div class="rail"><div class="num">3</div><div class="line"></div></div><div class="step-body"><div class="step-head"><span class="where">In the Claude app, Code tab</span><h3>Retrieve your brain</h3><p class="small">You create the Jumeau environment, then paste a single prompt. Claude installs what's missing, has you sign in to GitHub, copies the template, creates your private repository and connects to it. All you do is sign in.</p></div><div class="note piege"><span class="lbl">Check this before you start</span><p><strong>Access to the template must be open.</strong> It's the third item in step zero. If you haven't yet accepted the invitation GitHub sent you by email, the clone fails with a refusal. Go accept the invitation first. It takes ten seconds.</p></div>
+<p><strong>Open your twin on your folder</strong></p>
+<ol><li>In the Claude app, go to the <strong>Code</strong> tab.</li><li>In <strong>"Select environment"</strong>, create a new environment. In the <strong>"New environment"</strong> window, stay on the <strong>Local</strong> tab. Enter <strong>Jumeau</strong> as the name, choose <strong>This computer</strong> under <strong>"Run in"</strong>, then, under <strong>Folders</strong>, click <strong>"+ Add"</strong> and choose your <strong><code class="inline">jumeau</code></strong> folder. Click <strong>"Create environment"</strong>.</li><li>Open a new session on <strong>Jumeau</strong>. Below the input box, choose <strong>"Bypass permissions"</strong>. The app will remember it for this folder.</li></ol>
+<div class="note piege"><span class="lbl">Local, never Cloud</span><p>A <strong>Cloud</strong> environment runs on an Anthropic machine, not on your computer. It can't see your <code class="inline">jumeau</code> folder and installs nothing on your side. For your twin, it's always <strong>Local</strong>.</p></div>
+<p><strong>The prompt</strong></p>
+<ol start="4"><li>Copy the block below in full and paste it into the session, then press Enter.</li></ol>
+<div class="copybloc v-mon-poste-windows"><div class="copybloc-head"><span class="t">The installation prompt · Windows</span><button class="copy" type="button">Copy</button></div><pre>Hello Claude. I&#x27;m not technical, so do the work for me and
+speak to me simply, and don&#x27;t do anything destructive. Prepare my computer and
+install the brain of my digital twin. Don&#x27;t make me type anything, and
+tell me before each system window I&#x27;ll have to accept.
+1. Git. Check whether it&#x27;s installed. If not, install it with
+   winget install --id Git.Git -e --source winget
+2. Python. Install uv with Astral&#x27;s official installer, in my account,
+   without administrator rights, then Python 3.12 with
+   uv python install 3.12 --default.
+3. The GitHub tool. Install gh with
+   winget install --id GitHub.cli -e --source winget
+   Use full paths, my app can&#x27;t see the new PATH yet.
+   Check that git, python and gh respond with their version.
+4. Ask me for my first name, last name and email, then configure git
+   with that identity.
+5. Connect gh to GitHub through my browser with
+   gh auth login --hostname github.com --git-protocol https --web
+   then gh auth setup-git. Show me the one-time code it displays,
+   and I&#x27;ll enter it myself on the GitHub page. Never ask me for a
+   password or a token in this conversation. If the command waits for
+   a key you can&#x27;t press, stop and tell me.
+6. The working folder is this session&#x27;s folder, Documents\jumeau.
+   Before cloning, if this folder&#x27;s path contains OneDrive, stop:
+   suggest creating the jumeau folder directly in my personal
+   folder instead, outside OneDrive, and wait for my approval. Clone into it
+   https://github.com/EB-jumeaux/gabarit-jumeau.git, with the contents
+   directly in this folder, not in a subfolder. Then create the .env file from .env.exemple and add the line
+   GABARIT_DEPOT=https://github.com/EB-jumeaux/gabarit-jumeau.git
+   (it isn't a secret, it's the address my updates come from).
+7. Create MY own private repository with gh repo create jumeau --private, then point the folder to it with git remote set-url
+   origin, and push everything. Check that the branch is named main before
+   pushing, and that after the push git remote -v shows MY repository, and
+   no longer the template.
+8. Check that the folder contains CLAUDE.md, profile/ and tools/, and that
+   python tools/maj_jumeau.py --verifier runs without errors.
+9. Give me a report in plain language, one line per item. If an
+   item fails, show me the exact error message so I can
+   pass it on. End by telling me to fully quit the Claude
+   app and reopen it before my first real session.</pre></div>
+<div class="copybloc v-mon-poste-mac"><div class="copybloc-head"><span class="t">The installation prompt · Mac</span><button class="copy" type="button">Copy</button></div><pre>Hello Claude. I&#x27;m not technical, so do the work for me and
+speak to me simply, and don&#x27;t do anything destructive. Prepare my computer and
+install the brain of my digital twin. Don&#x27;t make me type anything, and
+tell me before each system window I&#x27;ll have to accept.
+1. Git. Check whether it&#x27;s installed. If not, run xcode-select --install and
+   wait until I&#x27;ve accepted Apple&#x27;s window and the installation is
+   finished.
+2. Python. Install uv with Astral&#x27;s official installer, in my account,
+   without administrator rights, then Python 3.12 with
+   uv python install 3.12 --default.
+3. The GitHub tool. Install gh in my account, without administrator
+   rights, from the official Mac archive published at
+   github.com/cli/cli/releases, in ~/.local/bin. Use full paths,
+   my app can&#x27;t see the new PATH yet. Check
+   that git, python and gh respond with their version.
+4. Ask me for my first name, last name and email, then configure git
+   with that identity.
+5. Connect gh to GitHub through my browser with
+   gh auth login --hostname github.com --git-protocol https --web
+   then gh auth setup-git. Show me the one-time code it displays,
+   and I&#x27;ll enter it myself on the GitHub page. Never ask me for a
+   password or a token in this conversation. If the command waits for
+   a key you can&#x27;t press, stop and tell me.
+6. The working folder is this session&#x27;s folder, Documents/jumeau. Clone into it
+   https://github.com/EB-jumeaux/gabarit-jumeau.git, with the contents
+   directly in this folder, not in a subfolder. Then create the .env file from .env.exemple and add the line
+   GABARIT_DEPOT=https://github.com/EB-jumeaux/gabarit-jumeau.git
+   (it isn't a secret, it's the address my updates come from).
+7. Create MY own private repository with gh repo create jumeau --private, then point the folder to it with git remote set-url
+   origin, and push everything. Check that the branch is named main before
+   pushing, and that after the push git remote -v shows MY repository, and
+   no longer the template.
+8. Check that the folder contains CLAUDE.md, profile/ and tools/, and that
+   python tools/maj_jumeau.py --verifier runs without errors.
+9. Give me a report in plain language, one line per item. If an
+   item fails, show me the exact error message so I can
+   pass it on. End by telling me to fully quit the Claude
+   app and reopen it before my first real session.</pre></div>
+<ol start="5"><li>Press Enter. There's nothing to replace: Claude will ask you for your name and email.</li></ol>
+<div class="note info"><span class="lbl">When Claude shows you a code and the browser opens</span><p>Claude displays an eight-character code and opens the GitHub page in your browser. You sign in <strong>yourself</strong>, with your own account, enter the code and authorize. If Claude asks you for a password or a token, say no and report it. That isn't the right way.</p></div>
+<div class="note info"><span class="lbl">A system window may ask you for confirmation</span><p><span class="v-mon-poste-windows">If Git or the GitHub tool is missing, Windows may show a window asking you to allow an app to make changes.</span><span class="v-mon-poste-mac">If Git is missing, your Mac shows an Apple window offering to install the developer tools.</span> Claude warns you first. Accept it, that's normal, and let the installation finish before you answer Claude.</p></div>
+<div class="note neutre"><span class="lbl">What hasn&#x27;t been verified yet</span><p>Signing in to GitHub when Claude starts it from the Code tab, installing the GitHub tool without rights on Mac, and installing Git on a computer that doesn't have it yet haven't been done end to end. Python and the rest of the installation have, on both Windows and Mac. If you see anything other than what this page says, report it. That's exactly what helps the next person.</p></div>
+<ol start="6"><li>When Claude tells you it's done, <strong>fully quit the Claude app, then reopen it.</strong> It can then see Git, Python and the GitHub tool, which Claude has just installed.</li></ol>
+<div class="note reussi"><span class="lbl">You&#x27;re done when</span><p>Claude confirms that the folder contains <code class="inline">CLAUDE.md</code>, <code class="inline">profile/</code> and <code class="inline">tools/</code>, and that <code class="inline">git remote -v</code> points to <strong>your</strong> repository. You can check for yourself on GitHub: your <code class="inline">jumeau</code> repository isn't empty. A folder that stays empty isn't a success, even if the report sounds optimistic.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="recuperer-ton-cerveau.le-cerveau-est-la-mon-depot-prive-est-sur-mon-compte-github-" data-n="c13"><span class="txt">The brain is there, my private repository is on my GitHub account, and I've reopened the app</span></label></div></div></div>
+<div class="step" data-step="4"><div class="rail"><div class="num">4</div></div><div class="step-body"><div class="step-head"><span class="where">In the Claude app, Code tab</span><h3>Your first session</h3><p class="small">The installation is done. What comes next is a conversation, and that's what makes the difference between a generic assistant and one that writes like you.</p></div><ol><li>In the <strong>Code</strong> tab, open a <strong>new session</strong> on <strong>Jumeau</strong>. A new one, not the installation one. A session reads the brain when it opens, and the installation one opened on an empty folder.</li><li>Check that <strong>"Bypass permissions"</strong> is selected below the input box, and write <strong>Hello</strong>.</li><li>Your twin introduces itself and asks you a series of questions to build your profile. Who you are, how you write, what matters to you.</li><li>Answer in your working language, in ordinary sentences.</li></ol>
+<div class="note info"><span class="lbl">Take your time here</span><p>A twin is only as good as its profile. The most valuable part is the one about your voice. Paste three emails you wrote yourself and ask it to work out your way of writing from them.</p></div>
+<div class="note repere"><span class="lbl">You decide its scope</span><p>This starting brain is <strong>neutral</strong>. Tell it what you want it to cover: work, personal life, or both.</p></div>
+<div class="note reussi"><span class="lbl">You&#x27;re done when</span><p>The interview is over. Your twin has written your answers to its files and saved them in your repository. Ask it to confirm this.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="ta-premiere-session.mon-profil-est-rempli-et-ma-premiere-session-est-faite" data-n="c14"><span class="txt">My profile is filled in and my first session is done</span></label></div></div></div></div></section>
+<section id="si-ca-coince"><div class="wrap"><div class="sec-head"><p class="eyebrow">Self-check</p><h2>If you get stuck</h2><p class="lede">Each of these cases really happened, or is flagged as unverified. Find your symptom and apply the fix. Two attempts at most, then report it and wait, without improvising repairs.</p></div><div class="sec-body"><details class="dx"><summary>"Bypass permissions" doesn't appear below the input box</summary><div class="dx-body"><p>The choice only exists if this setting is on. It's the first setting in step 1.</p><p class="geste">Open Settings, Claude Code, and turn on "Allow bypass permissions mode". Then open a new session on Jumeau. If the setting doesn't exist on your subscription, report it.</p></div></details>
+<details class="dx"><summary>Claude tells me it can't install anything, or can't see my folder</summary><div class="dx-body"><p>You're writing in an ordinary conversation or in Cowork. There, Claude isn't working on your computer. Only the Code tab, in Local, can see your <code class="inline">jumeau</code> folder.</p><p class="geste">Go to the <strong>Code</strong> tab, choose the <strong>Jumeau</strong> environment, and paste your prompt again in a new session.</p></div></details>
+<details class="dx"><summary>My session is running in Cloud</summary><div class="dx-body"><p>A Cloud session runs on an Anthropic machine. It can't see your computer, your folder or your tools.</p><p class="geste">Open a new session and choose the <strong>Jumeau</strong> environment, the one you created in <strong>Local</strong>. If you can't see it, redo step 3 from the start, on the Local tab.</p></div></details>
+<details class="dx"><summary>GitHub sign-in is stuck, or Claude says it can't finish it</summary><div class="dx-body"><p>This sign-in goes through your browser, and Claude can't answer a question asked in a window for you. This is the one point in the process that hasn't been tested end to end yet, and your report helps fix it.</p><p class="geste">See whether a GitHub page is waiting in your browser, or a window behind the others. If not, copy Claude's message in full and write to Éric Bourbeau, without trying another route.</p></div></details>
+<details class="dx"><summary>The template clone is refused, or I'm told the repository doesn't exist</summary><div class="dx-body"><div class="quote">Repository not found.</div><p>A private repository you don't have access to looks like a repository that doesn't exist. GitHub never says "you don't have permission". So it's almost always the access that's missing, not the address that's wrong.</p><p class="geste">Check two things, in this order. Did you accept the GitHub invitation you received by email, and did the GitHub sign-in really finish? If both are done and it still fails, report it.</p></div></details>
+<details class="dx"><summary>My repository was created but looks empty or has no main branch</summary><div class="dx-body"><p>The most misleading case, because everything seems to have worked. Check the branch before looking anywhere else.</p><p class="geste">Ask Claude to check the branch name, rename it to <code class="inline">main</code> if needed, then push again. Don't recreate the repository.</p></div></details>
+<details class="dx"><summary>The session doesn't recognize me and answers like an ordinary Claude</summary><div class="dx-body"><p>A session reads the brain when it opens. The installation session opened when your folder was still empty.</p><p class="geste">Open a new session on Jumeau. If you've just installed, quit the app first and reopen it.</p></div></details>
+<details class="dx"><summary>A message says the selected model requires usage credits</summary><div class="dx-body"><p>The model offered by default isn't enabled on your subscription. Nothing is broken, and it has nothing to do with the installation. The exact wording of this message in the app hasn't been recorded yet.</p><p class="geste">In the model selector, below the input box, choose a model available on your subscription, then paste your prompt again.</p></div></details>
+<details class="dx"><summary>I dictate with Wispr Flow and the text doesn't go into the input box</summary><div class="dx-body"><p>Dictation in the Code tab's input box hasn't been verified yet. Your report will help verify it.</p><p class="geste">Tell Éric by email, with your system and the version of the Claude app.</p></div></details>
+<details class="dx"><summary>An error appears and I don't understand it</summary><div class="dx-body"><p>You have no commands to type in this training. If you're asked to type one, something has sent you the wrong way.</p><p class="geste">Stop. Copy the error message in full, from the first line, and send it as is to Éric Bourbeau by email, with a subject that starts with Jumeau. A screenshot alone isn't enough. The exact text is what makes it possible to decide.</p></div></details>
+<details class="dx"><summary>The folder already exists, or the clone stopped halfway</summary><div class="dx-body"><p>It can always be fixed, on one condition: don't delete anything.</p><p class="geste">Report it as is to Éric Bourbeau. A half-finished installation can be resumed without harm. A brain erased by mistake is hard to recover.</p></div></details>
+<details class="dx"><summary>I reported a blocker and haven't had a reply</summary><div class="dx-body"><p>Two separate rules. A reported blocker gets a follow-up the very next day. A request for access to the template gets a follow-up after two business days. An unanswered question costs more days than any error screen.</p><p class="geste">Follow up the very next day, same email, same subject.</p></div></details></div></div></section>
+<section id="le-rythme-de-croisiere"><div class="wrap"><div class="sec-head"><p class="eyebrow">Once it's running</p><h2>The day-to-day rhythm</h2><p class="lede">What keeps your twin useful over time.</p></div><div class="sec-body"><div class="cartes"><div class="carte"><h4>One routine <span class="tag">every day</span></h4><p>Open the Claude app, Code tab, choose Jumeau, write. Syncing, rereading the brain and backups: it takes care of all that without you.</p></div><div class="carte"><h4>Automatic updates <span class="tag">nothing to do</span></h4><p>At every startup, it checks the template and picks up the tools improved since last time. Your content is never touched. You have nothing to install or request.</p></div><div class="carte"><h4>Nothing goes out without your approval <span class="tag">security</span></h4><p>An email, a message, an entry in a tool: it prepares a draft and waits for your go-ahead. Always. If it acts without asking, that's a defect, so report it to Éric Bourbeau.</p></div><div class="carte"><h4>Correct in the files <span class="tag">the method</span></h4><p>When it gets the tone or the method wrong, ask it to correct the relevant file, not just its reply. Otherwise it will make the same mistake tomorrow.</p></div><div class="carte"><h4>What matters gets written down <span class="tag">the principle</span></h4><p>What lives only in a session is lost when it closes. What's written in a brain file follows you everywhere.</p></div></div>
+<div class="note info"><span class="lbl">What comes next</span><p>After the installation, the first project we recommend is <strong>your emails</strong>: having it read your mailbox, sort what needs a reply and prepare drafts for you. Tell it "take care of my emails", and it will tell you what to do.</p>
+<p>Then allow two to three weeks of breaking in. Every friction you report during that time improves your twin.</p></div>
+<div class="note repere"><span class="lbl">You&#x27;re also a test bench</span><p>Report any defect to Éric Bourbeau by email. Your content never goes up to the template, but a defect you report gets fixed there, and the fix benefits everyone.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="le-rythme-de-croisiere.je-connais-le-geste-de-tous-les-jours" data-n="c15"><span class="txt">I know the everyday routine</span></label><label class="check"><input type="checkbox" data-k="le-rythme-de-croisiere.je-sais-que-je-corrige-ton-jumeau-dans-ses-fichiers-pas-seul" data-n="c16"><span class="txt">I know I correct my twin in its files, not just in its reply</span></label></div>
+<div class="copybloc accomp"><div class="accomp-head"><span class="lbl">With your twin</span><h3>Get guided through this installation</h3><p>To be guided step by step through installing your twin, copy this prompt and paste it at the start of a new conversation in the Claude app, or into your twin if the installation is done.</p><button class="copy accomp-btn" type="button">Copy the prompt</button></div><details class="accomp-prompt"><summary>View the prompt</summary><pre>You&#x27;re guiding me, step by step, through installing my digital twin on
+my computer. Here is what we&#x27;re installing, the pieces, the rules, the method, and
+how you should work with me.
+
+WHAT WE&#x27;RE INSTALLING
+
+A digital twin is a brain plus execution. The brain is a
+folder of text files that belongs to me, backed up online in a private
+repository on MY GitHub account. Execution is the Claude app, in
+its Code tab, reading this brain and acting on my computer. The installation
+starts from the template, the starting brain, with no personal
+content (https://github.com/EB-jumeaux/gabarit-jumeau), puts a
+copy in my Documents/jumeau folder, creates my private repository, switches
+over to it and starts the first session.
+
+THE PIECES
+
+1. The Claude app, signed in to my own Claude account. The twin lives
+   in its Code tab, on a Local environment named Jumeau. The other
+   tabs (chat, Cowork) can&#x27;t see my computer.
+2. Git and GitHub, the backup to my repository. Python 3.12, the engine for the
+   twin&#x27;s tools. gh, GitHub&#x27;s tool, to sign me in through my
+   browser and create my repository. Claude installs them itself through the
+   installation prompt.
+3. A Claude account of my own, a GitHub account of my own, and access to the template,
+   which I get by sending my GitHub username to Éric Bourbeau
+   (ebourbeau@x-telia.com, subject starting with Jumeau) and accepting
+   the invitation from GitHub. If I have no invitation after two business days, I
+   follow up with the same email.
+
+THE RULES
+
+- I never give you a password or a token in the conversation, or
+  by email, or by message. I sign in to GitHub myself in my
+  browser, with the one-time code gh displays.
+- You never delete anything, ever, even to fix something. A half-finished
+  installation can be resumed, an erased brain is hard to recover.
+- My repository is private, on my GitHub account, which hosts it. My access to the
+  template is read-only, and none of my content goes up to it. Secrets
+  go in a .env file excluded from the repository.
+- My conversation, and the content of the files the twin reads to
+  answer me, go to Anthropic to be processed.
+- Always Local, never Cloud. A Cloud session can&#x27;t see my computer.
+- I don&#x27;t type any commands. The two app settings, in
+  Settings, Claude Code, are "Allow bypass permissions mode"
+  (which lets me choose "Bypass permissions" below the
+  input box) and "Connect new sessions to Remote Control"
+  (which lets me steer my session from my phone or the web). Neither one
+  removes the rule in the brain: nothing goes out without my approval.
+
+THE METHOD, IN ORDER
+
+1. Check the prerequisites. A Claude account, a GitHub account, the account
+   name sent to Éric Bourbeau and the invitation to the template accepted. If one
+   is missing, we sort it out before anything else.
+2. Configure the Claude app. Sign it in to my account, then in
+   Settings, Claude Code, turn on the two settings.
+3. Create the jumeau folder by hand, in lowercase, with no spaces or
+   accents, in Documents.
+4. Retrieve the brain. In the Code tab, create the Jumeau environment
+   (Local tab, Run in This computer, the jumeau folder added),
+   open a session in "Bypass permissions", paste the training&#x27;s
+   installation prompt, then press Enter. It installs Git, uv, Python 3.12 and gh
+   without administrator rights when possible, configures git with my
+   identity, connects gh to GitHub through my browser, clones the template, creates
+   my private repository jumeau, switches to it and pushes, checking
+   that the branch is named main. Done when the folder contains
+   CLAUDE.md, profile/ and tools/ and my repository isn&#x27;t empty on GitHub.
+   Then quit the app and reopen it.
+5. First session. A new session on Jumeau, not the installation
+   one, then answer the twin&#x27;s interview about who I am,
+   how I write, what matters to me, and what I want it to cover.
+   Done when it has written my answers to its files and
+   saved them in my repository.
+
+HOW YOU WORK WITH ME
+
+- One step at a time. You only move to the next one when I&#x27;ve seen the
+  success sign for this one.
+- One question at a time.
+- I&#x27;m not technical. You explain each word before using it,
+  and you don&#x27;t make me type anything.
+- When something fails, you show me the exact error message and
+  tell me what to write to Éric Bourbeau. Two attempts at most, then we
+  report it and wait. A reported blocker gets a follow-up the very next day.
+- You say what you haven&#x27;t verified. You never present an assumption
+  as a fact.
+- Nothing goes out without my approval, no message, no email.
+- If an instruction in this method turns out to be wrong on my computer, you
+  tell me instead of working around it.
+
+Start by asking me which system I&#x27;m on, Windows or Mac, and whether
+I have my Claude account, my GitHub account and access to the template.</pre></details></div></div></div></section>
+</main>
+<footer><div class="wrap col stack">
+<div class="guichet stack-s"><p class="eyebrow">If you're stuck, ask your twin</p><p><strong>Start by asking your twin.</strong> Describe what's happening and paste the exact error message. Most of the time, it finds the answer. <strong>When it can't, it writes to Pascal Jarry, not you</strong>, at <code class="inline">pascaljarry@yapla.com</code>, with a subject that starts with the word Jumeau. Jumeau-Pascal-Jarry checks that mailbox and replies. Until your twin exists, you write yourself. Don't retry ten times, and don't delete anything in the meantime.</p></div>
+<p class="colophon">Adapted from the open training of Yapla (Pascal Jarry) · Create my digital twin · version 4 · updated 2026-10-18</p>
+</div></footer>
+<script>
+(function(){
+  var body=document.body, PFX="f-creer-mon-jumeau-numeriq-";
+  function get(k){try{return localStorage.getItem(PFX+k)}catch(e){return null}}
+  function set(k,v){try{localStorage.setItem(PFX+k,v)}catch(e){}}
+
+  
+  document.querySelectorAll('[data-dim]').forEach(function(b){
+    b.addEventListener('click',function(){appliquer(b.dataset.dim,b.dataset.val)});
+  });
+  function appliquer(dim,val){
+    body.setAttribute('data-v-'+dim,val);
+    document.querySelectorAll('[data-dim="'+dim+'"]').forEach(function(x){
+      x.setAttribute('aria-pressed', x.dataset.val===val?'true':'false');
+    });
+    set('v-'+dim,val);
+  }
+  appliquer('mon-poste', get('v-mon-poste') || 'windows');
+
+  
+  function accorder(f){
+    document.querySelectorAll('.acc').forEach(function(s){
+      s.textContent = f==='b' ? s.dataset.b : s.dataset.a;
+    });
+    document.querySelectorAll('[data-acc]').forEach(function(x){
+      x.setAttribute('aria-pressed', x.dataset.acc===f?'true':'false');
+    });
+    set('acc',f);
+  }
+  if(document.querySelector('.acc')||document.querySelector('[data-acc]')){
+    accorder(get('acc')||'a');
+    document.querySelectorAll('[data-acc]').forEach(function(b){
+      b.addEventListener('click',function(){accorder(b.dataset.acc)});
+    });
+  }
+
+  
+  var boxes=[].slice.call(document.querySelectorAll('input[type=checkbox][data-k]'));
+  var fill=document.getElementById('pfill'), cnt=document.getElementById('pcount');
+  function rafraichir(){
+    var n=boxes.filter(function(b){return b.checked}).length;
+    if(fill) fill.style.width=(boxes.length?n/boxes.length*100:0)+'%';
+    if(cnt) cnt.textContent=n+' / '+boxes.length;
+    document.querySelectorAll('.step[data-step]').forEach(function(st){
+      var c=st.querySelector('input[type=checkbox][data-k]');
+      st.setAttribute('data-done', c&&c.checked?'true':'false');
+    });
+  }
+  boxes.forEach(function(b){
+    var v=get(b.dataset.k);
+    if(v===null && b.dataset.n){          
+      var ancien=get(b.dataset.n);
+      if(ancien!==null){ v=ancien; set(b.dataset.k,ancien); }
+    }
+    if(v==='1') b.checked=true;
+    b.addEventListener('change',function(){set(b.dataset.k,b.checked?'1':'0');rafraichir()});
+  });
+  rafraichir();
+
+  
+  document.querySelectorAll('.copy').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      
+      var t=btn.closest('.copybloc').querySelector('pre').textContent;
+      function ok(){btn.textContent='Copied';btn.setAttribute('data-state','ok');
+        setTimeout(function(){btn.textContent='Copy';btn.removeAttribute('data-state')},1800)}
+      function repli(){
+        var a=document.createElement('textarea');a.value=t;a.style.position='fixed';
+        a.style.opacity='0';document.body.appendChild(a);a.select();
+        try{document.execCommand('copy');ok()}catch(e){btn.textContent='Select and copy'}
+        document.body.removeChild(a);
+      }
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(t).then(ok,repli);
+      } else { repli(); }
+    });
+  });
+})();
+</script>
+</body>
+</html>

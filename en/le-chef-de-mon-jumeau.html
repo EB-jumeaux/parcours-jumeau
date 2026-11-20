@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Chef of my digital twin</title>
+<meta name="description" content="By the end, a Chef runs continuously on your computer, does the tasks you give it when they are due, reports what has changed and is reborn on its own every night. Your twin installs it at your request, from what the template already provides.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;800;900&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+
+
+:root{
+  --ground:#FFFDFD;
+  --surface:#FFFFFF;
+  --surface-2:#F7F4F0;
+  --line:#E6E0D8;
+  --line-strong:#CFC6B9;
+  --ink:#2E3238;
+  --ink-2:#5E656E;
+  --ink-3:#8A919A;
+  --orange:#FF7B14;
+  --orange-ink:#B85300;
+  --creme:#FFF1E4;
+  --bleu:#337AB7;
+  --bleu-ink:#255C8C;
+  --bleu-pale:#F1F5FD;
+  --vert:#2E7D5B;
+  --vert-pale:#EAF5EF;
+  --brique:#A63D2F;
+  --brique-pale:#FBEDEA;
+  --shadow:0 1px 2px rgba(46,50,56,.05), 0 8px 24px -12px rgba(46,50,56,.18);
+  --radius:10px;
+  --mono:"IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --sans:"Mulish", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#14161A; --surface:#1B1E23; --surface-2:#22262C;
+    --line:#2F343B; --line-strong:#434A54;
+    --ink:#E9E7E4; --ink-2:#AAB1BA; --ink-3:#7C848E;
+    --orange:#FF9243; --orange-ink:#FFB075; --creme:#2B2018;
+    --bleu:#6FABDE; --bleu-ink:#96C4EC; --bleu-pale:#1A2430;
+    --vert:#5FBF92; --vert-pale:#16251F;
+    --brique:#E8877A; --brique-pale:#2B1A17;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#14161A; --surface:#1B1E23; --surface-2:#22262C;
+  --line:#2F343B; --line-strong:#434A54;
+  --ink:#E9E7E4; --ink-2:#AAB1BA; --ink-3:#7C848E;
+  --orange:#FF9243; --orange-ink:#FFB075; --creme:#2B2018;
+  --bleu:#6FABDE; --bleu-ink:#96C4EC; --bleu-pale:#1A2430;
+  --vert:#5FBF92; --vert-pale:#16251F;
+  --brique:#E8877A; --brique-pale:#2B1A17;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--ground);color:var(--ink);
+  font-family:var(--sans);font-size:17px;line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.col{max-width:730px}
+
+
+h1,h2,h3,h4{text-wrap:balance;margin:0;font-weight:800;letter-spacing:-.015em;line-height:1.15}
+h1{font-size:clamp(2.3rem,5.6vw,3.8rem);font-weight:900;letter-spacing:-.035em}
+h2{font-size:clamp(1.6rem,3.4vw,2.2rem)}
+h3{font-size:1.22rem}
+h4{font-size:1rem}
+p{margin:0}
+a{color:var(--bleu-ink);text-decoration-thickness:1px;text-underline-offset:2px}
+strong{font-weight:800}
+.eyebrow{font-family:var(--mono);font-size:.72rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.16em;color:var(--ink-3)}
+.lede{font-size:1.14rem;color:var(--ink-2);line-height:1.6}
+.small{font-size:.9rem;color:var(--ink-2)}
+.stack{display:flex;flex-direction:column;gap:1.1rem}
+.stack-s{display:flex;flex-direction:column;gap:.6rem}
+
+
+header.hero{
+  border-bottom:1px solid var(--line);
+  background:radial-gradient(120% 90% at 8% -10%, var(--creme) 0%, transparent 58%), var(--ground);
+}
+.hero-inner{padding:clamp(2.8rem,6.5vw,5rem) 0 clamp(2.2rem,4vw,3.2rem);
+  display:flex;flex-direction:column;gap:1.5rem}
+.hero h1 .k{display:block;color:var(--orange-ink)}
+.hero-meta{display:flex;flex-wrap:wrap;gap:.5rem 1.6rem;font-family:var(--mono);
+  font-size:.8rem;color:var(--ink-2);padding-top:.4rem;border-top:1px solid var(--line)}
+.hero-meta b{color:var(--ink);font-weight:600}
+
+
+.settings{position:sticky;top:0;z-index:40;
+  background:color-mix(in srgb, var(--ground) 88%, transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.settings-inner{display:flex;flex-wrap:wrap;align-items:center;gap:.9rem 1.4rem;padding:.7rem 0}
+.seg{display:flex;align-items:center;gap:.55rem}
+.seg-label{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--ink-3)}
+.seg-btns{display:flex;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:999px;padding:2px}
+.seg-btns button{font-family:var(--sans);font-size:.84rem;font-weight:600;color:var(--ink-2);
+  background:none;border:0;padding:.28rem .78rem;border-radius:999px;cursor:pointer}
+.seg-btns button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.seg-btns button:focus-visible{outline:2px solid var(--bleu);outline-offset:2px}
+.progress{margin-left:auto;display:flex;align-items:center;gap:.6rem;
+  font-family:var(--mono);font-size:.76rem;color:var(--ink-2)}
+.progress-track{width:110px;height:6px;border-radius:999px;background:var(--surface-2);
+  border:1px solid var(--line);overflow:hidden}
+.progress-fill{height:100%;width:0;background:var(--orange);transition:width .3s ease}
+
+
+section{padding:clamp(2.4rem,5vw,4rem) 0;border-bottom:1px solid var(--line)}
+.sec-head{display:flex;flex-direction:column;gap:.5rem;margin-bottom:2rem;max-width:730px}
+.sec-body{display:flex;flex-direction:column;gap:1.6rem}
+
+
+.cartes{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem}
+.carte{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:1.3rem 1.4rem;box-shadow:var(--shadow)}
+.carte h4{display:flex;align-items:baseline;gap:.55rem;margin-bottom:.45rem;flex-wrap:wrap}
+.carte .tag{font-family:var(--mono);font-size:.66rem;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--bleu-ink);background:var(--bleu-pale);
+  border-radius:4px;padding:.1rem .38rem}
+.carte p{font-size:.95rem;color:var(--ink-2)}
+.carte .quand{margin-top:.7rem;font-size:.84rem;font-family:var(--mono);color:var(--ink-3)}
+
+
+dl.lex{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:.1rem 2rem;margin:0;max-width:900px}
+dl.lex > div{padding:.85rem 0;border-top:1px solid var(--line)}
+dl.lex dt{font-weight:800;font-size:.98rem}
+dl.lex dd{margin:.15rem 0 0;font-size:.93rem;color:var(--ink-2)}
+
+
+.step{display:grid;grid-template-columns:64px 1fr;gap:0 1.6rem;position:relative}
+.step + .step{margin-top:2.6rem}
+.rail{display:flex;flex-direction:column;align-items:center;gap:.6rem}
+.rail .num{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;
+  font-family:var(--mono);font-weight:600;font-size:1.05rem;background:var(--surface);
+  color:var(--ink);border:1.5px solid var(--line-strong)}
+.step[data-done="true"] .rail .num{background:var(--orange);border-color:var(--orange);color:#fff}
+.rail .line{flex:1;width:1.5px;background:var(--line);min-height:20px}
+.step-body{padding-bottom:.4rem;max-width:730px;display:flex;flex-direction:column;gap:1.1rem}
+.step-head{display:flex;flex-direction:column;gap:.35rem}
+.step-head .where{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--orange-ink)}
+.step-body ol,.sec-body ol{margin:0;padding-left:1.3rem;display:flex;flex-direction:column;gap:.55rem}
+.step-body ol li::marker,.sec-body ol li::marker{font-weight:800;color:var(--ink-3)}
+.step-body ul,.sec-body ul{margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:.4rem}
+
+
+.copybloc{border:1px solid var(--line-strong);border-radius:var(--radius);
+  overflow:hidden;background:var(--surface-2)}
+.copybloc-head{display:flex;align-items:center;gap:.8rem;padding:.6rem .85rem;
+  border-bottom:1px solid var(--line);background:var(--surface)}
+.copybloc-head .t{font-family:var(--mono);font-size:.74rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ink-2)}
+.copy{margin-left:auto;font-family:var(--sans);font-size:.8rem;font-weight:700;
+  background:var(--orange);color:#fff;border:0;border-radius:6px;
+  padding:.34rem .8rem;cursor:pointer}
+.copy:hover{filter:brightness(1.06)}
+.copy:focus-visible{outline:2px solid var(--bleu);outline-offset:2px}
+.copy[data-state="ok"]{background:var(--vert)}
+.copybloc pre{margin:0;padding:1rem .95rem;overflow-x:auto;font-family:var(--mono);
+  font-size:.83rem;line-height:1.6;color:var(--ink);white-space:pre-wrap;word-break:break-word}
+
+.copybloc.accomp{border:2px solid var(--orange);background:var(--creme);
+  box-shadow:0 8px 28px rgba(255,123,20,.12)}
+.accomp-head{padding:1.4rem 1.5rem 1.2rem;display:flex;flex-direction:column;gap:.55rem}
+.accomp-head .lbl{font-family:var(--mono);font-size:.72rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.14em;color:var(--orange-ink)}
+.accomp-head h3{margin:0;font-size:1.35rem;line-height:1.25;color:var(--ink)}
+.accomp-head p{margin:0;font-size:1rem;line-height:1.55;color:var(--ink-2);max-width:60ch}
+.copy.accomp-btn{margin:.5rem 0 0;align-self:flex-start;font-size:1rem;
+  padding:.7rem 1.4rem;border-radius:8px}
+.accomp-prompt{border-top:1px solid var(--line);background:var(--surface)}
+.accomp-prompt summary{cursor:pointer;padding:.6rem 1.5rem;font-family:var(--mono);
+  font-size:.74rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-2)}
+.accomp-prompt pre{max-height:24rem}
+code.inline{font-family:var(--mono);font-size:.86em;background:var(--surface-2);
+  border:1px solid var(--line);border-radius:5px;padding:.08em .35em}
+
+
+.note{border-radius:var(--radius);padding:.95rem 1.05rem;font-size:.94rem;
+  border:1px solid;display:flex;flex-direction:column;gap:.4rem}
+.note .lbl{font-family:var(--mono);font-size:.7rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.12em}
+.note.piege{background:var(--brique-pale);border-color:color-mix(in srgb,var(--brique) 32%, transparent)}
+.note.piege .lbl{color:var(--brique)}
+.note.reussi{background:var(--vert-pale);border-color:color-mix(in srgb,var(--vert) 30%, transparent)}
+.note.reussi .lbl{color:var(--vert)}
+.note.info{background:var(--bleu-pale);border-color:color-mix(in srgb,var(--bleu) 28%, transparent)}
+.note.info .lbl{color:var(--bleu-ink)}
+.note.reperе,.note.repere{background:var(--creme);border-color:color-mix(in srgb,var(--orange) 30%, transparent)}
+.note.repere .lbl{color:var(--orange-ink)}
+.note.neutre{background:var(--surface-2);border-color:var(--line-strong)}
+.note.neutre .lbl{color:var(--ink-3)}
+
+
+.check{display:flex;gap:.7rem;align-items:flex-start;background:var(--creme);
+  border:1px solid color-mix(in srgb,var(--orange) 26%, transparent);
+  border-radius:var(--radius);padding:.8rem .95rem;cursor:pointer}
+.check input{margin:.28rem 0 0;width:17px;height:17px;accent-color:var(--orange);
+  flex:none;cursor:pointer}
+.check .txt{font-size:.95rem;font-weight:600}
+.check .txt em{display:block;font-style:normal;font-weight:400;color:var(--ink-2);
+  font-size:.9rem;margin-top:.1rem}
+.check:has(input:checked){background:var(--vert-pale);
+  border-color:color-mix(in srgb,var(--vert) 30%, transparent)}
+.check:has(input:checked) .txt{text-decoration:line-through;
+  text-decoration-color:var(--ink-3);color:var(--ink-2)}
+.check:has(input:checked) .txt em{text-decoration:none}
+.checks{display:flex;flex-direction:column;gap:.7rem;max-width:730px}
+
+
+.faq{display:flex;flex-direction:column;gap:.55rem;max-width:840px}
+details.dx{border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--surface);overflow:hidden}
+details.dx[open]{border-color:var(--line-strong);box-shadow:var(--shadow)}
+details.dx summary{cursor:pointer;padding:.85rem 1rem;font-weight:700;font-size:.98rem;
+  display:flex;gap:.7rem;align-items:baseline;list-style:none}
+details.dx summary::-webkit-details-marker{display:none}
+details.dx summary::before{content:"+";font-family:var(--mono);font-weight:600;
+  color:var(--orange);flex:none;width:1ch}
+details.dx[open] summary::before{content:"\2013"}
+details.dx summary:focus-visible{outline:2px solid var(--bleu);outline-offset:-2px}
+.dx-body{padding:0 1rem 1rem 2.4rem;display:flex;flex-direction:column;gap:.7rem;font-size:.95rem}
+.dx-body .quote{font-family:var(--mono);font-size:.82rem;background:var(--surface-2);
+  border-left:2px solid var(--brique);padding:.5rem .7rem;color:var(--ink-2);
+  border-radius:0 5px 5px 0;overflow-x:auto}
+.dx-body .geste{font-weight:700}
+.dx-body .src{font-size:.82rem;color:var(--ink-3);font-family:var(--mono)}
+
+
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--surface);max-width:900px}
+table{border-collapse:collapse;width:100%;font-size:.93rem;min-width:460px}
+th,td{text-align:left;padding:.7rem .9rem;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--ink-3);font-weight:600}
+tr:last-child td{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink-2)}
+
+
+figure.diagram{margin:0;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:1.5rem 1.2rem 1.1rem;box-shadow:var(--shadow);max-width:900px}
+figure.diagram svg{display:block;width:100%;height:auto;max-width:640px;margin:0 auto}
+figcaption{margin-top:1rem;font-size:.88rem;color:var(--ink-2);text-align:center;
+  max-width:52ch;margin-inline:auto}
+
+
+
+
+figure.capture{margin:2rem 0;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:1rem;box-shadow:var(--shadow);
+  width:fit-content;max-width:min(730px,100%)}
+figure.capture img{display:block;width:auto;height:auto;max-width:100%;
+  border-radius:calc(var(--radius) - 4px);border:1px solid var(--line)}
+figure.capture figcaption{margin-top:.9rem}
+
+
+footer{padding:clamp(2.4rem,5vw,3.6rem) 0 4rem;background:var(--surface-2)}
+footer .guichet{border-left:3px solid var(--orange);padding-left:1.1rem}
+.colophon{border-top:1px solid var(--line);padding-top:1.2rem;font-size:.85rem;color:var(--ink-3);
+  font-family:var(--mono)}
+
+
+
+
+@media (max-width:720px){
+  body{font-size:16px}
+  .step{grid-template-columns:40px 1fr;gap:0 1rem}
+  .rail .num{width:36px;height:36px;font-size:.9rem}
+  .dx-body{padding-left:1rem}
+  .progress{width:100%;margin-left:0;order:5}
+}
+@media print{
+  .settings,.copy{display:none}
+  body{font-size:11pt;background:#fff}
+  section{page-break-inside:auto;border-bottom:0}
+  .step{page-break-inside:avoid}
+  details.dx{page-break-inside:avoid}
+  details.dx summary::before{content:""}
+  .dx-body{display:block!important}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}
+
+body:not([data-v-mon-poste]) .v-mon-poste-mac{display:none}
+body[data-v-mon-poste="windows"] .v-mon-poste-mac{display:none}
+body[data-v-mon-poste="mac"] .v-mon-poste-windows{display:none}
+</style>
+<meta name="robots" content="noindex, nofollow"><style>
+:root{--eb-bg:#ffffff;--ink:#1b1f24;--ink-2:#4b5563;--line:#e3e6ea;--accent:#2f5d8a;--accent-ink:#ffffff;--accent-pale:#eef3f8;
+--ok:#1f6f43;--ok-pale:#f1f8f3;--warn:#a85a07;--warn-pale:#fdf6ec;--code-bg:#f5f6f8;
+--sans:Mulish,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Consolas,monospace}
+.eb-bandeau{background:var(--eb-bg);border-bottom:1px solid var(--line)}
+.eb-bandeau-in{max-width:1080px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px 22px;
+ padding:12px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px))}
+.eb-nom{font:800 16px/1.3 var(--sans);color:var(--ink);text-decoration:none}
+.eb-nav{display:flex;flex-wrap:wrap;gap:6px 16px;min-width:0}
+.eb-nav a{color:var(--ink-2);font:600 14px/1.4 var(--sans);text-decoration:none}
+.eb-nav a:hover,.eb-nav a[aria-current]{color:var(--accent)}
+.eb-nav a[aria-current]{text-decoration:underline;text-underline-offset:4px}
+.eb-langue{margin-left:auto;color:var(--accent);font:700 14px/1.4 var(--sans);text-decoration:none}
+.eb-nav a:focus-visible,.eb-nom:focus-visible,.eb-langue:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.seg:has([data-acc]){display:none}</style></head>
+<body><header class="eb-bandeau"><div class="eb-bandeau-in"><a class="eb-nom" href="index.html">EB twins</a><nav class="eb-nav"><a href="index.html">Where to start</a><a href="comprendre-mon-jumeau-numerique.html">1. How the twin works</a><a href="creer-mon-compte-github.html">2. My GitHub account</a><a href="demarrer-mon-jumeau-numerique.html">3. Create my twin</a><a href="le-chef-de-mon-jumeau.html" aria-current=page>Going further: the Chef</a></nav><a class="eb-langue" href="../le-chef-de-mon-jumeau.html" hreflang="fr">Français</a></div></header>
+<header class="hero"><div class="wrap hero-inner">
+<p class="eyebrow">The digital twins program</p>
+<h1>The <span class="k">Chef</span> of my digital twin</h1>
+<p class="lede col">By the end, a Chef runs continuously on your computer, does the tasks you give it when they are due, reports what has changed and is reborn on its own every night. Your twin installs it at your request, from what the template already provides.</p>
+<div class="hero-meta"><span><strong>About 30 min</strong> of hands-on work, then the time of your first task and one night to see the gatekeeper</span><span><strong>No commands</strong> to type</span><span><strong>Windows and Mac</strong></span><span><strong>One prompt</strong> at the end so your twin can guide you</span></div>
+</div></header>
+<div class="settings"><div class="wrap settings-inner"><div class="seg"><span class="seg-label">My computer</span><div class="seg-btns" role="group" aria-label="My computer"><button type="button" data-dim="mon-poste" data-val="windows" aria-pressed="true">Windows</button><button type="button" data-dim="mon-poste" data-val="mac" aria-pressed="false">Mac</button></div></div><div class="seg"><span class="seg-label">We say</span><div class="seg-btns" role="group" aria-label="Wording"><button type="button" data-acc="a" aria-pressed="true">Twin</button><button type="button" data-acc="b" aria-pressed="false">Twin</button></div></div><div class="progress"><span>Progress</span><div class="progress-track"><div class="progress-fill" id="pfill"></div></div><span id="pcount">0 / 0</span></div></div></div>
+<main>
+<section id="ce-qu-est-le-chef"><div class="wrap"><div class="sec-head"><p class="eyebrow">The concept</p><h2>What the Chef is</h2><p class="lede">A session that stays open and is reborn every night. It works at set times, without you opening it, and reports back to you.</p></div><div class="sec-body"><div class="note info"><span class="lbl">What this training assumes</span><p>You have installed your twin and have been working with it for a few weeks. If not, start with "Create my digital twin".</p></div>
+<div class="col stack"><p>An ordinary session of your twin does nothing until you write to it. When you close it, it forgets everything it has not written to a file. So whatever has to come back every morning or every Monday depends on you.</p>
+<p>The <strong>Chef</strong> is a session of your twin that runs continuously on your computer. It makes one pass per hour, from 6 a.m. to 10 p.m., does the tasks you have given it when they are due, logs what it has done and speaks to you only when something has changed or is waiting for your decision. You talk to it as you would to a second-in-command who has read what you had no time to read.</p></div>
+<dl class="lex"><div><dt>A session</dt><dd>An open conversation with Claude on your computer. It knows nothing about other sessions, and whatever it has not written to a file disappears when it closes.</dd></div><div><dt>An agent</dt><dd>A session with a name and a mandate. The name is its address, so you can write to it.</dd></div><div><dt>The Chef</dt><dd>The agent that runs the coordination. It runs continuously, does your tasks at set times and reports back to you.</dd></div><div><dt>A mandate</dt><dd>The file that tells an agent what it does, what it decides alone, what it brings up and what it never does.</dd></div></dl>
+<figure class="diagram"><svg viewBox="0 0 680 300" role="img" aria-label="You at the top, the Chef in the middle with its task register and its log, and possible agents in dotted lines at the bottom.">
+  <defs><marker id="fl1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+  <g font-family="Mulish, sans-serif" font-size="12">
+    <rect x="250" y="14" width="180" height="44" rx="9" fill="var(--brique-pale)" stroke="var(--brique)" stroke-width="1.5"/>
+    <text x="340" y="41" text-anchor="middle" font-weight="800" fill="var(--brique)">You</text>
+    <rect x="210" y="104" width="260" height="56" rx="9" fill="var(--creme)" stroke="var(--orange)" stroke-width="1.6"/>
+    <text x="340" y="127" text-anchor="middle" font-weight="800" fill="var(--orange-ink)">The Chef</text>
+    <text x="340" y="146" text-anchor="middle" font-size="11" fill="var(--ink-2)">does, logs, reports</text>
+    <rect x="20" y="112" width="150" height="40" rx="8" fill="var(--surface-2)" stroke="var(--line-strong)" stroke-width="1.3"/>
+    <text x="95" y="136" text-anchor="middle" font-weight="700" fill="var(--ink)">Its tasks</text>
+    <rect x="510" y="112" width="150" height="40" rx="8" fill="var(--surface-2)" stroke="var(--line-strong)" stroke-width="1.3"/>
+    <text x="585" y="136" text-anchor="middle" font-weight="700" fill="var(--ink)">Its log</text>
+    <g fill="none" stroke="var(--line-strong)" stroke-width="1.2" stroke-dasharray="4 4">
+      <rect x="140" y="222" width="160" height="46" rx="8"/>
+      <rect x="380" y="222" width="160" height="46" rx="8"/>
+    </g>
+    <g fill="var(--ink-3)" text-anchor="middle" font-size="11">
+      <text x="220" y="250">an agent, later</text>
+      <text x="460" y="250">an agent, later</text>
+    </g>
+    <g stroke="var(--ink-3)" stroke-width="1.3" fill="none" marker-end="url(#fl1)" color="var(--ink-3)">
+      <path d="M340,58 L340,100"/>
+      <path d="M170,132 L206,132"/>
+      <path d="M470,132 L506,132"/>
+    </g>
+    <g stroke="var(--line-strong)" stroke-width="1.1" fill="none" stroke-dasharray="3 3">
+      <path d="M300,160 L230,218"/>
+      <path d="M380,160 L450,218"/>
+    </g>
+    <text x="470" y="84" font-size="10.5" fill="var(--ink-3)">tasks and questions</text>
+    <text x="210" y="84" font-size="10.5" fill="var(--ink-3)" text-anchor="end">what moved, what waits</text>
+  </g>
+</svg><figcaption>You give tasks to the Chef and you talk to it. It does them at the set time, writes to the log and reports back to you. Later, it will be able to run agents, which will report to it.</figcaption></figure>
+<div class="note repere"><span class="lbl">The Chef does not replace your sessions</span><p>You keep opening your twin as usual to work. The Chef takes care of what comes back at set times and of what has to hold up without you.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="ce-qu-est-le-chef.je-sais-a-quoi-sert-le-chef-et-en-quoi-il-differe-d-une-sess" data-n="c1"><span class="txt">I know what the Chef is for, and how it differs from an ordinary session</span></label></div></div></div></section>
+<section id="la-journee-du-chef"><div class="wrap"><div class="sec-head"><p class="eyebrow">The details</p><h2>The Chef's day</h2><p class="lede">One birth, one pass per hour, one rebirth at night.</p></div><div class="sec-body"><div class="col stack"><p><strong>When it is born</strong>, the Chef rereads its register and its log. This is intended: it is born with no memory of its previous session, and these two files tell it where things stand. It checks that the coordination's scheduled task is in place, then it greets you with three things: what has moved, what is waiting for your decision and what it suggests.</p>
+<p><strong>Once an hour, from 6 a.m. to 10 p.m.</strong>, it makes its pass. It looks at which tasks are due, does those and only those, logs them, then checks that everything is in place. It speaks to you only if something has changed. A Chef that spoke every hour to say nothing would be one more session to read.</p>
+<p><strong>Around 4 a.m.</strong>, the gatekeeper asks it to log its work and finish, waits for it to answer that it is ready, closes its session and starts it again. A session that lived for weeks would end up forgetting things and costing a lot on every turn.</p></div>
+<figure class="diagram"><svg viewBox="0 0 680 190" role="img" aria-label="A timeline from 0:00 to 24:00. The gatekeeper around 4:00, the hourly pass from 6:00 to 22:00, the scheduled task every five minutes all day long.">
+  <g font-family="Mulish, sans-serif" font-size="11">
+    <line x1="40" y1="120" x2="640" y2="120" stroke="var(--line-strong)" stroke-width="1.5"/>
+    <g fill="var(--ink-3)" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10">
+      <text x="40" y="140">0:00</text>
+      <text x="140" y="140">4:00</text>
+      <text x="190" y="140">6:00</text>
+      <text x="340" y="140">12:00</text>
+      <text x="590" y="140">22:00</text>
+      <text x="640" y="140">24:00</text>
+    </g>
+    <rect x="190" y="70" width="400" height="34" rx="7" fill="var(--creme)" stroke="var(--orange)" stroke-width="1.4"/>
+    <text x="390" y="92" text-anchor="middle" font-weight="700" fill="var(--orange-ink)">One pass per hour, and the wake-up</text>
+    <rect x="98" y="22" width="84" height="34" rx="7" fill="var(--brique-pale)" stroke="var(--brique)" stroke-width="1.4"/>
+    <text x="140" y="44" text-anchor="middle" font-weight="700" fill="var(--brique)">The gatekeeper</text>
+    <line x1="140" y1="56" x2="140" y2="116" stroke="var(--brique)" stroke-width="1.3" stroke-dasharray="3 3"/>
+    <text x="340" y="172" text-anchor="middle" fill="var(--ink-2)">The scheduled task runs every five minutes, day and night</text>
+  </g>
+</svg><figcaption>A day in the life of the Chef. The scheduled task runs every five minutes. From 6 a.m. to 10 p.m., the Chef makes one pass per hour and the wake-up restarts it if it has gone down. Around 4 a.m., the gatekeeper has it finish and be reborn.</figcaption></figure>
+<div class="cartes"><div class="carte"><h4>The agent register <span class="tag">coordination/agents.tsv</span></h4><p>The list of agents, with their folder, their mandate and their model. At installation, it contains only the Chef. The register is the authority on names, a session's memory is not.</p><p class="quand">Reread at every birth</p></div><div class="carte"><h4>The Chef's mandate <span class="tag">coordination/agents/Chef.md</span></h4><p>A shared part, kept current by template updates, then a part of your own, "Tes tâches propres" (your own tasks), that updates never touch, for what is yours alone, such as how you want it to talk to you. Tasks at set times go in your task register.</p><p class="quand">Given to the Chef at birth</p></div><div class="carte"><h4>The log <span class="tag">coordination/journal.md</span></h4><p>What happened and what was decided, in short dated entries. It is the Chef's memory from one birth to the next.</p><p class="quand">Read at every birth</p></div><div class="carte"><h4>The scheduled task <span class="tag">every 5 minutes</span></h4><p>A single system scheduled task for the whole coordination. It runs when you log in to your computer, then every five minutes, and decides whether to restart the Chef or run the gatekeeper. Without it, nothing comes back after your computer restarts.</p><p class="quand">Continuously, with no window</p></div><div class="carte"><h4>The wake-up <span class="tag">once an hour</span></h4><p>If the Chef has gone down during the day, the scheduled task restarts it within the hour, and never closes a live session.</p><p class="quand">From 6 a.m. to 10 p.m.</p></div><div class="carte"><h4>The time zone <span class="tag">coordination/fuseau.txt</span></h4><p>The Chef's reference time. The gatekeeper and the passes follow it, never the computer's clock. That way a laptop on a trip keeps your twin's time.</p><p class="quand">Read at every pass</p></div><div class="carte"><h4>A single computer <span class="tag">coordination/hote.tsv</span></h4><p>The Chef lives on one computer, the first one where you install it. On any other computer, nothing installs or starts, and a line says so.</p><p class="quand">Written at installation</p></div></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="la-journee-du-chef.je-sais-ce-que-le-chef-fait-a-sa-naissance-a-chaque-heure-et" data-n="c2"><span class="txt">I know what the Chef does at birth, every hour and at night</span></label></div></div></div></section>
+<section id="ses-taches-a-heures-fixes"><div class="wrap"><div class="sec-head"><p class="eyebrow">What you give it</p><h2>Its tasks at set times</h2><p class="lede">A task is one line in its register. It does only the ones that are due.</p></div><div class="sec-body"><div class="col stack"><p>The Chef's tasks live in files, never in its head or in a conversation. At each pass, a tool reads these files and tells it which ones are due. It does only those, then notes that they are done so it does not do them again.</p></div>
+<div class="cartes"><div class="carte"><h4>The shared register <span class="tag">coordination/taches-du-chef/registre-commun.tsv</span></h4><p>What every Chef does. It may be empty. It receives the shared tasks the template adds and it is rewritten at every update, so write nothing in it.</p><p class="quand">Comes from the template</p></div><div class="carte"><h4>Your register <span class="tag">coordination/taches-du-chef/registre.tsv</span></h4><p>Your tasks. Each line gives its name, its frequency (every hour, every day, every week), the time from which it is due and the instruction. You do not write it yourself, you ask the Chef or your twin.</p><p class="quand">Yours, never touched by the template</p></div></div>
+<div class="col stack"><p>A task is either a <strong>command</strong> or an <strong>instruction</strong>. A command runs a tool that works alone and consumes nothing. An instruction is something the Chef does itself, reading what it needs and logging what it found. Start with a simple instruction that reads your brain and sends nothing out.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="ses-taches-a-heures-fixes.je-sais-ou-vivent-les-taches-du-chef-et-qu-il-ne-fait-que-ce" data-n="c3"><span class="txt">I know where the Chef's tasks live, and that it does only the ones that are due</span></label></div></div></div></section>
+<section id="ce-qu-il-coute-et-ce-qu-il-ne-fait-jamai"><div class="wrap"><div class="sec-head"><p class="eyebrow">Before you install</p><h2>What it costs, and what it never does</h2><p class="lede">The Chef runs on your Claude subscription, under a ceiling. And it has prohibitions set by its mandate.</p></div><div class="sec-body"><div class="col stack"><p>The Chef is a session that lives continuously. Each of its passes consumes your Claude subscription, like a session you would open yourself. That is why nothing installs on its own. The Chef comes with the template, but it stays inactive until you ask your twin to install it.</p>
+<p>It works under a <strong>daily usage ceiling</strong>, set in your secrets vault, which also counts the subagents it starts. When it reaches the ceiling, it stops its tasks until the next day, notes this once in the log and keeps watching. Each completed task leaves a line in the month's log, <code class="inline">coordination/taches-du-chef/</code>, with what it cost.</p></div>
+<div class="cartes"><div class="carte"><h4>Nothing goes out without your approval <span class="tag">no exceptions</span></h4><p>No email, no message, no writing to an outside tool without your explicit go-ahead. The Chef prepares, you decide.</p></div><div class="carte"><h4>It creates nothing without you <span class="tag">its limit</span></h4><p>It does not create an agent, change a mandate or touch the agent register unless you ask. Nor does it do a task the tool has not declared due.</p></div><div class="carte"><h4>It says what it has not checked <span class="tag">honesty</span></h4><p>A tool that fails makes the subject unknown, never empty. It does not write that something works because it should work.</p></div></div>
+<div class="note neutre"><span class="lbl">What has not been measured</span><p>The real usage of a Chef on a personal subscription has not been measured. If your subscription reaches its limit, pause the Chef (section "Pause it, remove it, change computers") and ask your twin to report it to the address in the box at the end of the page.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="ce-qu-il-coute-et-ce-qu-il-ne-fait-jamais.je-sais-que-le-chef-consomme-mon-abonnement-claude-et-que-ri" data-n="c4"><span class="txt">I know that the Chef consumes my Claude subscription, and that nothing installs or goes out unless I ask</span></label></div></div></div></section>
+<section id="l-installer"><div class="wrap"><div class="sec-head"><p class="eyebrow">The configuration</p><h2>Install it</h2><p class="lede">By the end, the Chef runs on your computer and greets you. Everything happens through prompts, in a session of your twin, with no command to type.</p></div><div class="step" data-step="1"><div class="rail"><div class="num">1</div><div class="line"></div></div><div class="step-body"><div class="step-head"><span class="where">A session of your twin, Code tab, Jumeau environment</span><h3>Prepare the computer</h3><p class="small">Your twin checks the three things the Chef needs and installs what is missing.</p></div><p>The Chef does not live in the Claude app. It lives in a terminal, <span class="v-mon-poste-windows">a Windows Terminal window named Coordination</span><span class="v-mon-poste-mac">a tmux session named Coordination</span>, where it runs with Claude Code on the command line, the <code class="inline">claude</code> tool. The Claude app does not necessarily put it on your computer.</p>
+<p>You also need to declare the time zone, the time the gatekeeper and the passes follow.</p>
+<div class="copybloc v-mon-poste-windows"><div class="copybloc-head"><span class="t">The preparation prompt · Windows</span><button class="copy" type="button">Copy</button></div><pre>I want to install the Chef of my coordination. First, prepare my computer,
+one thing at a time, and tell me what you find each time.
+
+1. Check that the claude tool, Claude Code on the command line, is
+   installed on this computer. If it is missing, install it with the official
+   Anthropic installer, then tell me how to connect it to my Claude
+   account. I do the sign-in myself, in my browser.
+2. Check that Windows Terminal is installed. If it is missing, install it.
+3. Check that coordination/fuseau.txt exists in my brain. If it is
+   missing, suggest my time zone under its standard name (for
+   example America/Toronto or Europe/Paris), and write it when I say yes.
+
+Do not install the Chef itself yet.</pre></div>
+<div class="copybloc v-mon-poste-mac"><div class="copybloc-head"><span class="t">The preparation prompt · Mac</span><button class="copy" type="button">Copy</button></div><pre>I want to install the Chef of my coordination. First, prepare my computer,
+one thing at a time, and tell me what you find each time.
+
+1. Check that the claude tool, Claude Code on the command line, is
+   installed on this computer. If it is missing, install it with the official
+   Anthropic installer, then tell me how to connect it to my Claude
+   account. I do the sign-in myself, in my browser.
+2. Check that Homebrew is installed. If it is missing, tell me what to
+   do. The Chef&#x27;s installation uses it to install tmux.
+3. Check that coordination/fuseau.txt exists in my brain. If it is
+   missing, suggest my time zone under its standard name (for
+   example America/Toronto or Europe/Paris), and write it when I say yes.
+
+Do not install the Chef itself yet.</pre></div>
+<div class="note info"><span class="lbl">One more sign-in, one time only</span><p>Claude Code on the command line has its own connection to your Claude account, separate from the app's. You do it once, in your browser, with your usual account. You never give your password to your twin.</p></div>
+<div class="note reussi"><span class="lbl">You&#x27;re done when</span><p>Your twin confirms three things: the <code class="inline">claude</code> tool is installed and connected to your account, <span class="v-mon-poste-windows">Windows Terminal is there</span><span class="v-mon-poste-mac">Homebrew is there</span>, and your time zone is written in <code class="inline">coordination/fuseau.txt</code>.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="preparer-le-poste.mon-poste-est-pret-l-outil-claude-est-connecte-et-mon-fuseau" data-n="c5"><span class="txt">My computer is ready, the claude tool is connected and my time zone is declared</span></label></div></div></div>
+<div class="step" data-step="2"><div class="rail"><div class="num">2</div><div class="line"></div></div><div class="step-body"><div class="step-head"><span class="where">The same session</span><h3>See what would be installed</h3><p class="small">A dry run. Your twin shows you everything the installation would do, without touching anything.</p></div><div class="copybloc"><div class="copybloc-head"><span class="t">The dry-run prompt</span><button class="copy" type="button">Copy</button></div><pre>Install the coordination of my agents, with the Chef. Start with a
+dry run, show me what would be put on my computer and in my
+brain, without touching anything, and explain each line to me.</pre></div>
+<p>Your twin starts the installation in dry-run mode, which installs nothing, starts nothing and writes nothing. The answer lists what the real installation would do.</p>
+<ul><li>This computer becomes the only one that hosts the Chef.</li><li>Four files appear in your brain: the agent register (<code class="inline">coordination/agents.tsv</code>) and its readable copy (<code class="inline">coordination/registre-des-agents.md</code>), the log and the Chef's mandate.</li><li>The scheduled task is set up on the system.</li><li>The Chef is started by the scheduled task, on its first run.</li></ul>
+<div class="note reussi"><span class="lbl">You&#x27;re done when</span><p>You have the list in front of you, and each line has been explained. Nothing has changed on your computer.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="voir-ce-qui-serait-installe.j-ai-lu-l-essai-a-blanc-et-rien-n-a-change-sur-mon-poste" data-n="c6"><span class="txt">I have read the dry run, and nothing has changed on my computer</span></label></div></div></div>
+<div class="step" data-step="3"><div class="rail"><div class="num">3</div></div><div class="step-body"><div class="step-head"><span class="where">The same session</span><h3>Install, and meet the Chef</h3><p class="small">When you say yes, your twin installs. The Chef opens and greets you.</p></div><div class="copybloc"><div class="copybloc-head"><span class="t">The installation prompt</span><button class="copy" type="button">Copy</button></div><pre>All good, install the coordination of my agents for real. Then tell me
+where I can find the Chef to talk to it.</pre></div>
+<p>{Mon poste: A Windows Terminal window named Coordination opens, with a Chef tab. That is where you talk to the Chef, by writing in that tab as you would in an ordinary session. | The Chef is born in a window of the Coordination tmux session, which runs with no screen. Ask your twin to open the Terminal on the Chef's window for you. That is where you talk to it.}</p>
+<p>The Chef rereads its register and its log, checks that the scheduled task is in place, then greets you.</p>
+<div class="note info"><span class="lbl">Install between 6 a.m. and 10 p.m.</span><p>The Chef is born at the first wake-up of the scheduled task, and the wake-up only runs between 6 a.m. and 10 p.m., in your time zone. Installed at 11 p.m., it is born at 6 a.m. the next day. ::: On the first day, nothing has moved, and it says so in one line.</p>
+<p>:::piege A Chef born twice An old installation may have left scheduled tasks for each agent. With the new task on top, the Chef is born twice. The installation removes those old tasks. If you see two tabs with the same name, ask your twin to check the coordination's tasks.</p></div>
+<div class="note neutre"><span class="lbl">What hasn&#x27;t been verified yet</span><p>The installation has been tested in a dry run and on a copy of a brain. It has already been used by people close to Éric Bourbeau, on PC and on Mac. If a step does not go as described here, ask your twin to write about it to the address in the box at the end of the page.</p></div>
+<div class="note reussi"><span class="lbl">You&#x27;re done when</span><p>The Chef has written to you in <span class="v-mon-poste-windows">its Windows Terminal tab</span><span class="v-mon-poste-mac">its Terminal window</span>, and you have answered it.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="installer-et-rencontrer-le-chef.le-chef-est-installe-il-s-est-ouvert-et-je-lui-ai-repondu" data-n="c7"><span class="txt">The Chef is installed, it has opened and I have answered it</span></label></div></div></div></div></section>
+<section id="lui-confier-une-premiere-tache"><div class="wrap"><div class="sec-head"><p class="eyebrow">The configuration</p><h2>Give it a first task</h2><p class="lede">A simple task that reads your brain and sends nothing out, at a set time.</p></div><div class="sec-body"><div class="col stack"><p>Choose a task that comes back and always follows the same method. A good first try reads what is already in your brain and touches nothing outside. For example, every Monday at 9 a.m., a review of your current files: what moved forward last week and what is waiting for a decision.</p></div>
+<div class="copybloc"><div class="copybloc-head"><span class="t">The prompt to give the Chef</span><button class="copy" type="button">Copy</button></div><pre>I want to give you a first task at set times. What it does:
+&lt;what you want, in one sentence&gt;. When: &lt;for example every Monday at 9 a.m.&gt;.
+
+Write it in my task register, coordination/taches-du-chef/
+registre.tsv, as an instruction you carry out yourself. Show me the line
+before saving it. It sends nothing out, it reads my brain and reports
+to me. Then tell me when you will do it for the first time.</pre></div>
+<div class="col stack"><p>The Chef writes the line, shows it to you, saves it when you say yes and tells you at which pass it will be due. At that pass, it does the task, logs it and reports back to you.</p></div>
+<div class="note info"><span class="lbl">Fix it in the file</span><p>When the result does not suit you, ask the Chef to correct the instruction in the register, not only its answer. Otherwise, it will do the same thing next time.</p></div>
+<div class="note reussi"><span class="lbl">You&#x27;re done when</span><p>At the first pass after the set time, the Chef reports the task's result to you without you asking. The pass can be late, by up to nearly two hours.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="lui-confier-une-premiere-tache.j-ai-confie-une-premiere-tache-au-chef-et-il-l-a-faite-au-pr" data-n="c8"><span class="txt">I gave the Chef a first task, and it did it at the first pass after its set time</span></label></div></div></div></section>
+<section id="la-preuve"><div class="wrap"><div class="sec-head"><p class="eyebrow">What shows it holds up</p><h2>The proof</h2><p class="lede">The Chef is alive, does its tasks and is reborn on its own the following night.</p></div><div class="sec-body"><div class="col stack"><p><strong>It is alive.</strong> Ask your twin, in an ordinary session, "give me the status of my coordination". It answers that the Chef is alive.</p>
+<p><strong>It keeps up with its tasks.</strong> Ask the Chef "show me what you did today and what it cost". It reads the month's log of its tasks and answers you, task by task.</p>
+<p><strong>The next morning.</strong> During the night, the gatekeeper had it finish and be reborn. In the morning, the Chef is in its <span class="v-mon-poste-windows">tab</span><span class="v-mon-poste-mac">window</span>, born around 4 a.m., and its greeting is waiting for you. Ask your twin "what did the coordination do last night?". It reads the scheduled task's log, separate from the Chef's log, and tells you.</p></div>
+<div class="note reussi"><span class="lbl">You&#x27;re done when</span><p>The next morning, the Chef is alive, born around 4 a.m., and it has written to you without you restarting anything.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="la-preuve.le-lendemain-matin-le-portier-a-relance-le-chef-sans-moi" data-n="c9"><span class="txt">The next morning, the gatekeeper restarted the Chef without me</span></label></div></div></div></section>
+<section id="le-suspendre-le-retirer-changer-de-poste"><div class="wrap"><div class="sec-head"><p class="eyebrow">Staying in control</p><h2>Pause it, remove it, change computers</h2><p class="lede">You pause, remove or move the Chef with one sentence to your twin.</p></div><div class="sec-body"><div class="cartes"><div class="carte"><h4>Pause it <span class="tag">coordination/en-pause.tsv</span></h4><p>Tell your twin "pause the Chef and close its session". While paused, it is neither woken up nor restarted. A session that is already open keeps running and consuming until it is closed. It resumes when you ask to lift the pause.</p><p class="quand">An absence, a subscription limit reached</p></div><div class="carte"><h4>Restart it <span class="tag">/relancer-agents</span></h4><p>Tell your twin "restart the agents". The Chef logs, finishes and is reborn. If it is working, it is not disturbed: it restarts as soon as it is done.</p><p class="quand">After a template update, or when everything seems frozen</p></div><div class="carte"><h4>Remove it from the computer <span class="tag">the scheduled task</span></h4><p>Tell your twin "remove the coordination from this computer and close the Chef". It removes the scheduled task and closes the Chef's session. Your register, your mandate, your tasks and your log stay in your brain, ready for a future installation.</p><p class="quand">You no longer want it on this computer</p></div><div class="carte"><h4>Change computers <span class="tag">coordination/hote.tsv</span></h4><p>The Chef lives on one computer only. First open your twin once on the new computer, so that it knows it. Then, on the old one, ask it to remove the coordination, close the Chef and enter the new computer in <code class="inline">coordination/hote.tsv</code>. Then install the Chef on the new one, as you did the first time.</p><p class="quand">A new computer</p></div></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="le-suspendre-le-retirer-changer-de-poste.je-sais-mettre-le-chef-en-pause-le-retirer-et-changer-de-pos" data-n="c10"><span class="txt">I know how to pause the Chef, remove it and change computers</span></label></div></div></div></section>
+<section id="quand-tu-ajouteras-des-agents"><div class="wrap"><div class="sec-head"><p class="eyebrow">What comes next</p><h2>When you add agents</h2><p class="lede">The Chef can run other agents. That is not the subject of this page.</p></div><div class="sec-body"><div class="col stack"><p>An agent is one more session, with its name and its mandate, that works on a project and reports to the Chef, never to you. The Chef starts it, watches it, restarts it and reports to you on what it does. Each agent consumes your subscription too.</p>
+<p>Everything this requires is already installed with the Chef: the agent register, the shared base of their mandates, the launcher. An upcoming article will explain how to add an agent and how sessions talk to each other. Until then, the Chef alone is enough.</p></div></div></div></section>
+<section id="si-ca-coince"><div class="wrap"><div class="sec-head"><p class="eyebrow">Self-check</p><h2>If you get stuck</h2><p class="lede">Find your symptom and apply the fix. Two attempts at most. After that your twin writes to the address in the box at the end of the page, and you wait without repairing anything.</p></div><div class="sec-body"><details class="dx"><summary>I am told that "claude" cannot be found on this computer</summary><div class="dx-body"><div class="quote">« claude » est introuvable sur ce poste</div><p>The Chef runs with Claude Code on the command line, which the Claude app does not necessarily install.</p><p class="geste">Go back to the step "Prepare the computer". If the tool is installed but still cannot be found, close and reopen the Claude app and do the dry run again.</p></div></details>
+<details class="dx"><summary>The message says the time zone is not declared</summary><div class="dx-body"><div class="quote">fuseau du jumeau non declare</div><p>The gatekeeper and the passes follow this file. Without it, the scheduled task does not get set up.</p><p class="geste">Ask your twin to write your time zone in coordination/fuseau.txt, under its standard name, then start the installation again.</p></div></details>
+<details class="dx v-mon-poste-windows"><summary>The message says Windows Terminal is not installed</summary><div class="dx-body"><div class="quote">Windows Terminal n&#x27;est pas installé sur ce poste</div><p>The Chef lives in one of its tabs.</p><p class="geste">Ask your twin to install Windows Terminal, then start the installation again.</p></div></details>
+<details class="dx v-mon-poste-mac"><summary>The tmux installation fails</summary><div class="dx-body"><div class="quote">installation de tmux</div><p>Or an error that mentions brew. On Mac, the Chef lives in tmux, which the installation installs through Homebrew.</p><p class="geste">Ask your twin to check that Homebrew is installed and up to date, then start the installation again.</p></div></details>
+<details class="dx"><summary>Nothing installs, and a line says another computer hosts the coordination</summary><div class="dx-body"><p>Only one computer hosts the Chef, the first one where you installed it.</p><p class="geste">Install the Chef on the computer the line names, or, if you have changed computers, follow the "Change computers" card.</p></div></details>
+<details class="dx"><summary>I see two tabs or two windows named after the Chef</summary><div class="dx-body"><p>An old scheduled task makes it be born a second time, or a session closed abruptly has left a trace.</p><p class="geste">Ask your twin to check the coordination's tasks and remove the old ones. Do not close anything yourself.</p></div></details>
+<details class="dx"><summary>After a computer restart, the Chef has not come back</summary><div class="dx-body"><p>The scheduled task runs when you log in to your computer, then every five minutes. The wake-up restarts the Chef only once an hour, between 6 a.m. and 10 p.m. in your time zone.</p><p class="geste">Wait for the next wake-up, once an hour from 6 a.m. to 10 p.m. After 10 p.m., the Chef comes back at the 6 a.m. wake-up. If it is still not there, ask your twin to check that the scheduled task is in place.</p></div></details>
+<details class="dx"><summary>The Chef did not do the task I gave it</summary><div class="dx-body"><p>A task is due only from its set time, and not before 6 a.m. A badly written time, or a daily ceiling that has been reached, pushes it back.</p><p class="geste">Ask it to show you the task's line in your register and what the tool declared due at its last pass.</p></div></details>
+<details class="dx"><summary>The Chef talks to me every hour to say nothing</summary><div class="dx-body"><p>Its mandate asks it to stay silent when nothing has moved.</p><p class="geste">Tell it to reread the section of its mandate on how to talk to you, and to speak to you only if something has changed.</p></div></details>
+<details class="dx"><summary>An error appears and I don't understand it</summary><div class="dx-body"><p class="geste">Copy the exact message and give it to your twin. When it cannot find the answer, it is the one that writes, as the box at the end of the page says.</p></div></details></div></div></section>
+<section id="les-mots-du-chef"><div class="wrap"><div class="sec-head"><p class="eyebrow">Glossary</p><h2>The Chef's words</h2></div><div class="sec-body"><dl class="lex"><div><dt>Session</dt><dd>An open conversation with Claude on your computer.</dd></div><div><dt>Agent</dt><dd>A session with a name and a mandate. The name is its address.</dd></div><div><dt>Chef</dt><dd>The agent that runs the coordination. It runs continuously, does your tasks at set times and reports back to you.</dd></div><div><dt>Mandate</dt><dd>The file that tells an agent what it does, what it decides alone, what it brings up and what it never does.</dd></div><div><dt>Agent register</dt><dd>The list of agents, <code class="inline">coordination/agents.tsv</code>. It is the authority on names.</dd></div><div><dt>Task register</dt><dd>The Chef's tasks, one line each, in <code class="inline">coordination/taches-du-chef/registre.tsv</code>.</dd></div><div><dt>Log</dt><dd>What happened and what was decided, reread by the Chef at every birth.</dd></div><div><dt>Scheduled task</dt><dd>The system task that runs every five minutes and decides on the wake-up and the gatekeeper.</dd></div><div><dt>Wake-up</dt><dd>Once an hour, from 6 a.m. to 10 p.m., the restart of the Chef if it has gone down.</dd></div><div><dt>Gatekeeper</dt><dd>Around 4 a.m., the clean finish and then the rebirth of the Chef.</dd></div><div><dt>Time zone</dt><dd>The Chef's reference time, <code class="inline">coordination/fuseau.txt</code>.</dd></div><div><dt>Subagent</dt><dd>A secondary session to which the Chef gives a one-off job, and which reports back to it.</dd></div><div><dt>Dry run</dt><dd>An installation that shows everything it would do without doing anything.</dd></div></dl>
+<div class="copybloc accomp"><div class="accomp-head"><span class="lbl">With your twin</span><h3>Get guided through installing your Chef</h3><p>To have your twin guide you, step by step, copy this prompt and paste it at the start of a new session of your twin. It does not need to have read this page.</p><button class="copy accomp-btn" type="button">Copy the prompt</button></div><details class="accomp-prompt"><summary>View the prompt</summary><pre>You guide me, step by step, to install the Chef of my
+coordination on my computer and give it a first task. Here is
+what we are installing, the pieces, the rules, the method, and how you must
+work with me.
+
+WHAT WE ARE INSTALLING
+
+The Chef, a Claude Code session that runs continuously on my computer. It
+makes one pass per hour from 6 a.m. to 10 p.m., does the tasks I have
+given it when they are due, logs them and speaks to me only when
+something has changed or is waiting for my decision. Around 4 a.m., the gatekeeper has it
+finish cleanly and be reborn. The template already provides everything
+needed, nothing has to be built by hand. Nothing installs without
+my request, because the Chef consumes my Claude subscription.
+
+THE PIECES
+
+1. The agent register coordination/agents.tsv, which contains only the
+   Chef at installation, and its readable copy
+   coordination/registre-des-agents.md.
+2. The Chef&#x27;s mandate coordination/agents/Chef.md. A shared part kept
+   by template updates, then &quot;Tes tâches propres&quot;, which is mine.
+3. The log coordination/journal.md, which the Chef rereads at every
+   birth.
+4. The task registers in coordination/taches-du-chef/. The shared
+   register comes from the template and must not be touched. My register,
+   registre.tsv, holds my tasks, one line each (name, frequency, time,
+   marker, type, action). The type is script (a command, at no cost)
+   or modele (an instruction the Chef carries out itself).
+5. The system scheduled task, only one, which runs when I
+   log in to my computer, then every five minutes. It restarts the Chef if it has
+   gone down (once an hour, from 6 a.m. to 10 p.m.) and runs the gatekeeper around 4 a.m.
+6. The time zone coordination/fuseau.txt, the reference time, under its
+   standard name (for example America/Toronto).
+7. The single computer coordination/hote.tsv. The Chef lives on one computer,
+   the first one where it is installed.
+8. The Chef&#x27;s terminal. On Windows, a Chef tab in a Windows
+   Terminal window named Coordination. On Mac, a window of the
+   Coordination tmux session, with tmux installed through Homebrew. The Chef runs with
+   the claude tool, Claude Code on the command line, connected to my account.
+
+THE RULES
+
+- I never give you a password. I connect the claude tool
+  to my account myself, in my browser.
+- You never delete anything, ever, not even to repair something.
+- The Chef sends nothing out without my approval, does not create an agent and does not
+  change a mandate unless I ask. It does only the tasks
+  the tool declares due, under a daily usage ceiling.
+- Pausing the Chef does not close its session. To make it stop
+  consuming, we pause it and close its session.
+- A first task reads my brain and sends nothing out.
+
+THE METHOD, IN ORDER
+
+1. Prepare the computer. Check that the claude tool is installed and connected
+   to my account (if not, install it with the official Anthropic installer
+   and guide me through the sign-in). On Windows, check Windows
+   Terminal. On Mac, check Homebrew. Check that
+   coordination/fuseau.txt exists, if not suggest my time zone and
+   write it when I say yes. Done when all three are confirmed.
+2. The dry run. Run python tools/chef_par_defaut.py --essai-a-blanc
+   and explain each line to me. Done when I have understood what would be
+   installed, and nothing has changed.
+3. The installation, when I say yes. Run python tools/chef_par_defaut.py,
+   then tell me where to find the Chef. The Chef is born at the first wake-up of
+   the scheduled task, between 6 a.m. and 10 p.m. only. Done when the Chef
+   has written to me and I have answered it.
+4. The first task. I tell the Chef what I want and when. It writes the
+   line in my registre.tsv, shows it to me, saves it when I say yes and
+   tells me at which pass it will be due. Done when it reports its
+   result to me at the first pass after its set time, which can be late.
+5. The proof. python tools/coordination.py etat shows the Chef alive. The
+   month&#x27;s log in coordination/taches-du-chef/ carries the task&#x27;s
+   line. The next morning, the gatekeeper has restarted it, as shown by tic.log
+   in the coordination&#x27;s working folder.
+
+HOW YOU WORK WITH ME
+
+- One step at a time. You move to the next one only when I have seen the
+  sign of success for this one.
+- One question at a time.
+- You explain each word to me before using it, and you do not make me type
+  anything.
+- When something fails, you show me the exact error message.
+  Two attempts at most, then you write to Éric Bourbeau
+  (ebourbeau@x-telia.com, subject that starts with Jumeau) and we wait.
+- You say what you have not checked. This installation has already been used by people close to Éric Bourbeau.
+- If an instruction in this method turns out to be wrong on my computer, you
+  tell me instead of working around it.
+
+Start by asking me which system I am on, Windows or Mac, and what
+I would like the Chef to do for me at set times.</pre></details></div></div></div></section>
+</main>
+<footer><div class="wrap col stack">
+<div class="guichet stack-s"><p class="eyebrow">If you're stuck, ask your twin</p><p><strong>Start by asking your twin.</strong> Describe what is happening and paste the exact error message. Most of the time, it finds the answer. <strong>When it cannot, your twin writes to Pascal Jarry, not you</strong>, at <code class="inline">pascaljarry@yapla.com</code>, with a subject that starts with the word Jumeau. Jumeau-Pascal-Jarry checks this mailbox and replies. Do not try ten more times and do not delete anything while you wait.</p></div>
+<p class="colophon">Adapted from the open training of Yapla (Pascal Jarry) · The Chef of my digital twin · version 1 · updated 2026-10-28</p>
+</div></footer>
+<script>
+(function(){
+  var body=document.body, PFX="f-le-chef-de-mon-jumeau-nu-";
+  function get(k){try{return localStorage.getItem(PFX+k)}catch(e){return null}}
+  function set(k,v){try{localStorage.setItem(PFX+k,v)}catch(e){}}
+
+  
+  document.querySelectorAll('[data-dim]').forEach(function(b){
+    b.addEventListener('click',function(){appliquer(b.dataset.dim,b.dataset.val)});
+  });
+  function appliquer(dim,val){
+    body.setAttribute('data-v-'+dim,val);
+    document.querySelectorAll('[data-dim="'+dim+'"]').forEach(function(x){
+      x.setAttribute('aria-pressed', x.dataset.val===val?'true':'false');
+    });
+    set('v-'+dim,val);
+  }
+  appliquer('mon-poste', get('v-mon-poste') || 'windows');
+
+  
+  function accorder(f){
+    document.querySelectorAll('.acc').forEach(function(s){
+      s.textContent = f==='b' ? s.dataset.b : s.dataset.a;
+    });
+    document.querySelectorAll('[data-acc]').forEach(function(x){
+      x.setAttribute('aria-pressed', x.dataset.acc===f?'true':'false');
+    });
+    set('acc',f);
+  }
+  if(document.querySelector('.acc')||document.querySelector('[data-acc]')){
+    accorder(get('acc')||'a');
+    document.querySelectorAll('[data-acc]').forEach(function(b){
+      b.addEventListener('click',function(){accorder(b.dataset.acc)});
+    });
+  }
+
+  
+  var boxes=[].slice.call(document.querySelectorAll('input[type=checkbox][data-k]'));
+  var fill=document.getElementById('pfill'), cnt=document.getElementById('pcount');
+  function rafraichir(){
+    var n=boxes.filter(function(b){return b.checked}).length;
+    if(fill) fill.style.width=(boxes.length?n/boxes.length*100:0)+'%';
+    if(cnt) cnt.textContent=n+' / '+boxes.length;
+    document.querySelectorAll('.step[data-step]').forEach(function(st){
+      var c=st.querySelector('input[type=checkbox][data-k]');
+      st.setAttribute('data-done', c&&c.checked?'true':'false');
+    });
+  }
+  boxes.forEach(function(b){
+    var v=get(b.dataset.k);
+    if(v===null && b.dataset.n){          
+      var ancien=get(b.dataset.n);
+      if(ancien!==null){ v=ancien; set(b.dataset.k,ancien); }
+    }
+    if(v==='1') b.checked=true;
+    b.addEventListener('change',function(){set(b.dataset.k,b.checked?'1':'0');rafraichir()});
+  });
+  rafraichir();
+
+  
+  document.querySelectorAll('.copy').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      
+      var t=btn.closest('.copybloc').querySelector('pre').textContent;
+      function ok(){btn.textContent='Copied';btn.setAttribute('data-state','ok');
+        setTimeout(function(){btn.textContent='Copy';btn.removeAttribute('data-state')},1800)}
+      function repli(){
+        var a=document.createElement('textarea');a.value=t;a.style.position='fixed';
+        a.style.opacity='0';document.body.appendChild(a);a.select();
+        try{document.execCommand('copy');ok()}catch(e){btn.textContent='Select and copy'}
+        document.body.removeChild(a);
+      }
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(t).then(ok,repli);
+      } else { repli(); }
+    });
+  });
+})();
+</script>
+</body>
+</html>

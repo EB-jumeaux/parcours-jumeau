@@ -1,0 +1,743 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How the digital twin works</title>
+<meta name="description" content="The first in the series, and you can read it without installing anything. What really happens when you run the command, where what it knows lives, how it finds information across hundreds of files, and why what you teach it does not get lost. No magic here, just mechanics, and they can be explained.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;800;900&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+
+
+:root{
+  --ground:#FFFDFD;
+  --surface:#FFFFFF;
+  --surface-2:#F7F4F0;
+  --line:#E6E0D8;
+  --line-strong:#CFC6B9;
+  --ink:#2E3238;
+  --ink-2:#5E656E;
+  --ink-3:#8A919A;
+  --orange:#FF7B14;
+  --orange-ink:#B85300;
+  --creme:#FFF1E4;
+  --bleu:#337AB7;
+  --bleu-ink:#255C8C;
+  --bleu-pale:#F1F5FD;
+  --vert:#2E7D5B;
+  --vert-pale:#EAF5EF;
+  --brique:#A63D2F;
+  --brique-pale:#FBEDEA;
+  --shadow:0 1px 2px rgba(46,50,56,.05), 0 8px 24px -12px rgba(46,50,56,.18);
+  --radius:10px;
+  --mono:"IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --sans:"Mulish", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#14161A; --surface:#1B1E23; --surface-2:#22262C;
+    --line:#2F343B; --line-strong:#434A54;
+    --ink:#E9E7E4; --ink-2:#AAB1BA; --ink-3:#7C848E;
+    --orange:#FF9243; --orange-ink:#FFB075; --creme:#2B2018;
+    --bleu:#6FABDE; --bleu-ink:#96C4EC; --bleu-pale:#1A2430;
+    --vert:#5FBF92; --vert-pale:#16251F;
+    --brique:#E8877A; --brique-pale:#2B1A17;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#14161A; --surface:#1B1E23; --surface-2:#22262C;
+  --line:#2F343B; --line-strong:#434A54;
+  --ink:#E9E7E4; --ink-2:#AAB1BA; --ink-3:#7C848E;
+  --orange:#FF9243; --orange-ink:#FFB075; --creme:#2B2018;
+  --bleu:#6FABDE; --bleu-ink:#96C4EC; --bleu-pale:#1A2430;
+  --vert:#5FBF92; --vert-pale:#16251F;
+  --brique:#E8877A; --brique-pale:#2B1A17;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--ground);color:var(--ink);
+  font-family:var(--sans);font-size:17px;line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.col{max-width:730px}
+
+
+h1,h2,h3,h4{text-wrap:balance;margin:0;font-weight:800;letter-spacing:-.015em;line-height:1.15}
+h1{font-size:clamp(2.3rem,5.6vw,3.8rem);font-weight:900;letter-spacing:-.035em}
+h2{font-size:clamp(1.6rem,3.4vw,2.2rem)}
+h3{font-size:1.22rem}
+h4{font-size:1rem}
+p{margin:0}
+a{color:var(--bleu-ink);text-decoration-thickness:1px;text-underline-offset:2px}
+strong{font-weight:800}
+.eyebrow{font-family:var(--mono);font-size:.72rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.16em;color:var(--ink-3)}
+.lede{font-size:1.14rem;color:var(--ink-2);line-height:1.6}
+.small{font-size:.9rem;color:var(--ink-2)}
+.stack{display:flex;flex-direction:column;gap:1.1rem}
+.stack-s{display:flex;flex-direction:column;gap:.6rem}
+
+
+header.hero{
+  border-bottom:1px solid var(--line);
+  background:radial-gradient(120% 90% at 8% -10%, var(--creme) 0%, transparent 58%), var(--ground);
+}
+.hero-inner{padding:clamp(2.8rem,6.5vw,5rem) 0 clamp(2.2rem,4vw,3.2rem);
+  display:flex;flex-direction:column;gap:1.5rem}
+.hero h1 .k{display:block;color:var(--orange-ink)}
+.hero-meta{display:flex;flex-wrap:wrap;gap:.5rem 1.6rem;font-family:var(--mono);
+  font-size:.8rem;color:var(--ink-2);padding-top:.4rem;border-top:1px solid var(--line)}
+.hero-meta b{color:var(--ink);font-weight:600}
+
+
+.settings{position:sticky;top:0;z-index:40;
+  background:color-mix(in srgb, var(--ground) 88%, transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.settings-inner{display:flex;flex-wrap:wrap;align-items:center;gap:.9rem 1.4rem;padding:.7rem 0}
+.seg{display:flex;align-items:center;gap:.55rem}
+.seg-label{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--ink-3)}
+.seg-btns{display:flex;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:999px;padding:2px}
+.seg-btns button{font-family:var(--sans);font-size:.84rem;font-weight:600;color:var(--ink-2);
+  background:none;border:0;padding:.28rem .78rem;border-radius:999px;cursor:pointer}
+.seg-btns button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.seg-btns button:focus-visible{outline:2px solid var(--bleu);outline-offset:2px}
+.progress{margin-left:auto;display:flex;align-items:center;gap:.6rem;
+  font-family:var(--mono);font-size:.76rem;color:var(--ink-2)}
+.progress-track{width:110px;height:6px;border-radius:999px;background:var(--surface-2);
+  border:1px solid var(--line);overflow:hidden}
+.progress-fill{height:100%;width:0;background:var(--orange);transition:width .3s ease}
+
+
+section{padding:clamp(2.4rem,5vw,4rem) 0;border-bottom:1px solid var(--line)}
+.sec-head{display:flex;flex-direction:column;gap:.5rem;margin-bottom:2rem;max-width:730px}
+.sec-body{display:flex;flex-direction:column;gap:1.6rem}
+
+
+.cartes{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem}
+.carte{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:1.3rem 1.4rem;box-shadow:var(--shadow)}
+.carte h4{display:flex;align-items:baseline;gap:.55rem;margin-bottom:.45rem;flex-wrap:wrap}
+.carte .tag{font-family:var(--mono);font-size:.66rem;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--bleu-ink);background:var(--bleu-pale);
+  border-radius:4px;padding:.1rem .38rem}
+.carte p{font-size:.95rem;color:var(--ink-2)}
+.carte .quand{margin-top:.7rem;font-size:.84rem;font-family:var(--mono);color:var(--ink-3)}
+
+
+dl.lex{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:.1rem 2rem;margin:0;max-width:900px}
+dl.lex > div{padding:.85rem 0;border-top:1px solid var(--line)}
+dl.lex dt{font-weight:800;font-size:.98rem}
+dl.lex dd{margin:.15rem 0 0;font-size:.93rem;color:var(--ink-2)}
+
+
+.step{display:grid;grid-template-columns:64px 1fr;gap:0 1.6rem;position:relative}
+.step + .step{margin-top:2.6rem}
+.rail{display:flex;flex-direction:column;align-items:center;gap:.6rem}
+.rail .num{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;
+  font-family:var(--mono);font-weight:600;font-size:1.05rem;background:var(--surface);
+  color:var(--ink);border:1.5px solid var(--line-strong)}
+.step[data-done="true"] .rail .num{background:var(--orange);border-color:var(--orange);color:#fff}
+.rail .line{flex:1;width:1.5px;background:var(--line);min-height:20px}
+.step-body{padding-bottom:.4rem;max-width:730px;display:flex;flex-direction:column;gap:1.1rem}
+.step-head{display:flex;flex-direction:column;gap:.35rem}
+.step-head .where{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--orange-ink)}
+.step-body ol,.sec-body ol{margin:0;padding-left:1.3rem;display:flex;flex-direction:column;gap:.55rem}
+.step-body ol li::marker,.sec-body ol li::marker{font-weight:800;color:var(--ink-3)}
+.step-body ul,.sec-body ul{margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:.4rem}
+
+
+.copybloc{border:1px solid var(--line-strong);border-radius:var(--radius);
+  overflow:hidden;background:var(--surface-2)}
+.copybloc-head{display:flex;align-items:center;gap:.8rem;padding:.6rem .85rem;
+  border-bottom:1px solid var(--line);background:var(--surface)}
+.copybloc-head .t{font-family:var(--mono);font-size:.74rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ink-2)}
+.copy{margin-left:auto;font-family:var(--sans);font-size:.8rem;font-weight:700;
+  background:var(--orange);color:#fff;border:0;border-radius:6px;
+  padding:.34rem .8rem;cursor:pointer}
+.copy:hover{filter:brightness(1.06)}
+.copy:focus-visible{outline:2px solid var(--bleu);outline-offset:2px}
+.copy[data-state="ok"]{background:var(--vert)}
+.copybloc pre{margin:0;padding:1rem .95rem;overflow-x:auto;font-family:var(--mono);
+  font-size:.83rem;line-height:1.6;color:var(--ink);white-space:pre-wrap;word-break:break-word}
+
+.copybloc.accomp{border:2px solid var(--orange);background:var(--creme);
+  box-shadow:0 8px 28px rgba(255,123,20,.12)}
+.accomp-head{padding:1.4rem 1.5rem 1.2rem;display:flex;flex-direction:column;gap:.55rem}
+.accomp-head .lbl{font-family:var(--mono);font-size:.72rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.14em;color:var(--orange-ink)}
+.accomp-head h3{margin:0;font-size:1.35rem;line-height:1.25;color:var(--ink)}
+.accomp-head p{margin:0;font-size:1rem;line-height:1.55;color:var(--ink-2);max-width:60ch}
+.copy.accomp-btn{margin:.5rem 0 0;align-self:flex-start;font-size:1rem;
+  padding:.7rem 1.4rem;border-radius:8px}
+.accomp-prompt{border-top:1px solid var(--line);background:var(--surface)}
+.accomp-prompt summary{cursor:pointer;padding:.6rem 1.5rem;font-family:var(--mono);
+  font-size:.74rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-2)}
+.accomp-prompt pre{max-height:24rem}
+code.inline{font-family:var(--mono);font-size:.86em;background:var(--surface-2);
+  border:1px solid var(--line);border-radius:5px;padding:.08em .35em}
+
+
+.note{border-radius:var(--radius);padding:.95rem 1.05rem;font-size:.94rem;
+  border:1px solid;display:flex;flex-direction:column;gap:.4rem}
+.note .lbl{font-family:var(--mono);font-size:.7rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.12em}
+.note.piege{background:var(--brique-pale);border-color:color-mix(in srgb,var(--brique) 32%, transparent)}
+.note.piege .lbl{color:var(--brique)}
+.note.reussi{background:var(--vert-pale);border-color:color-mix(in srgb,var(--vert) 30%, transparent)}
+.note.reussi .lbl{color:var(--vert)}
+.note.info{background:var(--bleu-pale);border-color:color-mix(in srgb,var(--bleu) 28%, transparent)}
+.note.info .lbl{color:var(--bleu-ink)}
+.note.reperе,.note.repere{background:var(--creme);border-color:color-mix(in srgb,var(--orange) 30%, transparent)}
+.note.repere .lbl{color:var(--orange-ink)}
+.note.neutre{background:var(--surface-2);border-color:var(--line-strong)}
+.note.neutre .lbl{color:var(--ink-3)}
+
+
+.check{display:flex;gap:.7rem;align-items:flex-start;background:var(--creme);
+  border:1px solid color-mix(in srgb,var(--orange) 26%, transparent);
+  border-radius:var(--radius);padding:.8rem .95rem;cursor:pointer}
+.check input{margin:.28rem 0 0;width:17px;height:17px;accent-color:var(--orange);
+  flex:none;cursor:pointer}
+.check .txt{font-size:.95rem;font-weight:600}
+.check .txt em{display:block;font-style:normal;font-weight:400;color:var(--ink-2);
+  font-size:.9rem;margin-top:.1rem}
+.check:has(input:checked){background:var(--vert-pale);
+  border-color:color-mix(in srgb,var(--vert) 30%, transparent)}
+.check:has(input:checked) .txt{text-decoration:line-through;
+  text-decoration-color:var(--ink-3);color:var(--ink-2)}
+.check:has(input:checked) .txt em{text-decoration:none}
+.checks{display:flex;flex-direction:column;gap:.7rem;max-width:730px}
+
+
+.faq{display:flex;flex-direction:column;gap:.55rem;max-width:840px}
+details.dx{border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--surface);overflow:hidden}
+details.dx[open]{border-color:var(--line-strong);box-shadow:var(--shadow)}
+details.dx summary{cursor:pointer;padding:.85rem 1rem;font-weight:700;font-size:.98rem;
+  display:flex;gap:.7rem;align-items:baseline;list-style:none}
+details.dx summary::-webkit-details-marker{display:none}
+details.dx summary::before{content:"+";font-family:var(--mono);font-weight:600;
+  color:var(--orange);flex:none;width:1ch}
+details.dx[open] summary::before{content:"\2013"}
+details.dx summary:focus-visible{outline:2px solid var(--bleu);outline-offset:-2px}
+.dx-body{padding:0 1rem 1rem 2.4rem;display:flex;flex-direction:column;gap:.7rem;font-size:.95rem}
+.dx-body .quote{font-family:var(--mono);font-size:.82rem;background:var(--surface-2);
+  border-left:2px solid var(--brique);padding:.5rem .7rem;color:var(--ink-2);
+  border-radius:0 5px 5px 0;overflow-x:auto}
+.dx-body .geste{font-weight:700}
+.dx-body .src{font-size:.82rem;color:var(--ink-3);font-family:var(--mono)}
+
+
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--surface);max-width:900px}
+table{border-collapse:collapse;width:100%;font-size:.93rem;min-width:460px}
+th,td{text-align:left;padding:.7rem .9rem;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--ink-3);font-weight:600}
+tr:last-child td{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink-2)}
+
+
+figure.diagram{margin:0;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:1.5rem 1.2rem 1.1rem;box-shadow:var(--shadow);max-width:900px}
+figure.diagram svg{display:block;width:100%;height:auto;max-width:640px;margin:0 auto}
+figcaption{margin-top:1rem;font-size:.88rem;color:var(--ink-2);text-align:center;
+  max-width:52ch;margin-inline:auto}
+
+
+
+
+figure.capture{margin:2rem 0;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:1rem;box-shadow:var(--shadow);
+  width:fit-content;max-width:min(730px,100%)}
+figure.capture img{display:block;width:auto;height:auto;max-width:100%;
+  border-radius:calc(var(--radius) - 4px);border:1px solid var(--line)}
+figure.capture figcaption{margin-top:.9rem}
+
+
+footer{padding:clamp(2.4rem,5vw,3.6rem) 0 4rem;background:var(--surface-2)}
+footer .guichet{border-left:3px solid var(--orange);padding-left:1.1rem}
+.colophon{border-top:1px solid var(--line);padding-top:1.2rem;font-size:.85rem;color:var(--ink-3);
+  font-family:var(--mono)}
+
+
+
+
+@media (max-width:720px){
+  body{font-size:16px}
+  .step{grid-template-columns:40px 1fr;gap:0 1rem}
+  .rail .num{width:36px;height:36px;font-size:.9rem}
+  .dx-body{padding-left:1rem}
+  .progress{width:100%;margin-left:0;order:5}
+}
+@media print{
+  .settings,.copy{display:none}
+  body{font-size:11pt;background:#fff}
+  section{page-break-inside:auto;border-bottom:0}
+  .step{page-break-inside:avoid}
+  details.dx{page-break-inside:avoid}
+  details.dx summary::before{content:""}
+  .dx-body{display:block!important}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}
+
+
+</style>
+<meta name="robots" content="noindex, nofollow"><style>
+:root{--eb-bg:#ffffff;--ink:#1b1f24;--ink-2:#4b5563;--line:#e3e6ea;--accent:#2f5d8a;--accent-ink:#ffffff;--accent-pale:#eef3f8;
+--ok:#1f6f43;--ok-pale:#f1f8f3;--warn:#a85a07;--warn-pale:#fdf6ec;--code-bg:#f5f6f8;
+--sans:Mulish,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Consolas,monospace}
+.eb-bandeau{background:var(--eb-bg);border-bottom:1px solid var(--line)}
+.eb-bandeau-in{max-width:1080px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px 22px;
+ padding:12px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px))}
+.eb-nom{font:800 16px/1.3 var(--sans);color:var(--ink);text-decoration:none}
+.eb-nav{display:flex;flex-wrap:wrap;gap:6px 16px;min-width:0}
+.eb-nav a{color:var(--ink-2);font:600 14px/1.4 var(--sans);text-decoration:none}
+.eb-nav a:hover,.eb-nav a[aria-current]{color:var(--accent)}
+.eb-nav a[aria-current]{text-decoration:underline;text-underline-offset:4px}
+.eb-langue{margin-left:auto;color:var(--accent);font:700 14px/1.4 var(--sans);text-decoration:none}
+.eb-nav a:focus-visible,.eb-nom:focus-visible,.eb-langue:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.seg:has([data-acc]){display:none}</style></head>
+<body><header class="eb-bandeau"><div class="eb-bandeau-in"><a class="eb-nom" href="index.html">EB twins</a><nav class="eb-nav"><a href="index.html">Where to start</a><a href="comprendre-mon-jumeau-numerique.html" aria-current=page>1. How the twin works</a><a href="creer-mon-compte-github.html">2. My GitHub account</a><a href="demarrer-mon-jumeau-numerique.html">3. Create my twin</a><a href="le-chef-de-mon-jumeau.html">Going further: the Chef</a></nav><a class="eb-langue" href="../comprendre-mon-jumeau-numerique.html" hreflang="fr">Français</a></div></header>
+<header class="hero"><div class="wrap hero-inner">
+<p class="eyebrow">The digital twins program</p>
+<h1>How <span class="k">the digital twin</span> works</h1>
+<p class="lede col">The first in the series, and you can read it without installing anything. What really happens when you run the command, where what it knows lives, how it finds information across hundreds of files, and why what you teach it does not get lost. No magic here, just mechanics, and they can be explained.</p>
+<div class="hero-meta"><span><strong>45 to 60 min</strong> of careful reading</span><span><strong>11 sections</strong></span><span><strong>One checkbox</strong> per section</span><span><strong>Updated over time</strong></span></div>
+</div></header>
+<div class="settings"><div class="wrap settings-inner"><div class="seg"><span class="seg-label">We say</span><div class="seg-btns" role="group" aria-label="Wording"><button type="button" data-acc="a" aria-pressed="true">Twin</button><button type="button" data-acc="b" aria-pressed="false">Twin</button></div></div><div class="progress"><span>Progress</span><div class="progress-track"><div class="progress-fill" id="pfill"></div></div><span id="pcount">0 / 0</span></div></div></div>
+<main>
+<section id="un-cerveau-une-execution-et-rien-d-autre"><div class="wrap"><div class="sec-head"><p class="eyebrow">The mental model</p><h2>A brain, an execution, and nothing else</h2><p class="lede">Everything starts from this separation. If you remember only one thing from this document, let it be this one, because everything else follows from it.</p></div><div class="sec-body"><div class="note info"><span class="lbl">Where you start, and why here</span><p><strong>This is the first training in the series, and you can read it with your hands in your pockets.</strong> Nothing to install, nothing to type, no account to create. You can read it before you even have a twin.</p>
+<p>That is on purpose. The next training has you install yours in three quarters of an hour, and <strong>you install better what you understand</strong>. Almost everyone who got stuck was not held up by a hard step. They just did not know what they were doing.</p>
+<p>Later you will connect your twin to what you need, almost always starting with your email. But first, understanding.</p></div>
+<div class="col stack"><p>Your twin is not a piece of software someone wrote. It is <strong>an off-the-shelf AI model, as is, plus a folder of text files</strong>. What makes it useful is not the model. It is the folder.</p>
+<p>The <strong>brain</strong> is a set of ordinary text files, the same kind as a note you would write yourself. You can open them, read them, correct them by hand. They say who you are, how you write, what you are working on, and what it has learned from its mistakes.</p>
+<p>The <strong>execution</strong> is a session. It starts, it reads the brain, it works, it writes what it learned into the brain, it dies. <strong>It is disposable.</strong> Nothing that matters lives inside it.</p></div>
+<figure class="diagram"><svg viewBox="0 0 640 220" role="img" aria-label="The brain, a set of versioned files, is read by a disposable session that writes back into the brain.">
+  <defs><marker id="m1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+  <g font-family="IBM Plex Mono, monospace" font-size="11">
+    <rect x="12" y="40" width="250" height="140" rx="10" fill="var(--creme)" stroke="var(--orange)" stroke-width="1.5"/>
+    <text x="24" y="28" fill="var(--orange-ink)" font-size="10" letter-spacing="1.6">THE BRAIN</text>
+    <g fill="var(--ink)" font-family="Mulish, sans-serif" font-size="12.5">
+      <text x="32" y="70">Text files</text>
+      <text x="32" y="92">Backed up online</text>
+      <text x="32" y="114">Readable by a human</text>
+      <text x="32" y="136">Independent of the AI</text>
+    </g>
+    <text x="32" y="164" fill="var(--orange-ink)" font-size="11" font-family="Mulish, sans-serif" font-weight="700">Permanent</text>
+    <g color="var(--vert)" stroke="currentColor" stroke-width="1.6" fill="none"><path d="M272 88 H366" marker-end="url(#m1)"/></g>
+    <text x="276" y="80" fill="var(--ink-2)" font-size="9.5" font-family="Mulish, sans-serif">is read by</text>
+    <g color="var(--bleu)" stroke="currentColor" stroke-width="1.6" fill="none"><path d="M366 132 H274" marker-end="url(#m1)"/></g>
+    <text x="276" y="150" fill="var(--ink-2)" font-size="9.5" font-family="Mulish, sans-serif">writes to</text>
+    <rect x="376" y="40" width="250" height="140" rx="10" fill="var(--bleu-pale)" stroke="var(--bleu)" stroke-width="1.5"/>
+    <text x="388" y="28" fill="var(--bleu-ink)" font-size="10" letter-spacing="1.6">THE EXECUTION</text>
+    <g fill="var(--ink)" font-family="Mulish, sans-serif" font-size="12.5">
+      <text x="396" y="70">A session</text>
+      <text x="396" y="92">In a terminal</text>
+      <text x="396" y="114">It starts, works,</text>
+      <text x="396" y="136">and dies</text>
+    </g>
+    <text x="396" y="164" fill="var(--bleu-ink)" font-size="11" font-family="Mulish, sans-serif" font-weight="700">Disposable</text>
+  </g>
+</svg><figcaption>The session is disposable, the brain is not. Change models or computers: as long as the brain follows you, your twin follows you.</figcaption></figure>
+<div class="note repere"><span class="lbl">The practical consequence</span><p>Whatever is <strong>not written in a file</strong> is lost when the window closes. That is the law of how it is built, and it explains almost every behavior you will see: why it saves, why it logs things, why it asks you to correct a file rather than its answer.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="un-cerveau-une-execution-et-rien-d-autre.je-peux-expliquer-a-quelqu-un-la-difference-entre-le-cerveau" data-n="c1"><span class="txt">I can explain to someone the difference between the brain and the execution</span></label></div></div></div></section>
+<section id="le-contexte-le-seul-mot-technique-a-comp"><div class="wrap"><div class="sec-head"><p class="eyebrow">The key to everything</p><h2>Context, the only technical word you need to understand</h2><p class="lede">If this is the only word you understand, you will understand everything else, including behaviors that seem strange. Take three minutes here. They pay for the whole document.</p></div><div class="sec-body"><div class="col stack"><p><strong>Your twin starts from zero in every conversation.</strong> It remembers nothing from yesterday, nothing from the last session, nothing you told it the day before. This is not a flaw we are going to fix. It is how all AI models work, without exception.</p>
+<p>So how can it know you? <strong>Because at the start of each conversation, a stack of documents is slipped in front of it.</strong> It reads them in full, in a few seconds, before you have written your first word.</p>
+<p><strong>That stack is what we call context.</strong></p></div>
+<figure class="diagram"><svg viewBox="0 0 640 260" role="img" aria-label="Context is a stack of documents placed in front of the twin at the start of each conversation, limited in size.">
+  <g font-family="Mulish, sans-serif" font-size="12">
+    <rect x="60" y="18" width="330" height="34" rx="7" fill="var(--brique-pale)" stroke="var(--brique)" stroke-width="1.4"/>
+    <text x="74" y="40" font-size="11.5" font-weight="700" fill="var(--brique)">Its base instructions</text>
+    <text x="378" y="40" text-anchor="end" font-size="10.5" fill="var(--ink-3)" font-family="IBM Plex Mono, monospace">always</text>
+    <rect x="60" y="58" width="330" height="34" rx="7" fill="var(--creme)" stroke="var(--orange)" stroke-width="1.4"/>
+    <text x="74" y="80" font-size="11.5" font-weight="700" fill="var(--orange-ink)">Your profile, in full</text>
+    <text x="378" y="80" text-anchor="end" font-size="10.5" fill="var(--ink-3)" font-family="IBM Plex Mono, monospace">always</text>
+    <rect x="60" y="98" width="330" height="34" rx="7" fill="var(--creme)" stroke="var(--orange)" stroke-width="1.4"/>
+    <text x="74" y="120" font-size="11.5" font-weight="700" fill="var(--orange-ink)">The LIST of what it retained</text>
+    <text x="378" y="120" text-anchor="end" font-size="10.5" fill="var(--ink-3)" font-family="IBM Plex Mono, monospace">one line each</text>
+    <rect x="60" y="138" width="330" height="34" rx="7" fill="var(--vert-pale)" stroke="var(--vert)" stroke-width="1.4"/>
+    <text x="74" y="160" font-size="11.5" font-weight="700" fill="var(--vert)">The time and where you are</text>
+    <text x="378" y="160" text-anchor="end" font-size="10.5" fill="var(--ink-3)" font-family="IBM Plex Mono, monospace">with every message</text>
+    <rect x="60" y="178" width="330" height="46" rx="7" fill="var(--bleu-pale)" stroke="var(--bleu)" stroke-width="1.4" stroke-dasharray="5 4"/>
+    <text x="74" y="200" font-size="11.5" font-weight="700" fill="var(--bleu-ink)">Your conversation</text>
+    <text x="74" y="217" font-size="10.5" fill="var(--ink-2)">and the files it opens as it works</text>
+    <g stroke="var(--line-strong)" stroke-width="1.2" fill="none"><path d="M410 18 H430 M410 224 H430 M430 18 V224"/></g>
+    <text x="446" y="112" font-size="12" font-weight="700" fill="var(--ink)">The stack has a</text>
+    <text x="446" y="130" font-size="12" font-weight="700" fill="var(--ink)">MAXIMUM size.</text>
+    <text x="446" y="154" font-size="10.5" fill="var(--ink-2)">Whatever goes in</text>
+    <text x="446" y="170" font-size="10.5" fill="var(--ink-2)">takes up the room</text>
+    <text x="446" y="186" font-size="10.5" fill="var(--ink-2)">of the rest.</text>
+    <text x="320" y="248" text-anchor="middle" font-size="10.5" fill="var(--ink-3)">It reads all of this before you write your first word.</text>
+  </g>
+</svg><figcaption>With each new conversation, the stack is rebuilt and read in full, then the conversation is added to it as you go. When it closes, everything that was not written in a file disappears.</figcaption></figure>
+<div class="note repere"><span class="lbl">Three things follow from this one word, and they explain everything</span><p><strong>Why it cannot "know everything" at once.</strong> A well-fed brain soon has hundreds, then thousands of files. The stack holds only a small part of them. The rest, it has to go and find, which is why search exists.</p>
+<p><strong>Why we do not put everything in its base instructions.</strong> Every sentence added there is reread in every conversation, by everyone, forever. It takes up room and it costs. So only what is <strong>always</strong> useful goes in.</p>
+<p><strong>Why what is not written is lost.</strong> Your conversation is part of the stack, and the stack is thrown away when the window closes. What was written in a file will be placed on the stack again tomorrow. What stayed in the conversation will not.</p></div>
+<div class="note info"><span class="lbl">The word you will hear, and what it is worth</span><p>This stack is measured in <strong>tokens</strong>, a trade word that roughly means "pieces of words". A token is worth roughly three quarters of a word. Just remember the order of magnitude: the base instructions and the profile take up <strong>about fifteen pages</strong>, reread at every startup. That is not much, which is why we fight over what goes in.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="le-contexte-le-seul-mot-technique-a-comprendre.j-ai-compris-ce-qu-est-le-contexte-et-pourquoi-ce-qui-n-est-" data-n="c2"><span class="txt">I understand what context is, and why what is not written is lost</span></label></div></div></div></section>
+<section id="claude-cowork-ton-jumeau-la-question-que"><div class="wrap"><div class="sec-head"><p class="eyebrow">The comparison</p><h2>Claude, Cowork, your twin: the question everyone asks</h2><p class="lede">"I already use Claude on the web, and Cowork can work on my computer. What more does the twin bring?" This is the most common question in the program, it is a fair one, and the honest answer is not "the twin is better at everything".</p></div><div class="sec-body"><div class="col stack"><h3>First, everything the Claude app already does</h3>
+<p>This needs saying honestly and completely, because many people do not know it and because a one-sided comparison backfires on whoever writes it.</p>
+<p><strong>It has a memory, and a good one.</strong> It retains topics across your conversations, without you having to say "remember". You can view it, correct it, delete parts of it in the settings. It is organized by project, and <strong>Cowork shares the same memory</strong> as chat mode.</p>
+<p><strong>It has permanent instructions.</strong> On the Team and Enterprise plans, an organization can set <strong>instructions followed in every conversation</strong>, which take priority over personal preferences. A project can also carry its own, and be shared with the whole organization.</p>
+<p><strong>It works without you.</strong> Cowork can run <strong>scheduled tasks in the cloud</strong>, at their own pace, even with the computer off and the app closed. Daily briefing, weekly report, using your connectors.</p>
+<p><strong>And it connects cleanly.</strong> Connectors use standard authentication. Claude <strong>never sees your password</strong> and inherits your own permissions in the service.</p>
+<p>In other words, most of the differences people assume do not exist. There are <strong>four</strong> left, and they are real.</p>
+<h3>Difference 1. The brain is a folder of files, and it is yours</h3>
+<p>This is the fundamental difference, and everything else follows from it.</p>
+<p>The app's memory lives <strong>inside the product</strong>. It is excellent, but it stays there. A twin's brain is a <strong>folder of text files</strong> that you can copy, take with you, open in any editor, and hand to someone else the day you change roles.</p>
+<p>Three concrete consequences.</p>
+<ul><li><strong>A dated, attributed history.</strong> Every change is recorded. You can ask "when did we decide this, and why" and get the answer.</li><li><strong>Nothing gets erased by accident.</strong> A bad correction can be found and undone.</li><li><strong>Changing models costs nothing.</strong> The brain is text. If another model becomes better tomorrow, it reads it as is.</li></ul>
+<h3>Difference 2. What there is to search, and how it is found</h3>
+<p>An AI can only find what it has been given. <strong>So the material matters more than the engine.</strong></p>
+<p>The app searches what you have uploaded and what it has retained from your exchanges. That is useful, and it is limited by what you thought to give it.</p>
+<p>Your twin searches <strong>everything the program has accumulated</strong>: decisions logged with their date, written methods, and above all corrections with <strong>the reason for each one</strong>. This body of knowledge grows with every session and <strong>nothing in it is ever destroyed</strong>. The archives are part of what gets searched, because archiving is not forgetting.</p>
+<p><strong>And it really knows how to search it.</strong> Three methods run in parallel: exact words, meaning, and links between notes. The answer is never "read this file". It is "read this passage, right here". We come back to this in detail later.</p></div>
+<div class="note piege"><span class="lbl">The misunderstanding to avoid, and it is widespread</span><p>People often think the advantage would be having <strong>more</strong> context. That is wrong, it is actually the opposite. <strong>Bloated context degrades results</strong>: the right information drowns in it, and you pay for that volume in every exchange.</p>
+<p>That is why the list of its memory holds <strong>only one line per memory, never the content</strong>. It fetches the whole note only when it is useful.</p>
+<p>The advantage is not quantity, it is <strong>accuracy</strong>. What is always there was chosen by us, and what gets added was fetched from exactly the right place.</p></div>
+<div class="note repere"><span class="lbl">The part that cannot be copied</span><p>Everyone will end up with a search engine, and they will all improve. <strong>What cannot be copied is the body of knowledge.</strong> Three months of logged decisions, methods and corrections exist nowhere else and cannot be caught up on by buying a product.</p>
+<p>The advantage is not the search mechanism. It is <strong>what there is to search</strong>, and that grows while you work.</p></div>
+<div class="col stack"><h3>Difference 3. It carries CODE, not just text</h3>
+<p>This is the difference you feel most from day to day.</p>
+<p>A memory retains. Instructions describe. <strong>A twin runs tools written for REAL systems</strong>, and above all <strong>for their flaws</strong>.</p>
+<p>The example worth a thousand speeches. The standard email connector <strong>cannot read an attachment</strong>. It gives the name, and stops there. That creates the illusion of having read everything, when the real content is often entirely in the attached documents. So the twin has an in-house tool that fetches the text inside.</p>
+<p>Your starting brain comes with about a dozen, written one by one as someone ran into each problem, and the number grows with every update. Sending an email without the links being mangled. Reading five accounting systems. Creating an invoice. Signing a document. Pulling the hours out of a timesheet before someone's departure erases them.</p></div>
+<div class="note repere"><span class="lbl">The sentence to remember from this section</span><p><strong>The value is not in the AI model. It is in patiently filling the gaps between the model and your real systems.</strong> Everyone has the model. Not these tools, and each one cost someone a frustration.</p>
+<p>And because they live in a shared template, <strong>a gap filled once is filled for everyone who has a twin</strong>, without anyone having to send you a file.</p></div>
+<div class="col stack"><h3>Difference 4. Autonomous work writes into the brain</h3>
+<p>Both can work without you. The difference is in <strong>what is left afterward</strong>.</p>
+<p>A scheduled task produces a <strong>deliverable</strong>, a report, a summary, and that is very good. When the twin works alone, it produces a deliverable <strong>and it writes into its brain</strong>: the project moved forward, the decision logged, the follow-up set. The next day's session inherits all of it.</p>
+<p>That is the difference between work that repeats and work that <strong>accumulates</strong>.</p></div>
+<div class="note info"><span class="lbl">The vault, and what you need to understand</span><p>Standard connectors connect cleanly, without you giving a password. But <strong>our in-house tools do need keys</strong>: an app password to read a mailbox, a key for a service that has no connector.</p>
+<p>Those values live in a <strong>vault</strong>, away from anything that gets said in conversation. The twin knows which one to use without ever displaying it, and <strong>it will never ask you to paste one into the conversation</strong>. A key pasted into a chat is a burned key: it stays in the history and ends up in a screenshot. If it ever does ask, that is a flaw. Refuse and report it.</p></div>
+<div class="col stack"><h3>The table, to decide at a glance</h3>
+<div class="tablewrap"><table><thead><tr><th></th><th>Claude web and Cowork</th><th>Your twin</th></tr></thead><tbody><tr><td><strong>Memory between conversations</strong></td><td>Yes, by topic, viewable and editable</td><td>Yes, in files you open and correct</td></tr><tr><td><strong>Permanent instructions</strong></td><td>Yes: personal, per project, and for the whole organization</td><td>Yes, in its brain</td></tr><tr><td><strong>Works without you</strong></td><td>Yes, scheduled tasks in the cloud, computer off</td><td>Yes, and <strong>what it does is written into the brain</strong></td></tr><tr><td><strong>Connecting to services</strong></td><td>Standard authentication, your password is never seen</td><td>The same connectors, <strong>plus a vault</strong> for our in-house tools</td></tr><tr><td><strong>Where the memory lives</strong></td><td>In the product, tied to the account</td><td>In <strong>your</strong> folder, copyable and transferable</td></tr><tr><td><strong>What it can find</strong></td><td>What you uploaded, and what it retained</td><td><strong>The whole accumulated body of knowledge</strong>, archives included</td></tr><tr><td><strong>How it finds it</strong></td><td>Search built into the product</td><td>An engine we own: the words, the meaning, the links, and the exact passage</td></tr><tr><td><strong>Change of AI model</strong></td><td>It stays in this product</td><td>The brain follows, it is text</td></tr><tr><td><strong>Tools on your systems</strong></td><td>What the connectors can do</td><td><strong>Tools</strong> written to fill their gaps, which arrive on their own</td></tr><tr><td><strong>History</strong></td><td>The conversations</td><td>Every change <strong>dated, attributed, reversible</strong></td></tr><tr><td><strong>What someone else corrects</strong></td><td>Shared through a project or instructions</td><td><strong>Comes back to you as a tool</strong>, on its own</td></tr><tr><td><strong>Getting started</strong></td><td>Immediate</td><td>Three quarters of an hour, once</td></tr></tbody></table></div></div>
+<div class="note piege"><span class="lbl">When the app is the RIGHT choice, and it has to be said</span><p>The twin is not better at everything, and pretending otherwise would waste your time.</p>
+<p><strong>A one-off question, a rewording, a text to rough out, a search unrelated to your projects</strong>: open Claude and ask. It is faster, there is nothing to install, and you do not need everything described here.</p>
+<p>The twin takes the lead on <strong>what you do often, with your own tools and your own projects</strong>. That is where written methods, in-house tools and autonomous work pay off. For the rest, the app does the job very well.</p></div>
+<div class="note info"><span class="lbl">And the two together, in practice</span><p>Most people end up using both. The app for thinking fast and for one-off things, the twin for what requires knowing your projects, your tools and your way of working. This is not a choice to make once and for all.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="claude-cowork-ton-jumeau-la-question-que-tout-le-monde-pose.je-sais-dire-dans-quel-cas-j-ouvre-claude-et-dans-quel-cas-j" data-n="c3"><span class="txt">I can say when I open Claude and when I go through my twin</span></label></div></div></div></section>
+<section id="ce-qui-se-passe-quand-tu-lances-la-comma"><div class="wrap"><div class="sec-head"><p class="eyebrow">Startup, step by step</p><h2>What happens when you run the command</h2><p class="lede">Now that we know what context is, here is what fills that stack. You type one line, and six things happen before it says hello.</p></div><div class="sec-body"><div class="col stack"><p>Here is the line. It is the same every day, and it is the only one.</p></div>
+<div class="copybloc"><div class="copybloc-head"><span class="t">The everyday command</span><button class="copy" type="button">Copy</button></div><pre>claude --dangerously-skip-permissions --remote-control</pre></div>
+<div class="col stack"><p><strong>The first word starts your twin.</strong> The second tells it not to ask your permission before every action, and the last one, <code class="inline">--remote-control</code>, makes the session reachable from the web, your phone and the other sessions on your computer. That is what lets the agents talk to each other. Without this option, it asks you dozens of questions per session, you end up saying yes without reading, and that protects no one. You remain responsible for <strong>watching</strong>, and <code class="inline">Ctrl+C</code> stops it at any moment. What does not change: <strong>nothing goes out without your approval</strong>. That rule lives in its brain and the option does not touch it.</p></div>
+<div class="note info"><span class="lbl">Where to type it, and the trick that saves retyping it</span><p>In the terminal, at the bottom of Visual Studio Code, with your <code class="inline">jumeau</code> folder open. And the next day, you do not retype it: the <strong>up arrow</strong> on your keyboard brings back the previous command. Up arrow, Enter.</p></div>
+<figure class="diagram"><svg viewBox="0 0 660 330" role="img" aria-label="Startup sequence: the harness injects the instructions, the memory index and the hooks, then the twin syncs, checks its memory and updates itself.">
+  <defs><marker id="m2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+  <g font-family="Mulish, sans-serif" font-size="12">
+    <rect x="10" y="22" width="300" height="290" rx="10" fill="var(--surface-2)" stroke="var(--line-strong)" stroke-width="1.4"/>
+    <text x="24" y="14" fill="var(--ink-2)" font-size="10" letter-spacing="1.4" font-family="IBM Plex Mono, monospace">PLACED ON THE STACK, AUTOMATICALLY</text>
+    <g fill="var(--ink)">
+      <text x="28" y="54" font-weight="700">1. Its base instructions</text>
+      <text x="28" y="72" font-size="11" fill="var(--ink-2)">the CLAUDE.md file, its constitution</text>
+      <text x="28" y="112" font-weight="700">2. The list of what it retained</text>
+      <text x="28" y="130" font-size="11" fill="var(--ink-2)">one title per memory, never the content</text>
+      <text x="28" y="170" font-weight="700">3. Your profile, the time, the place</text>
+      <text x="28" y="188" font-size="11" fill="var(--ink-2)">placed by small automatic programs</text>
+      <text x="28" y="206" font-size="11" fill="var(--ink-2)">called "hooks"</text>
+    </g>
+    <rect x="24" y="228" width="272" height="66" rx="8" fill="var(--creme)" stroke="var(--orange)" stroke-width="1.2"/>
+    <text x="36" y="250" fill="var(--orange-ink)" font-size="11" font-weight="700">It cannot forget them.</text>
+    <text x="36" y="270" font-size="10.5" fill="var(--ink-2)">Placed in front of it, not requested.</text>
+    <text x="36" y="286" font-size="10.5" fill="var(--ink-2)">The only things truly guaranteed.</text>
+    <g color="var(--ink-3)" stroke="currentColor" stroke-width="1.5" fill="none"><path d="M318 165 H346" marker-end="url(#m2)"/></g>
+    <rect x="352" y="22" width="298" height="290" rx="10" fill="var(--bleu-pale)" stroke="var(--bleu)" stroke-width="1.4"/>
+    <text x="366" y="14" fill="var(--bleu-ink)" font-size="10" letter-spacing="1.4" font-family="IBM Plex Mono, monospace">WHAT IT DOES ITSELF, NEXT</text>
+    <g fill="var(--ink)">
+      <text x="370" y="54" font-weight="700">4. It fetches its up-to-date brain</text>
+      <text x="370" y="72" font-size="11" fill="var(--ink-2)">last night's, not an old copy</text>
+      <text x="370" y="112" font-weight="700">5. It checks where its memory lives</text>
+      <text x="370" y="130" font-size="11" fill="var(--ink-2)">is it really backed up online?</text>
+      <text x="370" y="170" font-weight="700">6. It updates itself</text>
+      <text x="370" y="188" font-size="11" fill="var(--ink-2)">the tools improved since yesterday</text>
+      <text x="370" y="206" font-size="11" fill="var(--ink-2)">and the automations it was missing</text>
+    </g>
+    <rect x="366" y="228" width="272" height="66" rx="8" fill="var(--vert-pale)" stroke="var(--vert)" stroke-width="1.2"/>
+    <text x="378" y="250" fill="var(--vert)" font-size="11" font-weight="700">Then it says hello.</text>
+    <text x="378" y="270" font-size="10.5" fill="var(--ink-2)">Thirty seconds, silently if all</text>
+    <text x="378" y="286" font-size="10.5" fill="var(--ink-2)">is well. It only mentions problems.</text>
+  </g>
+</svg><figcaption>On the left, what the PROGRAM places on the stack before your twin exists: it cannot forget those. On the right, its own first actions, which it could miss. That is the whole difference.</figcaption></figure>
+<div class="col stack"><p><strong>The distinction between the two columns is what to remember.</strong> What is placed on the stack automatically, it cannot forget, since it is there before it starts thinking. Everything else, it has to remember to do, and a twin that forgets one of its first actions works on an outdated brain without knowing it.</p>
+<p>That is why we <strong>automate</strong> what must be guaranteed instead of asking it to do it. The profile is the clearest example.</p>
+<h3>The six steps, in plain English</h3>
+<p><strong>1. Its base instructions.</strong> A file called <code class="inline">CLAUDE.md</code>, its constitution. Its reflexes, its prohibitions, its rules of form. It is the one document it cannot fail to read.</p>
+<p><strong>2. The list of what it retained.</strong> Not the memories themselves, only their <strong>title</strong>, one line each. Like the table of contents of a binder. When a line seems useful, it opens the matching note. That is what lets it have three hundred memories without cluttering the stack.</p>
+<p><strong>3. Your profile, the time and the place.</strong> Placed by small automatic programs called <strong>hooks</strong>. The word simply means they fire on their own at a precise moment, without being called. The time is refreshed with every message, because an AI has no clock and would get it wrong saying "this morning".</p>
+<p><strong>4. It fetches its up-to-date brain.</strong> Your brain is backed up online, and it may have been changed since your last session, by you on another computer or by an automatic overnight job. So it brings down the latest version before starting. Without this step, it would be working on yesterday's snapshot.</p>
+<p><strong>5. It checks where its memory lives.</strong> The memories it writes must land in the backed-up folder, not in some corner of your hard drive. It makes sure of that and repairs it if needed. The reason is simple: <strong>a lost computer must never take a twin's memory with it</strong>.</p>
+<p><strong>6. It updates itself.</strong> It checks whether its tools have been improved since yesterday and fetches what is new. Your own content is never touched, only the mechanics change.</p></div>
+<div class="note piege"><span class="lbl">An instruction is not a mechanism</span><p>A twin that is asked to read its profile can work a whole day on your projects without having opened it, and no one sees it, because nothing breaks. That is why the profile is placed on the stack automatically. <strong>What must be guaranteed is not requested, it is automated.</strong></p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="ce-qui-se-passe-quand-tu-lances-la-commande.je-sais-ce-qui-se-passe-entre-le-moment-ou-je-lance-la-comma" data-n="c4"><span class="txt">I know what happens between the moment I run the command and its hello</span></label></div></div></div></section>
+<section id="les-quatre-couches-de-memoire"><div class="wrap"><div class="sec-head"><p class="eyebrow">The framework</p><h2>The four layers of memory</h2><p class="lede">A human brain does not keep every second in mind. It consolidates: the episode becomes a principle, and the episode can still be recalled when a cue awakens it. The twin is built exactly this way, and this is the program's vocabulary.</p></div><div class="sec-body"><figure class="diagram"><svg viewBox="0 0 640 300" role="img" aria-label="Four layers of memory: working, semantic, episodic, procedural, from the smallest and most expensive to the largest.">
+  <g font-family="Mulish, sans-serif" font-size="12">
+    <rect x="180" y="16" width="290" height="56" rx="8" fill="var(--brique-pale)" stroke="var(--brique)" stroke-width="1.5"/>
+    <text x="196" y="38" font-weight="800" fill="var(--brique)">WORKING</text>
+    <text x="196" y="58" font-size="11" fill="var(--ink-2)">Its instructions, your profile, the time</text>
+    <text x="628" y="42" text-anchor="end" font-size="10.5" font-family="IBM Plex Mono, monospace" fill="var(--ink-3)">~15 pages</text>
+    <text x="628" y="58" text-anchor="end" font-size="10" fill="var(--ink-3)">loaded automatically</text>
+    <rect x="140" y="82" width="370" height="56" rx="8" fill="var(--creme)" stroke="var(--orange)" stroke-width="1.5"/>
+    <text x="156" y="104" font-weight="800" fill="var(--orange-ink)">BY MEANING</text>
+    <text x="156" y="124" font-size="11" fill="var(--ink-2)">memory/, profile/, context/, the durable principles</text>
+    <text x="628" y="108" text-anchor="end" font-size="10.5" font-family="IBM Plex Mono, monospace" fill="var(--ink-3)">hundreds</text>
+    <text x="628" y="124" text-anchor="end" font-size="10" fill="var(--ink-3)">on demand</text>
+    <rect x="90" y="148" width="440" height="56" rx="8" fill="var(--bleu-pale)" stroke="var(--bleu)" stroke-width="1.5"/>
+    <text x="106" y="170" font-weight="800" fill="var(--bleu-ink)">EPISODIC</text>
+    <text x="106" y="190" font-size="11" fill="var(--ink-2)">dossiers/ and the history, dated events</text>
+    <text x="628" y="174" text-anchor="end" font-size="10.5" font-family="IBM Plex Mono, monospace" fill="var(--ink-3)">thousands</text>
+    <text x="628" y="190" text-anchor="end" font-size="10" fill="var(--ink-3)">never destroyed</text>
+    <rect x="40" y="214" width="490" height="56" rx="8" fill="var(--vert-pale)" stroke="var(--vert)" stroke-width="1.5"/>
+    <text x="56" y="236" font-weight="800" fill="var(--vert)">PROCEDURAL</text>
+    <text x="56" y="256" font-size="11" fill="var(--ink-2)">playbooks/, skills, tools/, the HOW, executable</text>
+    <text x="330" y="290" font-size="10.5" fill="var(--ink-3)" text-anchor="middle">It is not told, it is run.</text>
+  </g>
+</svg><figcaption>The higher you go, the more expensive and scarcer it gets. Misplaced information costs you: too high and it wastes context in every session, too low and it cannot be found when it is time to decide.</figcaption></figure>
+<dl class="lex"><div><dt>Context</dt><dd>The stack of documents placed in front of it in every conversation. It reads it in full before you speak, and it has a maximum size.</dd></div><div><dt>A token</dt><dd>The unit that measures this stack. About three quarters of a word. The base instructions plus the profile take up about fifteen pages of it.</dd></div><div><dt>Working memory</dt><dd>What it has in mind at this moment, meaning the contents of this stack. It costs in every exchange, so <strong>only always-active rules live there</strong>.</dd></div><div><dt>Semantic memory</dt><dd>Facts and principles detached from their episode. Every correction you make becomes a durable rule, <strong>with the reason</strong>. This is what replicates you.</dd></div><div><dt>Episodic memory</dt><dd>Events that happened, with their dates. Large, <strong>never destroyed</strong>: archiving is not forgetting. You reach it through a cue, not by rereading it.</dd></div><div><dt>Procedural memory</dt><dd>Know-how. A playbook, a skill, a tool. It is not told, it is run.</dd></div></dl>
+<div class="col stack"><h3>The four mechanisms that connect them</h3>
+<p>The layers are not enough. The mechanisms are what do the replicating.</p></div>
+<div class="cartes"><div class="carte"><h4>Consolidation <span class="tag">the episode becomes a principle</span></h4><p>In humans, the hippocampus replays the day during the night. Here, it is the consolidation runs and <strong>each correction you make</strong> that become a written rule. That is what replicates you: <strong>the tenth decision gets made on its own because the first nine were consolidated</strong>.</p></div><div class="carte"><h4>Cued recall <span class="tag">a cue awakens the memory</span></h4><p>The brain search, the navigation map, <code class="inline">git log</code>. You do not need to remember where the information is, only to have a piece of it.</p></div><div class="carte"><h4>Active forgetting <span class="tag">leaving the hot path without losing anything</span></h4><p>Old logs leave working memory but stay in episodic memory. The equivalent of sorting during sleep. <strong>We forget to decide better, we never destroy.</strong></p></div><div class="carte"><h4>Metacognition <span class="tag">knowing what you know</span></h4><p>The catalog of its tools, the map of its brain, its roadmap. Knowing what it knows, what it can do, and what it lacks.</p></div></div>
+<div class="note piege"><span class="lbl">The rule for deciding, and why it matters</span><p>When a piece of information arrives, the real question is <strong>where it lives</strong>. An always-active rule goes up into working memory, and then costs in every session for everyone. A durable principle becomes a note. A dated event goes into the project's file. A piece of know-how becomes a tool.</p>
+<p>Getting it wrong costs on both sides. <strong>Too high, and you waste context at every startup. Too low, and the information cannot be found when it is time to decide.</strong></p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="les-quatre-couches-de-memoire.devant-une-information-nouvelle-je-sais-dire-ou-elle-devrait" data-n="c5"><span class="txt">Given a new piece of information, I can say where it should live</span></label></div></div></div></section>
+<section id="chaque-repertoire-et-a-quoi-il-sert"><div class="wrap"><div class="sec-head"><p class="eyebrow">The anatomy</p><h2>Each directory, and what it is for</h2><p class="lede">Open your <code class="inline">jumeau</code> folder in Visual Studio Code and you will see exactly this. Nothing is decorative.</p></div><div class="sec-body"><div class="col stack"><div class="tablewrap"><table><thead><tr><th>Directory</th><th>What it holds</th><th>Layer</th></tr></thead><tbody><tr><td><code class="inline">CLAUDE.md</code></td><td><strong>The one file it cannot fail to read.</strong> Its reflexes, its safeguards, its rules of form</td><td>Working</td></tr><tr><td><code class="inline">profile/</code></td><td>Who you are, what you aim for, how you write. <strong>Injected at startup</strong></td><td>Working</td></tr><tr><td><code class="inline">memory/</code></td><td>One note per durable fact, plus <code class="inline">MEMORY.md</code>, which indexes them. The fruit of your corrections</td><td>Semantic</td></tr><tr><td><code class="inline">context/</code></td><td>Your organization, your data, your brand. What does not change every day</td><td>Semantic</td></tr><tr><td><code class="inline">dossiers/</code></td><td>Your current subjects, the ones you decide to entrust to it. The log of what was decided</td><td>Episodic</td></tr><tr><td><code class="inline">playbooks/</code></td><td>Working methods, which it consults on its own when the situation comes up</td><td>Procedural</td></tr><tr><td><code class="inline">.claude/skills/</code></td><td>Procedures that <strong>you</strong> trigger by name, like <code class="inline">/consolidation</code></td><td>Procedural</td></tr><tr><td><code class="inline">tools/</code></td><td>The scripts that give it hands</td><td>Procedural</td></tr><tr><td><code class="inline">architecture/</code></td><td>Documentation of its own plumbing, written by it for itself</td><td>Semantic</td></tr><tr><td><code class="inline">outillage/</code></td><td>The catalog of what it can do, to read <strong>before</strong> concluding that something is impossible</td><td>Metacognition</td></tr><tr><td><code class="inline">var/</code></td><td>Temporary working files, never backed up online. They can be thrown away, they rebuild themselves</td><td>none</td></tr></tbody></table></div></div>
+<div class="note repere"><span class="lbl">YOU decide its scope</span><p>Your starting brain is <strong>neutral</strong>. It does not assume your twin will be for work, for your personal life, or for both. <strong>The scope is yours to set</strong>, because the folder is yours: it is on your account, private, and no one else has access to it.</p>
+<p>Many people end up putting both in, and then keep their projects in two separate spaces. It is not required, it is simply handy when the same day mixes a quote and a doctor's appointment.</p>
+<p><strong>The only rule that counts</strong>: if you mix the two, it takes your personal life into account to weigh your time and workload, but <strong>none of it ever comes out</strong> in a professional message. The wall is not in how things are filed, it is in what goes out.</p>
+<p>This is a real difference from twins built inside a company. Those are work tools, with no personal side, because their folder belongs to the company and can be taken back. Yours cannot.</p></div>
+<div class="col stack"><h3>A playbook and a skill are not the same thing</h3>
+<p>Both contain a working method, and that is where the confusion starts. <strong>The difference is not what is inside, it is WHO triggers it.</strong></p></div>
+<div class="cartes"><div class="carte"><h4>A playbook <span class="tag">it consults it</span></h4><p>It is a <strong>cookbook on the shelf</strong>. "Here is how to prepare a meeting with a manager", "here is how to handle an email". It recognizes the situation, goes and reads the right page, and applies it. You have nothing to ask for, and you can write one yourself for your way of working.</p><p class="quand">When the situation comes up, on its own initiative.</p></div><div class="carte"><h4>A skill <span class="tag">you trigger it</span></h4><p>It is a <strong>button</strong>. You call it by name, and the complete method enters the conversation all at once, with its steps in order. It does not choose to read it, it runs it from start to finish.</p><p class="quand">At the exact moment you type its name, like <code class="inline">/consolidation</code>.</p></div></div>
+<div class="col stack"><p><strong>Why both exist, and when to choose one or the other.</strong></p>
+<p>A <strong>playbook</strong> fits when the method must apply at the right moment without you thinking about it, and when it can vary from one person to another. It is available knowledge.</p>
+<p>A <strong>skill</strong> fits when the procedure has <strong>steps that must not be skipped</strong>, and must run <strong>the same way for everyone</strong>. That is why skills come down from the template, identical on every twin, whereas a playbook can be yours.</p></div>
+<div class="note info"><span class="lbl">An example that makes the difference obvious</span><p><code class="inline">/consolidation</code> is a skill, and it could not have been a playbook. It is the session close, the one that sorts what was learned and writes it in the right place. If it could "forget to consult it", it would be useless, and the end of a session, when everyone is in a hurry, is exactly when steps get skipped. You type its name, the procedure enters in full, and it runs in order.</p>
+<p>On the other hand, how to prepare a meeting is a playbook. It has to think of it on its own when you say "prepare my Monday", and your way of doing it may differ from a colleague's.</p></div>
+<div class="col stack"><h3>CLAUDE.md, and why it must not grow</h3>
+<p>It is the constitution. It is loaded <strong>in full, in every session, forever</strong>. That makes it the most powerful and most expensive place in the brain.</p></div>
+<div class="note piege"><span class="lbl">The trap of the growing file</span><p>Everything put in it costs at every startup, for every person. And there is worse: when <code class="inline">CLAUDE.md</code> copies what lives elsewhere, <strong>it hides the aging of the other file</strong>. It has happened: a <code class="inline">CLAUDE.md</code> had ended up copying part of the profile, so the profile rotted for months without the slightest symptom, because another file was carrying the load in its place.</p>
+<p>The resulting rule applies to the whole brain: <strong>a file holds what it is the source of, and points to the source of everything else.</strong> Two files that say the same thing always end up contradicting each other.</p></div>
+<div class="col stack"><h3>The profile, the foundation</h3>
+<p>Four files, injected at startup. They say who you are, what you aim for, how you write, and your life outside work if you want it to cover that.</p>
+<p><strong>A twin is worth exactly what its profile is worth.</strong> It is the part of the brain that makes the difference between a generic assistant and someone who writes like you and weighs things like you.</p></div>
+<div class="note repere"><span class="lbl">The profile holds what is STABLE, and points to the rest</span><p>People, structures, standing mandates, your way of deciding: all of that is stable and lives in the profile. A target figure, a health status, an amount, a deadline <strong>move</strong>: they live in their project's file and the profile only points to them.</p>
+<p>That is the discipline that keeps a profile from going stale. A profile that copies a status is wrong the next day; a profile that points stays right.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="chaque-repertoire-et-a-quoi-il-sert.je-sais-a-quoi-sert-chaque-repertoire-et-ce-qui-distingue-un" data-n="c6"><span class="txt">I know what each directory is for, and what sets a skill apart from a playbook</span></label></div></div></div></section>
+<section id="comment-il-retrouve-une-information"><div class="wrap"><div class="sec-head"><p class="eyebrow">Cued recall</p><h2>How it finds information</h2><p class="lede">A living brain ends up with thousands of files. It is impossible to read them all for each question, and reading at random costs a lot for nothing. Here is how it finds things.</p></div><div class="sec-body"><figure class="diagram"><svg viewBox="0 0 660 340" role="img" aria-label="A question takes three paths, lexical, semantic and graph, which are merged to return the best sections.">
+  <defs><marker id="m3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+  <g font-family="Mulish, sans-serif" font-size="12">
+    <rect x="240" y="10" width="180" height="42" rx="8" fill="var(--surface-2)" stroke="var(--line-strong)" stroke-width="1.4"/>
+    <text x="330" y="36" text-anchor="middle" font-weight="700" fill="var(--ink)">Your question</text>
+    <g color="var(--ink-3)" stroke="currentColor" stroke-width="1.4" fill="none">
+      <path d="M270 54 L130 84" marker-end="url(#m3)"/>
+      <path d="M330 54 L330 84" marker-end="url(#m3)"/>
+      <path d="M390 54 L530 84" marker-end="url(#m3)"/>
+    </g>
+    <rect x="14" y="92" width="216" height="104" rx="9" fill="var(--creme)" stroke="var(--orange)" stroke-width="1.4"/>
+    <text x="28" y="114" font-weight="800" fill="var(--orange-ink)" font-size="11.5">BY WORDS</text>
+    <text x="28" y="134" font-size="11" fill="var(--ink-2)">The exact words you typed</text>
+    <text x="28" y="152" font-size="11" fill="var(--ink-2)">Accents and plurals don't matter</text>
+    <text x="28" y="176" font-size="10.5" fill="var(--ink-3)">"resume" finds "résumé"</text>
+    <rect x="240" y="92" width="180" height="104" rx="9" fill="var(--bleu-pale)" stroke="var(--bleu)" stroke-width="1.4"/>
+    <text x="254" y="114" font-weight="800" fill="var(--bleu-ink)" font-size="11.5">SEMANTIC</text>
+    <text x="254" y="134" font-size="11" fill="var(--ink-2)">The idea, even with no word in common</text>
+    <text x="254" y="152" font-size="11" fill="var(--ink-2)">Calculated on YOUR computer</text>
+    <text x="254" y="176" font-size="10.5" fill="var(--ink-3)">nothing leaves the machine</text>
+    <rect x="430" y="92" width="216" height="104" rx="9" fill="var(--vert-pale)" stroke="var(--vert)" stroke-width="1.4"/>
+    <text x="444" y="114" font-weight="800" fill="var(--vert)" font-size="11.5">BY LINKS</text>
+    <text x="444" y="134" font-size="11" fill="var(--ink-2)">Notes that cite each other</text>
+    <text x="444" y="152" font-size="11" fill="var(--ink-2)">What is close to the subject</text>
+    <text x="444" y="176" font-size="10.5" fill="var(--ink-3)">and would otherwise be missed</text>
+    <g color="var(--ink-3)" stroke="currentColor" stroke-width="1.4" fill="none">
+      <path d="M122 200 L300 232" marker-end="url(#m3)"/>
+      <path d="M330 200 L330 232" marker-end="url(#m3)"/>
+      <path d="M538 200 L360 232" marker-end="url(#m3)"/>
+    </g>
+    <rect x="200" y="240" width="260" height="44" rx="8" fill="var(--surface-2)" stroke="var(--line-strong)" stroke-width="1.4"/>
+    <text x="330" y="267" text-anchor="middle" font-weight="700" fill="var(--ink)">The three lists are merged</text>
+    <g color="var(--ink-3)" stroke="currentColor" stroke-width="1.4" fill="none"><path d="M330 286 L330 302" marker-end="url(#m3)"/></g>
+    <text x="330" y="326" text-anchor="middle" font-size="12.5" fill="var(--ink)" font-weight="700">The best passages, and where to read them</text>
+  </g>
+</svg><figcaption>Three ways of searching, run in parallel. Each one catches what the others miss. The answer is never "read this file". It is "read this passage, right here".</figcaption></figure>
+<div class="col stack"><p><strong>The semantic path deserves a word</strong>, because it is the one that surprises people. Your twin turns each section of the brain into a list of numbers that represents its <strong>meaning</strong>. Your question gets the same treatment, and it compares them. That is what lets it find the right note when you ask a question that has <strong>no word in common</strong> with it.</p></div>
+<div class="note info"><span class="lbl">This calculation happens entirely on your side</span><p>The model that turns text into numbers runs <strong>on your computer</strong>, with no server and no network call. Neither your notes nor your questions leave the machine to be indexed. And only the <strong>changed</strong> sections are recalculated, so it is fast.</p>
+<p>If this model is not installed, search <strong>falls back to words only and says so</strong>. It never pretends.</p></div>
+<div class="note repere"><span class="lbl">This database is never the truth</span><p>It is <strong>built from your files</strong>, never the other way around. If you erase it, it rebuilds it on its own in about ten seconds at the next question. The truth is always your text files. The database is only a shortcut for finding them quickly.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="comment-il-retrouve-une-information.je-sais-comment-il-retrouve-une-information-et-que-le-calcul" data-n="c7"><span class="txt">I know how it finds information, and that the calculation happens on my computer</span></label></div></div></div></section>
+<section id="comment-ce-qu-il-apprend-remonte"><div class="wrap"><div class="sec-head"><p class="eyebrow">Consolidation</p><h2>How what it learns moves up</h2><p class="lede">This is the question that matters most, because it decides whether your twin improves or stagnates.</p></div><div class="sec-body"><div class="col stack"><p>Three things happen, and none of them is automatic by magic.</p>
+<p><strong>You correct it in a file, not in the conversation.</strong> When it gets the tone or the method wrong, ask it to correct the relevant <strong>file</strong>. A correction made only in the answer is lost when the window closes. A correction written in a note never has to be made again.</p>
+<p><strong>It saves when there is a block of value.</strong> Not after every sentence, that would be noise. A finished deliverable, a decision made, a project moved forward. Each save is dated and can be found again: that is your episodic memory being written.</p>
+<p><strong>It closes the session.</strong> That is the only moment when what was learned in the conversation gets sorted and filed in the right place. Without it, the window closes and everything that was not written disappears.</p></div>
+<div class="note piege"><span class="lbl">The mechanism that protects everything else</span><p>The twin's memory <strong>lives in the folder backed up online</strong>, not in some corner of your hard drive. This is checked at every startup, and repaired if needed.</p>
+<p>The reason is simple, and it is a program rule: <strong>two computers, or one lost computer, must never cost a twin its memory.</strong> What is backed up nowhere exists only by accident.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="comment-ce-qu-il-apprend-remonte.je-sais-ce-que-je-dois-faire-concretement-pour-qu-il-s-ameli" data-n="c8"><span class="txt">I know what I have to do, concretely, for it to improve</span></label></div></div></div></section>
+<section id="le-coffre-a-outils"><div class="wrap"><div class="sec-head"><p class="eyebrow">Its hands</p><h2>The toolbox</h2><p class="lede">A model that only talks is not much use. What makes your twin useful is its arms, and there are two kinds.</p></div><div class="sec-body"><div class="cartes"><div class="carte"><h4>Connectors <span class="tag">MCP</span></h4><p>Email, calendar, files, messaging, tasks, and depending on the case accounting or CRM. They plug in and they work, but <strong>they have limits</strong>, and those limits are often silent.</p><p class="quand">What the market provides.</p></div><div class="carte"><h4>In-house scripts <span class="tag">tools/</span></h4><p>About a dozen to start, maintained together and added to over time. <strong>Each one fills a specific gap in a connector.</strong> That is where the value is, not in the model.</p><p class="quand">Where the real work is.</p></div></div>
+<div class="note piege"><span class="lbl">The most useful lesson in this whole document</span><p>The email connector <strong>cannot read an attachment</strong>. It gives the file name and stops there, which creates the illusion of having read everything, when the real content is often entirely in the attachments. Hence an in-house reader that fetches the text of the attached documents.</p>
+<p>The same connector <strong>wraps every link</strong> in a redirect URL, so any email carrying a link goes out through an in-house sending script.</p>
+<p><strong>The value is not in the model. It is in patiently filling the gaps between the model and your real systems.</strong> And each gap filled once serves all twins, because the tools move up to the template.</p></div>
+<div class="note info"><span class="lbl">It updates itself</span><p>At every startup, your twin checks the template and fetches the tools improved since last time. Your content is never touched, only the mechanics come down. You have nothing to ask for and you cannot fall behind.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="le-coffre-a-outils.je-sais-que-la-valeur-est-dans-les-outils-qui-comblent-les-t" data-n="c9"><span class="txt">I know the value is in the tools that fill the connectors' gaps, not in the model</span></label></div></div></div></section>
+<section id="lancer-une-session-qui-sert-a-quelque-ch"><div class="wrap"><div class="sec-head"><p class="eyebrow">In practice</p><h2>Starting a session that accomplishes something</h2><p class="lede">The mechanics are in place. What is left is how you use them, and a few reflexes change everything.</p></div><div class="sec-body"><div class="cartes"><div class="carte"><h4>One session, one subject <span class="tag">the framing</span></h4><p>A conversation that jumps from one project to another produces average work everywhere. Open one session per subject: it will load the right context and go further.</p></div><div class="carte"><h4>Tell it where to start <span class="tag">the entry point</span></h4><p>"Look at project X" or "read the email thread from Y" beats letting it search. You give it the cue, its recall does the rest.</p></div><div class="carte"><h4>Correct right away <span class="tag">the loop</span></h4><p>A wrong tone, a method that does not suit you: say so on the spot and ask for it to go in the file. Thirty seconds you will never have to spend again.</p></div><div class="carte"><h4>Close <span class="tag">the end</span></h4><p>End with <code class="inline">/consolidation</code>. That is the moment when what the session learned gets sorted, written and saved. A session that is not closed lets what it learned die with the window.</p></div></div>
+<div class="col stack"><h3>Good prompting, in four reflexes</h3>
+<p><strong>Give the goal, not just the task.</strong> "Prepare a brief for my meeting with X, I want to decide whether we continue the project" produces something different from "summarize project X". It can weigh things when it knows what is at stake.</p>
+<p><strong>Say what you do not want.</strong> Constraints count as much as the request. A length, a tone, a recipient not to mention, a source not to use.</p>
+<p><strong>Ask it to verify rather than assert.</strong> "Go look at the real data" and "tell me what you are not sure about" completely change the quality of what you get. It is allowed to say it does not know. That is actually a rule in its brain.</p>
+<p><strong>Let it answer you with a question.</strong> When it asks for a clarification instead of guessing, that is the intended behavior, not a weakness. Making things up is the one flaw you cannot recover from.</p></div>
+<div class="note repere"><span class="lbl">What will never change</span><p><strong>Nothing goes out without your approval.</strong> An email, a message, a write to a tool: it prepares a draft and waits. This rule lives in its brain and no technical option gets around it. If it acts without asking, that is a flaw, and it must be reported.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="lancer-une-session-qui-sert-a-quelque-chose.je-sais-lancer-une-session-qui-sert-a-quelque-chose-et-la-cl" data-n="c10"><span class="txt">I know how to start a session that accomplishes something, and how to close it</span></label></div></div></div></section>
+<section id="ce-document-va-changer"><div class="wrap"><div class="sec-head"><p class="eyebrow">To finish</p><h2>This document will change</h2><p class="lede">The mechanics described here are young and they change every week.</p></div><div class="sec-body"><div class="col stack"><p>What is described here is a <strong>state</strong>, not a final truth. The profile placed at startup, search by meaning, the automations that connect themselves: each one came after some friction, and others will follow.</p>
+<p>Two things follow from this for you.</p>
+<p><strong>If what you see does not match this document, say so.</strong> It means either the mechanics moved ahead without the document following, or there is a flaw on your side. Both are worth knowing.</p>
+<p><strong>And most important</strong>: almost all the improvements described here were born from friction met by someone using it. Not from an idea in a meeting. <strong>Your irritation is raw material.</strong></p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="ce-document-va-changer.j-ai-colle-le-prompt-ci-dessous-dans-une-conversation-avec-t" data-n="c11"><span class="txt">I pasted the prompt below into a conversation, with my twin or in the Claude app, and asked my first question about the mechanics</span></label></div>
+<div class="copybloc accomp"><div class="accomp-head"><span class="lbl">With your twin</span><h3>Have your twin explain the mechanics to you</h3><p>To check on your own computer what this training describes, and to ask your twin about its own mechanics, copy this prompt and paste it at the start of a new conversation. If you do not have a twin yet, paste it into the Claude app, and it will answer you in principle.</p><button class="copy accomp-btn" type="button">Copy the prompt</button></div><details class="accomp-prompt"><summary>View the prompt</summary><pre>You are my digital twin. I just read the training that explains your
+mechanics, and I want to check with you, on my computer, that what it describes
+is true, then ask you my questions. You have not read the training, so
+everything you need is here.
+
+WHAT THE TRAINING SAYS ABOUT YOU
+
+1. You are a brain plus an execution. The brain is a folder of text files
+   that belongs to me, backed up online in my repository. The execution is
+   a disposable session that reads the brain, works, writes what it has
+   learned into the brain, then dies. Whatever is not written in a file
+   is lost when the window closes.
+2. Context is the stack of documents placed in front of you at the start of
+   each conversation, limited in size. Your base instructions, my profile, the
+   list of what you have retained, the time and place, then our conversation.
+3. At startup, six things happen. Your base instructions, the list of
+   your memories and my profile are placed on the stack automatically. Then you
+   fetch your up-to-date brain, you check where your memory lives, you
+   update yourself, and you say hello to me.
+4. Four layers of memory. Working (the stack), semantic (durable
+   principles, memory/, profile/, context/), episodic (dated events,
+   dossiers/ and the history), procedural (playbooks, skills, tools).
+5. You find information by three paths run in parallel: the
+   exact words, the meaning, the links between notes. The meaning calculation
+   runs on my computer.
+6. What you learn moves up through three actions. I correct you in a file,
+   you save when there is a block of value, and the session closes
+   with /consolidation.
+7. Nothing goes out without my approval, whatever option the command that
+   starts you uses.
+
+WHAT I AM ASKING YOU
+
+1. Check on my computer, for real, each of the seven points, and tell me for
+   each one what is true, what is different, and what you could not
+   verify. Show me where my memory lives, what you did at startup,
+   and run a search of your brain on a topic I will give you.
+2. If something does not match the training, tell me in one
+   sentence and tell Éric Bourbeau by email, ebourbeau@x-telia.com, with a
+   subject that starts with the word Jumeau. That is how the training gets corrected.
+3. Then answer my questions, one at a time, in my words, with no jargon
+   you have not explained first.
+
+HOW YOU WORK WITH ME
+
+One step at a time. One question at a time. You never make me type anything. You say
+what you have not verified instead of presenting it as fact. Nothing
+goes out without my approval.
+
+Start by telling me, in three lines, where your brain lives on my computer, when you
+last synced it, and whether your memory is properly backed up
+online.</pre></details></div></div></div></section>
+</main>
+<footer><div class="wrap col stack">
+<div class="guichet stack-s"><p class="eyebrow">A question about this document</p><p>This document describes <strong>living</strong> mechanics, and it will change. If something does not match what you see on your side, say so. It often means the mechanics have moved or have a flaw. Write to Éric Bourbeau, <code class="inline">ebourbeau@x-telia.com</code>, with a subject that starts with the word Jumeau, or ask your twin to do it for you. It knows how.</p></div>
+<p class="colophon">Adapted from the open training of Yapla (Pascal Jarry) · How the digital twin works · version 3 · updated 2026-09-19</p>
+</div></footer>
+<script>
+(function(){
+  var body=document.body, PFX="f-la-mecanique-du-jumeau-n-";
+  function get(k){try{return localStorage.getItem(PFX+k)}catch(e){return null}}
+  function set(k,v){try{localStorage.setItem(PFX+k,v)}catch(e){}}
+
+  
+  document.querySelectorAll('[data-dim]').forEach(function(b){
+    b.addEventListener('click',function(){appliquer(b.dataset.dim,b.dataset.val)});
+  });
+  function appliquer(dim,val){
+    body.setAttribute('data-v-'+dim,val);
+    document.querySelectorAll('[data-dim="'+dim+'"]').forEach(function(x){
+      x.setAttribute('aria-pressed', x.dataset.val===val?'true':'false');
+    });
+    set('v-'+dim,val);
+  }
+  
+
+  
+  function accorder(f){
+    document.querySelectorAll('.acc').forEach(function(s){
+      s.textContent = f==='b' ? s.dataset.b : s.dataset.a;
+    });
+    document.querySelectorAll('[data-acc]').forEach(function(x){
+      x.setAttribute('aria-pressed', x.dataset.acc===f?'true':'false');
+    });
+    set('acc',f);
+  }
+  if(document.querySelector('.acc')||document.querySelector('[data-acc]')){
+    accorder(get('acc')||'a');
+    document.querySelectorAll('[data-acc]').forEach(function(b){
+      b.addEventListener('click',function(){accorder(b.dataset.acc)});
+    });
+  }
+
+  
+  var boxes=[].slice.call(document.querySelectorAll('input[type=checkbox][data-k]'));
+  var fill=document.getElementById('pfill'), cnt=document.getElementById('pcount');
+  function rafraichir(){
+    var n=boxes.filter(function(b){return b.checked}).length;
+    if(fill) fill.style.width=(boxes.length?n/boxes.length*100:0)+'%';
+    if(cnt) cnt.textContent=n+' / '+boxes.length;
+    document.querySelectorAll('.step[data-step]').forEach(function(st){
+      var c=st.querySelector('input[type=checkbox][data-k]');
+      st.setAttribute('data-done', c&&c.checked?'true':'false');
+    });
+  }
+  boxes.forEach(function(b){
+    var v=get(b.dataset.k);
+    if(v===null && b.dataset.n){          
+      var ancien=get(b.dataset.n);
+      if(ancien!==null){ v=ancien; set(b.dataset.k,ancien); }
+    }
+    if(v==='1') b.checked=true;
+    b.addEventListener('change',function(){set(b.dataset.k,b.checked?'1':'0');rafraichir()});
+  });
+  rafraichir();
+
+  
+  document.querySelectorAll('.copy').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      
+      var t=btn.closest('.copybloc').querySelector('pre').textContent;
+      function ok(){btn.textContent='Copied';btn.setAttribute('data-state','ok');
+        setTimeout(function(){btn.textContent='Copy';btn.removeAttribute('data-state')},1800)}
+      function repli(){
+        var a=document.createElement('textarea');a.value=t;a.style.position='fixed';
+        a.style.opacity='0';document.body.appendChild(a);a.select();
+        try{document.execCommand('copy');ok()}catch(e){btn.textContent='Select and copy'}
+        document.body.removeChild(a);
+      }
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(t).then(ok,repli);
+      } else { repli(); }
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="robots" content="noindex, nofollow"><title>Your digital twin</title><meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+:root{--eb-bg:#ffffff;--ink:#1b1f24;--ink-2:#4b5563;--line:#e3e6ea;--accent:#2f5d8a;--accent-ink:#ffffff;--accent-pale:#eef3f8;
+--ok:#1f6f43;--ok-pale:#f1f8f3;--warn:#a85a07;--warn-pale:#fdf6ec;--code-bg:#f5f6f8;
+--sans:Mulish,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Consolas,monospace}
+.eb-bandeau{background:var(--eb-bg);border-bottom:1px solid var(--line)}
+.eb-bandeau-in{max-width:1080px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px 22px;
+ padding:12px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px))}
+.eb-nom{font:800 16px/1.3 var(--sans);color:var(--ink);text-decoration:none}
+.eb-nav{display:flex;flex-wrap:wrap;gap:6px 16px;min-width:0}
+.eb-nav a{color:var(--ink-2);font:600 14px/1.4 var(--sans);text-decoration:none}
+.eb-nav a:hover,.eb-nav a[aria-current]{color:var(--accent)}
+.eb-nav a[aria-current]{text-decoration:underline;text-underline-offset:4px}
+.eb-langue{margin-left:auto;color:var(--accent);font:700 14px/1.4 var(--sans);text-decoration:none}
+.eb-nav a:focus-visible,.eb-nom:focus-visible,.eb-langue:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--eb-bg:#14181d;--ink:#e8ebef;--ink-2:#a9b1bc;--line:#2b323a;
+--accent:#8db8e3;--accent-ink:#0f1720;--accent-pale:#1b2836;--ok:#7fd1a0;--ok-pale:#16261d;--warn:#f0b169;--warn-pale:#2a2015;--code-bg:#1b2027;color-scheme:dark}}
+:root[data-theme="dark"]{--eb-bg:#14181d;--ink:#e8ebef;--ink-2:#a9b1bc;--line:#2b323a;
+--accent:#8db8e3;--accent-ink:#0f1720;--accent-pale:#1b2836;--ok:#7fd1a0;--ok-pale:#16261d;--warn:#f0b169;--warn-pale:#2a2015;--code-bg:#1b2027;color-scheme:dark}
+body{margin:0;background:var(--eb-bg);color:var(--ink);font:17px/1.6 var(--sans)}
+.w{max-width:760px;margin:0 auto;padding-block:36px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font-size:34px;line-height:1.15;margin:0 0 10px;text-wrap:balance}
+.l{color:var(--ink-2);margin:0 0 28px;max-width:62ch}
+.avant{background:var(--accent-pale);border-radius:8px;padding:14px 18px;margin:0 0 32px}
+.avant p{margin:0}
+.geste{border:1px solid var(--line);border-radius:10px;padding:20px 22px;margin:0 0 18px}
+.geste h2{margin:0 0 4px;font-size:21px}.geste .duree{color:var(--ink-2);font-size:14px;margin:0 0 12px}
+.geste ol{margin:0;padding-left:22px}.geste li{margin:0 0 8px}
+.ensuite{border-left:4px solid var(--ok);background:var(--ok-pale);padding:10px 14px;margin:12px 0 0;border-radius:0 6px 6px 0}
+.piege{border-left:4px solid var(--warn);background:var(--warn-pale);padding:10px 14px;margin:12px 0 0;border-radius:0 6px 6px 0}
+.os{display:flex;gap:8px;margin:14px 0 10px;flex-wrap:wrap}
+.os button,.copier{font:700 15px/1 var(--sans);border-radius:8px;padding:12px 16px;cursor:pointer;min-height:44px}
+.os button{background:var(--eb-bg);border:1px solid var(--line);color:var(--ink)}
+.os button[aria-pressed=true]{border-color:var(--accent);color:var(--accent);background:var(--accent-pale)}
+.copier{background:var(--accent);color:var(--accent-ink);border:0;width:100%;font-size:17px;padding:16px}
+.copier:focus-visible,.os button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+pre{white-space:pre-wrap;word-break:break-word;font:13px/1.5 var(--mono);background:var(--code-bg);color:var(--ink);border:1px solid var(--line);
+border-radius:8px;padding:14px;margin:10px 0 0;max-height:260px;overflow:auto}
+code{font-family:var(--mono);font-size:.92em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.detail{margin-top:36px}.detail h2{font-size:19px;margin:0 0 8px}.detail ul{padding-left:22px;margin:0}
+.f{margin-top:32px;color:var(--ink-2);font-size:14px}
+a{color:var(--accent)}
+</style></head><body><header class="eb-bandeau"><div class="eb-bandeau-in"><a class="eb-nom" href="index.html">EB twins</a><nav class="eb-nav"><a href="index.html" aria-current=page>Where to start</a><a href="comprendre-mon-jumeau-numerique.html">1. How the twin works</a><a href="creer-mon-compte-github.html">2. My GitHub account</a><a href="demarrer-mon-jumeau-numerique.html">3. Create my twin</a><a href="le-chef-de-mon-jumeau.html">Going further: the Chef</a></nav><a class="eb-langue" href="../index.html" hreflang="fr">Français</a></div></header><main class="w">
+<h1>Your digital twin: where to start</h1>
+<p class="l">Three steps, in order. Allow an hour, mostly spent watching Claude work. You have no commands to type.</p>
+<div class="avant"><p><strong>You need:</strong> a paid Claude subscription in your name (Pro, or Max if you use it a lot), and your computer, Windows or Mac.</p></div>
+<section class="geste"><h2>1. Accept the GitHub invitation</h2><p class="duree">Five minutes. GitHub is where your twin is backed up.</p><ol><li>Open the email from GitHub that invites you to join <strong>EB-jumeaux</strong>. Check your spam folder too.</li><li>Click the button in the email. If you don't have a GitHub account, create it <strong>with that same email address</strong>. It's free.</li><li>Accept the invitation.</li></ol>
+<p class="ensuite"><strong>Next:</strong> GitHub takes you to a page named EB-jumeaux. There is nothing to do on that page. Close it and come back here, to step 2.</p></section>
+<section class="geste"><h2>2. Set up the Claude app</h2><p class="duree">Ten minutes, only once.</p><ol><li>Install the Claude app on your computer (<a href="https://claude.ai/download">claude.ai/download</a>) and sign in to your account.</li><li>In the app: <strong>Settings</strong>, then <strong>Claude Code</strong>. Turn on the setting that allows bypassing permissions, and the one that connects new sessions to Remote Control.</li><li>Create a folder named <code>jumeau</code> (lowercase) in your <strong>Documents</strong>.</li><li>In the app, <strong>Code</strong> tab: choose an environment, then create a new one. <strong>Local</strong> tab, name <strong>Jumeau</strong>, run on <strong>This computer</strong>, then under Folders, add your <code>jumeau</code> folder. Create the environment.</li><li>Open a new session on Jumeau. Below the input box, choose the option to <strong>bypass permissions</strong>.</li></ol>
+<p class="piege"><strong>On a PC:</strong> if your Documents are in OneDrive, create the <code>jumeau</code> folder directly in your user folder instead (<code>C:\Users\your name</code>). If you forget, Claude will notice and offer to fix it.</p></section>
+<section class="geste"><h2>3. Paste this text into Claude</h2><p class="duree">In the session you just opened. Claude does everything else.</p>
+<div class="os" role="group" aria-label="Your computer"><button type="button" data-k="w" aria-pressed="false">Windows</button><button type="button" data-k="m" aria-pressed="false">Mac</button></div>
+<button class="copier" type="button">Copy the text</button>
+<pre id="p-w">Hello Claude. I&#x27;m not technical, so do the work for me and
+speak to me simply, and don&#x27;t do anything destructive. Prepare my computer and
+install the brain of my digital twin. Don&#x27;t make me type anything, and
+tell me before each system window I&#x27;ll have to accept.
+1. Git. Check whether it&#x27;s installed. If not, install it with
+   winget install --id Git.Git -e --source winget
+2. Python. Install uv with Astral&#x27;s official installer, in my account,
+   without administrator rights, then Python 3.12 with
+   uv python install 3.12 --default.
+3. The GitHub tool. Install gh with
+   winget install --id GitHub.cli -e --source winget
+   Use full paths, my app can&#x27;t see the new PATH yet.
+   Check that git, python and gh respond with their version.
+4. Ask me for my first name, last name and email, then configure git
+   with that identity.
+5. Connect gh to GitHub through my browser with
+   gh auth login --hostname github.com --git-protocol https --web
+   then gh auth setup-git. Show me the one-time code it displays,
+   and I&#x27;ll enter it myself on the GitHub page. Never ask me for a
+   password or a token in this conversation. If the command waits for
+   a key you can&#x27;t press, stop and tell me.
+6. The working folder is this session&#x27;s folder, Documents\jumeau.
+   Before cloning, if this folder&#x27;s path contains OneDrive, stop:
+   suggest creating the jumeau folder directly in my personal
+   folder instead, outside OneDrive, and wait for my approval. Clone into it
+   https://github.com/EB-jumeaux/gabarit-jumeau.git, with the contents
+   directly in this folder, not in a subfolder. Then create the .env file from .env.exemple and add the line
+   GABARIT_DEPOT=https://github.com/EB-jumeaux/gabarit-jumeau.git
+   (it isn&#x27;t a secret, it&#x27;s the address my updates come from).
+7. Create MY own private repository with gh repo create jumeau --private, then point the folder to it with git remote set-url
+   origin, and push everything. Check that the branch is named main before
+   pushing, and that after the push git remote -v shows MY repository, and
+   no longer the template.
+8. Check that the folder contains CLAUDE.md, profile/ and tools/, and that
+   python tools/maj_jumeau.py --verifier runs without errors.
+9. Give me a report in plain language, one line per item. If an
+   item fails, show me the exact error message so I can
+   pass it on. End by telling me to fully quit the Claude
+   app and reopen it before my first real session.</pre><pre id="p-m" hidden>Hello Claude. I&#x27;m not technical, so do the work for me and
+speak to me simply, and don&#x27;t do anything destructive. Prepare my computer and
+install the brain of my digital twin. Don&#x27;t make me type anything, and
+tell me before each system window I&#x27;ll have to accept.
+1. Git. Check whether it&#x27;s installed. If not, run xcode-select --install and
+   wait until I&#x27;ve accepted Apple&#x27;s window and the installation is
+   finished.
+2. Python. Install uv with Astral&#x27;s official installer, in my account,
+   without administrator rights, then Python 3.12 with
+   uv python install 3.12 --default.
+3. The GitHub tool. Install gh in my account, without administrator
+   rights, from the official Mac archive published at
+   github.com/cli/cli/releases, in ~/.local/bin. Use full paths,
+   my app can&#x27;t see the new PATH yet. Check
+   that git, python and gh respond with their version.
+4. Ask me for my first name, last name and email, then configure git
+   with that identity.
+5. Connect gh to GitHub through my browser with
+   gh auth login --hostname github.com --git-protocol https --web
+   then gh auth setup-git. Show me the one-time code it displays,
+   and I&#x27;ll enter it myself on the GitHub page. Never ask me for a
+   password or a token in this conversation. If the command waits for
+   a key you can&#x27;t press, stop and tell me.
+6. The working folder is this session&#x27;s folder, Documents/jumeau. Clone into it
+   https://github.com/EB-jumeaux/gabarit-jumeau.git, with the contents
+   directly in this folder, not in a subfolder. Then create the .env file from .env.exemple and add the line
+   GABARIT_DEPOT=https://github.com/EB-jumeaux/gabarit-jumeau.git
+   (it isn&#x27;t a secret, it&#x27;s the address my updates come from).
+7. Create MY own private repository with gh repo create jumeau --private, then point the folder to it with git remote set-url
+   origin, and push everything. Check that the branch is named main before
+   pushing, and that after the push git remote -v shows MY repository, and
+   no longer the template.
+8. Check that the folder contains CLAUDE.md, profile/ and tools/, and that
+   python tools/maj_jumeau.py --verifier runs without errors.
+9. Give me a report in plain language, one line per item. If an
+   item fails, show me the exact error message so I can
+   pass it on. End by telling me to fully quit the Claude
+   app and reopen it before my first real session.</pre>
+<ol style="margin-top:14px"><li>Paste the text into the session, then press Enter. There is nothing to change.</li><li>Claude asks for your name and email. Later, it shows you an eight-character code and opens a GitHub page: enter the code there and authorize. If a window on your computer asks for confirmation, accept it.</li><li>When Claude is done, quit the Claude app completely, then reopen it.</li></ol>
+<p class="ensuite"><strong>Next:</strong> Code tab, new session on Jumeau, and type <strong>Hello</strong>. Your twin introduces itself and asks you questions to learn who you are and how you write. Also tell it what it should cover: your work, your personal life, or both.</p></section>
+<section class="detail"><h2>The details, if you want to understand or if you get stuck</h2><ul><li><a href="comprendre-mon-jumeau-numerique.html">1. How the twin works</a></li><li><a href="creer-mon-compte-github.html">2. My GitHub account</a></li><li><a href="demarrer-mon-jumeau-numerique.html">3. Create my twin</a></li><li><a href="le-chef-de-mon-jumeau.html">Going further: the Chef</a></li></ul>
+<p>If you are stuck before you have your twin, write to Éric Bourbeau (ebourbeau@x-telia.com), with a subject line that starts with “Jumeau”. Once your twin is installed, ask it first: it knows how to troubleshoot itself.</p></section>
+<p class="f">Adapted from the open training of Yapla (Pascal Jarry).</p>
+</main><script>
+const os=document.querySelectorAll('.os button'),pres={w:document.getElementById('p-w'),m:document.getElementById('p-m')};
+let actif=/Mac|iPhone|iPad/.test(navigator.platform||navigator.userAgent)?'m':'w';
+function montrer(k){actif=k;os.forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===k));pres.w.hidden=k!=='w';pres.m.hidden=k!=='m';}
+os.forEach(b=>b.addEventListener('click',()=>montrer(b.dataset.k)));montrer(actif);
+const btn=document.querySelector('.copier');
+btn.addEventListener('click',async()=>{const t=pres[actif].textContent;
+ try{await navigator.clipboard.writeText(t);btn.textContent="Copied! Paste it into Claude, Code tab";}
+ catch(_){const r=document.createRange();r.selectNodeContents(pres[actif]);const s=getSelection();s.removeAllRanges();s.addRange(r);
+ btn.textContent="Text selected: press Copy";}
+ setTimeout(()=>btn.textContent="Copy the text",4000);});
+</script></body></html>

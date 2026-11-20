@@ -1,0 +1,743 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La mécanique du jumeau numérique</title>
+<meta name="description" content="La première du parcours, et elle se lit sans rien installer. Ce qui se passe vraiment quand tu lances la commande, où vit ce qu&#x27;il sait, comment il retrouve une information dans des centaines de fichiers, et pourquoi ce qu&#x27;on lui apprend ne se perd pas. Pas de magie ici, une mécanique, et elle s&#x27;exp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;800;900&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+
+
+:root{
+  --ground:#FFFDFD;
+  --surface:#FFFFFF;
+  --surface-2:#F7F4F0;
+  --line:#E6E0D8;
+  --line-strong:#CFC6B9;
+  --ink:#2E3238;
+  --ink-2:#5E656E;
+  --ink-3:#8A919A;
+  --orange:#FF7B14;
+  --orange-ink:#B85300;
+  --creme:#FFF1E4;
+  --bleu:#337AB7;
+  --bleu-ink:#255C8C;
+  --bleu-pale:#F1F5FD;
+  --vert:#2E7D5B;
+  --vert-pale:#EAF5EF;
+  --brique:#A63D2F;
+  --brique-pale:#FBEDEA;
+  --shadow:0 1px 2px rgba(46,50,56,.05), 0 8px 24px -12px rgba(46,50,56,.18);
+  --radius:10px;
+  --mono:"IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --sans:"Mulish", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#14161A; --surface:#1B1E23; --surface-2:#22262C;
+    --line:#2F343B; --line-strong:#434A54;
+    --ink:#E9E7E4; --ink-2:#AAB1BA; --ink-3:#7C848E;
+    --orange:#FF9243; --orange-ink:#FFB075; --creme:#2B2018;
+    --bleu:#6FABDE; --bleu-ink:#96C4EC; --bleu-pale:#1A2430;
+    --vert:#5FBF92; --vert-pale:#16251F;
+    --brique:#E8877A; --brique-pale:#2B1A17;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#14161A; --surface:#1B1E23; --surface-2:#22262C;
+  --line:#2F343B; --line-strong:#434A54;
+  --ink:#E9E7E4; --ink-2:#AAB1BA; --ink-3:#7C848E;
+  --orange:#FF9243; --orange-ink:#FFB075; --creme:#2B2018;
+  --bleu:#6FABDE; --bleu-ink:#96C4EC; --bleu-pale:#1A2430;
+  --vert:#5FBF92; --vert-pale:#16251F;
+  --brique:#E8877A; --brique-pale:#2B1A17;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--ground);color:var(--ink);
+  font-family:var(--sans);font-size:17px;line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.col{max-width:730px}
+
+
+h1,h2,h3,h4{text-wrap:balance;margin:0;font-weight:800;letter-spacing:-.015em;line-height:1.15}
+h1{font-size:clamp(2.3rem,5.6vw,3.8rem);font-weight:900;letter-spacing:-.035em}
+h2{font-size:clamp(1.6rem,3.4vw,2.2rem)}
+h3{font-size:1.22rem}
+h4{font-size:1rem}
+p{margin:0}
+a{color:var(--bleu-ink);text-decoration-thickness:1px;text-underline-offset:2px}
+strong{font-weight:800}
+.eyebrow{font-family:var(--mono);font-size:.72rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.16em;color:var(--ink-3)}
+.lede{font-size:1.14rem;color:var(--ink-2);line-height:1.6}
+.small{font-size:.9rem;color:var(--ink-2)}
+.stack{display:flex;flex-direction:column;gap:1.1rem}
+.stack-s{display:flex;flex-direction:column;gap:.6rem}
+
+
+header.hero{
+  border-bottom:1px solid var(--line);
+  background:radial-gradient(120% 90% at 8% -10%, var(--creme) 0%, transparent 58%), var(--ground);
+}
+.hero-inner{padding:clamp(2.8rem,6.5vw,5rem) 0 clamp(2.2rem,4vw,3.2rem);
+  display:flex;flex-direction:column;gap:1.5rem}
+.hero h1 .k{display:block;color:var(--orange-ink)}
+.hero-meta{display:flex;flex-wrap:wrap;gap:.5rem 1.6rem;font-family:var(--mono);
+  font-size:.8rem;color:var(--ink-2);padding-top:.4rem;border-top:1px solid var(--line)}
+.hero-meta b{color:var(--ink);font-weight:600}
+
+
+.settings{position:sticky;top:0;z-index:40;
+  background:color-mix(in srgb, var(--ground) 88%, transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.settings-inner{display:flex;flex-wrap:wrap;align-items:center;gap:.9rem 1.4rem;padding:.7rem 0}
+.seg{display:flex;align-items:center;gap:.55rem}
+.seg-label{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--ink-3)}
+.seg-btns{display:flex;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:999px;padding:2px}
+.seg-btns button{font-family:var(--sans);font-size:.84rem;font-weight:600;color:var(--ink-2);
+  background:none;border:0;padding:.28rem .78rem;border-radius:999px;cursor:pointer}
+.seg-btns button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.seg-btns button:focus-visible{outline:2px solid var(--bleu);outline-offset:2px}
+.progress{margin-left:auto;display:flex;align-items:center;gap:.6rem;
+  font-family:var(--mono);font-size:.76rem;color:var(--ink-2)}
+.progress-track{width:110px;height:6px;border-radius:999px;background:var(--surface-2);
+  border:1px solid var(--line);overflow:hidden}
+.progress-fill{height:100%;width:0;background:var(--orange);transition:width .3s ease}
+
+
+section{padding:clamp(2.4rem,5vw,4rem) 0;border-bottom:1px solid var(--line)}
+.sec-head{display:flex;flex-direction:column;gap:.5rem;margin-bottom:2rem;max-width:730px}
+.sec-body{display:flex;flex-direction:column;gap:1.6rem}
+
+
+.cartes{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem}
+.carte{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:1.3rem 1.4rem;box-shadow:var(--shadow)}
+.carte h4{display:flex;align-items:baseline;gap:.55rem;margin-bottom:.45rem;flex-wrap:wrap}
+.carte .tag{font-family:var(--mono);font-size:.66rem;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--bleu-ink);background:var(--bleu-pale);
+  border-radius:4px;padding:.1rem .38rem}
+.carte p{font-size:.95rem;color:var(--ink-2)}
+.carte .quand{margin-top:.7rem;font-size:.84rem;font-family:var(--mono);color:var(--ink-3)}
+
+
+dl.lex{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:.1rem 2rem;margin:0;max-width:900px}
+dl.lex > div{padding:.85rem 0;border-top:1px solid var(--line)}
+dl.lex dt{font-weight:800;font-size:.98rem}
+dl.lex dd{margin:.15rem 0 0;font-size:.93rem;color:var(--ink-2)}
+
+
+.step{display:grid;grid-template-columns:64px 1fr;gap:0 1.6rem;position:relative}
+.step + .step{margin-top:2.6rem}
+.rail{display:flex;flex-direction:column;align-items:center;gap:.6rem}
+.rail .num{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;
+  font-family:var(--mono);font-weight:600;font-size:1.05rem;background:var(--surface);
+  color:var(--ink);border:1.5px solid var(--line-strong)}
+.step[data-done="true"] .rail .num{background:var(--orange);border-color:var(--orange);color:#fff}
+.rail .line{flex:1;width:1.5px;background:var(--line);min-height:20px}
+.step-body{padding-bottom:.4rem;max-width:730px;display:flex;flex-direction:column;gap:1.1rem}
+.step-head{display:flex;flex-direction:column;gap:.35rem}
+.step-head .where{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--orange-ink)}
+.step-body ol,.sec-body ol{margin:0;padding-left:1.3rem;display:flex;flex-direction:column;gap:.55rem}
+.step-body ol li::marker,.sec-body ol li::marker{font-weight:800;color:var(--ink-3)}
+.step-body ul,.sec-body ul{margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:.4rem}
+
+
+.copybloc{border:1px solid var(--line-strong);border-radius:var(--radius);
+  overflow:hidden;background:var(--surface-2)}
+.copybloc-head{display:flex;align-items:center;gap:.8rem;padding:.6rem .85rem;
+  border-bottom:1px solid var(--line);background:var(--surface)}
+.copybloc-head .t{font-family:var(--mono);font-size:.74rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ink-2)}
+.copy{margin-left:auto;font-family:var(--sans);font-size:.8rem;font-weight:700;
+  background:var(--orange);color:#fff;border:0;border-radius:6px;
+  padding:.34rem .8rem;cursor:pointer}
+.copy:hover{filter:brightness(1.06)}
+.copy:focus-visible{outline:2px solid var(--bleu);outline-offset:2px}
+.copy[data-state="ok"]{background:var(--vert)}
+.copybloc pre{margin:0;padding:1rem .95rem;overflow-x:auto;font-family:var(--mono);
+  font-size:.83rem;line-height:1.6;color:var(--ink);white-space:pre-wrap;word-break:break-word}
+
+.copybloc.accomp{border:2px solid var(--orange);background:var(--creme);
+  box-shadow:0 8px 28px rgba(255,123,20,.12)}
+.accomp-head{padding:1.4rem 1.5rem 1.2rem;display:flex;flex-direction:column;gap:.55rem}
+.accomp-head .lbl{font-family:var(--mono);font-size:.72rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.14em;color:var(--orange-ink)}
+.accomp-head h3{margin:0;font-size:1.35rem;line-height:1.25;color:var(--ink)}
+.accomp-head p{margin:0;font-size:1rem;line-height:1.55;color:var(--ink-2);max-width:60ch}
+.copy.accomp-btn{margin:.5rem 0 0;align-self:flex-start;font-size:1rem;
+  padding:.7rem 1.4rem;border-radius:8px}
+.accomp-prompt{border-top:1px solid var(--line);background:var(--surface)}
+.accomp-prompt summary{cursor:pointer;padding:.6rem 1.5rem;font-family:var(--mono);
+  font-size:.74rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-2)}
+.accomp-prompt pre{max-height:24rem}
+code.inline{font-family:var(--mono);font-size:.86em;background:var(--surface-2);
+  border:1px solid var(--line);border-radius:5px;padding:.08em .35em}
+
+
+.note{border-radius:var(--radius);padding:.95rem 1.05rem;font-size:.94rem;
+  border:1px solid;display:flex;flex-direction:column;gap:.4rem}
+.note .lbl{font-family:var(--mono);font-size:.7rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.12em}
+.note.piege{background:var(--brique-pale);border-color:color-mix(in srgb,var(--brique) 32%, transparent)}
+.note.piege .lbl{color:var(--brique)}
+.note.reussi{background:var(--vert-pale);border-color:color-mix(in srgb,var(--vert) 30%, transparent)}
+.note.reussi .lbl{color:var(--vert)}
+.note.info{background:var(--bleu-pale);border-color:color-mix(in srgb,var(--bleu) 28%, transparent)}
+.note.info .lbl{color:var(--bleu-ink)}
+.note.reperе,.note.repere{background:var(--creme);border-color:color-mix(in srgb,var(--orange) 30%, transparent)}
+.note.repere .lbl{color:var(--orange-ink)}
+.note.neutre{background:var(--surface-2);border-color:var(--line-strong)}
+.note.neutre .lbl{color:var(--ink-3)}
+
+
+.check{display:flex;gap:.7rem;align-items:flex-start;background:var(--creme);
+  border:1px solid color-mix(in srgb,var(--orange) 26%, transparent);
+  border-radius:var(--radius);padding:.8rem .95rem;cursor:pointer}
+.check input{margin:.28rem 0 0;width:17px;height:17px;accent-color:var(--orange);
+  flex:none;cursor:pointer}
+.check .txt{font-size:.95rem;font-weight:600}
+.check .txt em{display:block;font-style:normal;font-weight:400;color:var(--ink-2);
+  font-size:.9rem;margin-top:.1rem}
+.check:has(input:checked){background:var(--vert-pale);
+  border-color:color-mix(in srgb,var(--vert) 30%, transparent)}
+.check:has(input:checked) .txt{text-decoration:line-through;
+  text-decoration-color:var(--ink-3);color:var(--ink-2)}
+.check:has(input:checked) .txt em{text-decoration:none}
+.checks{display:flex;flex-direction:column;gap:.7rem;max-width:730px}
+
+
+.faq{display:flex;flex-direction:column;gap:.55rem;max-width:840px}
+details.dx{border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--surface);overflow:hidden}
+details.dx[open]{border-color:var(--line-strong);box-shadow:var(--shadow)}
+details.dx summary{cursor:pointer;padding:.85rem 1rem;font-weight:700;font-size:.98rem;
+  display:flex;gap:.7rem;align-items:baseline;list-style:none}
+details.dx summary::-webkit-details-marker{display:none}
+details.dx summary::before{content:"+";font-family:var(--mono);font-weight:600;
+  color:var(--orange);flex:none;width:1ch}
+details.dx[open] summary::before{content:"\2013"}
+details.dx summary:focus-visible{outline:2px solid var(--bleu);outline-offset:-2px}
+.dx-body{padding:0 1rem 1rem 2.4rem;display:flex;flex-direction:column;gap:.7rem;font-size:.95rem}
+.dx-body .quote{font-family:var(--mono);font-size:.82rem;background:var(--surface-2);
+  border-left:2px solid var(--brique);padding:.5rem .7rem;color:var(--ink-2);
+  border-radius:0 5px 5px 0;overflow-x:auto}
+.dx-body .geste{font-weight:700}
+.dx-body .src{font-size:.82rem;color:var(--ink-3);font-family:var(--mono)}
+
+
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--surface);max-width:900px}
+table{border-collapse:collapse;width:100%;font-size:.93rem;min-width:460px}
+th,td{text-align:left;padding:.7rem .9rem;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--ink-3);font-weight:600}
+tr:last-child td{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink-2)}
+
+
+figure.diagram{margin:0;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:1.5rem 1.2rem 1.1rem;box-shadow:var(--shadow);max-width:900px}
+figure.diagram svg{display:block;width:100%;height:auto;max-width:640px;margin:0 auto}
+figcaption{margin-top:1rem;font-size:.88rem;color:var(--ink-2);text-align:center;
+  max-width:52ch;margin-inline:auto}
+
+
+
+
+figure.capture{margin:2rem 0;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:1rem;box-shadow:var(--shadow);
+  width:fit-content;max-width:min(730px,100%)}
+figure.capture img{display:block;width:auto;height:auto;max-width:100%;
+  border-radius:calc(var(--radius) - 4px);border:1px solid var(--line)}
+figure.capture figcaption{margin-top:.9rem}
+
+
+footer{padding:clamp(2.4rem,5vw,3.6rem) 0 4rem;background:var(--surface-2)}
+footer .guichet{border-left:3px solid var(--orange);padding-left:1.1rem}
+.colophon{border-top:1px solid var(--line);padding-top:1.2rem;font-size:.85rem;color:var(--ink-3);
+  font-family:var(--mono)}
+
+
+
+
+@media (max-width:720px){
+  body{font-size:16px}
+  .step{grid-template-columns:40px 1fr;gap:0 1rem}
+  .rail .num{width:36px;height:36px;font-size:.9rem}
+  .dx-body{padding-left:1rem}
+  .progress{width:100%;margin-left:0;order:5}
+}
+@media print{
+  .settings,.copy{display:none}
+  body{font-size:11pt;background:#fff}
+  section{page-break-inside:auto;border-bottom:0}
+  .step{page-break-inside:avoid}
+  details.dx{page-break-inside:avoid}
+  details.dx summary::before{content:""}
+  .dx-body{display:block!important}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}
+
+
+</style>
+<meta name="robots" content="noindex, nofollow"><style>
+:root{--eb-bg:#ffffff;--ink:#1b1f24;--ink-2:#4b5563;--line:#e3e6ea;--accent:#2f5d8a;--accent-ink:#ffffff;--accent-pale:#eef3f8;
+--ok:#1f6f43;--ok-pale:#f1f8f3;--warn:#a85a07;--warn-pale:#fdf6ec;--code-bg:#f5f6f8;
+--sans:Mulish,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Consolas,monospace}
+.eb-bandeau{background:var(--eb-bg);border-bottom:1px solid var(--line)}
+.eb-bandeau-in{max-width:1080px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px 22px;
+ padding:12px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px))}
+.eb-nom{font:800 16px/1.3 var(--sans);color:var(--ink);text-decoration:none}
+.eb-nav{display:flex;flex-wrap:wrap;gap:6px 16px;min-width:0}
+.eb-nav a{color:var(--ink-2);font:600 14px/1.4 var(--sans);text-decoration:none}
+.eb-nav a:hover,.eb-nav a[aria-current]{color:var(--accent)}
+.eb-nav a[aria-current]{text-decoration:underline;text-underline-offset:4px}
+.eb-langue{margin-left:auto;color:var(--accent);font:700 14px/1.4 var(--sans);text-decoration:none}
+.eb-nav a:focus-visible,.eb-nom:focus-visible,.eb-langue:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style></head>
+<body><header class="eb-bandeau"><div class="eb-bandeau-in"><a class="eb-nom" href="index.html">Jumeaux et jumelles EB</a><nav class="eb-nav"><a href="index.html">Par où commencer</a><a href="comprendre-mon-jumeau-numerique.html" aria-current=page>1. La mécanique du jumeau</a><a href="creer-mon-compte-github.html">2. Mon compte GitHub</a><a href="demarrer-mon-jumeau-numerique.html">3. Créer mon jumeau</a><a href="le-chef-de-mon-jumeau.html">Pour aller plus loin : le Chef</a></nav><a class="eb-langue" href="en/comprendre-mon-jumeau-numerique.html" hreflang="en">English</a></div></header>
+<header class="hero"><div class="wrap hero-inner">
+<p class="eyebrow">Le programme des jumeaux numériques</p>
+<h1>La mécanique <span class="k">du jumeau numérique</span></h1>
+<p class="lede col">La première du parcours, et elle se lit sans rien installer. Ce qui se passe vraiment quand tu lances la commande, où vit ce qu'<span class="acc" data-a="il" data-b="elle">il</span> sait, comment <span class="acc" data-a="il" data-b="elle">il</span> retrouve une information dans des centaines de fichiers, et pourquoi ce qu'on lui apprend ne se perd pas. Pas de magie ici, une mécanique, et elle s'explique.</p>
+<div class="hero-meta"><span><strong>45 à 60 min</strong> de lecture attentive</span><span><strong>11 sections</strong></span><span><strong>Une case</strong> par section</span><span><strong>Mis à jour dans le temps</strong></span></div>
+</div></header>
+<div class="settings"><div class="wrap settings-inner"><div class="seg"><span class="seg-label">On dit</span><div class="seg-btns" role="group" aria-label="Accord"><button type="button" data-acc="a" aria-pressed="true">Jumeau</button><button type="button" data-acc="b" aria-pressed="false">Jumelle</button></div></div><div class="progress"><span>Avancement</span><div class="progress-track"><div class="progress-fill" id="pfill"></div></div><span id="pcount">0 / 0</span></div></div></div>
+<main>
+<section id="un-cerveau-une-execution-et-rien-d-autre"><div class="wrap"><div class="sec-head"><p class="eyebrow">Le modèle mental</p><h2>Un cerveau, une exécution, et rien d'autre</h2><p class="lede">Tout part de cette séparation. Si tu ne retiens qu'une chose de ce document, que ce soit celle-là, parce que tout le reste en découle.</p></div><div class="sec-body"><div class="note info"><span class="lbl">Par où tu commences, et pourquoi par ici</span><p><strong>C'est la première formation du parcours, et elle se lit les mains dans les poches.</strong> Rien à installer, rien à taper, aucun compte à créer. Tu peux la lire avant même d'avoir un jumeau.</p>
+<p>C'est délibéré. La formation suivante te fait installer le tien en trois quarts d'heure, et <strong>on installe mieux ce qu'on a compris</strong>. Presque tous ceux qui ont calé ne butaient pas sur une étape difficile, ils ne savaient pas ce qu'ils étaient en train de faire.</p>
+<p>Ensuite tu brancheras <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> sur ce dont tu as besoin, en commençant presque toujours par tes courriels. Mais d'abord, comprendre.</p></div>
+<div class="col stack"><p><span class="acc" data-a="Ton jumeau" data-b="Ta jumelle">Ton jumeau</span> n'est pas un logiciel qu'on a écrit. C'est <strong>un modèle d'IA du marché, tel quel, plus un dossier de fichiers texte</strong>. Ce qui le rend utile, ce n'est pas le modèle, c'est le dossier.</p>
+<p>Le <strong>cerveau</strong>, ce sont des fichiers texte ordinaires, du même genre qu'une note que tu écrirais toi-même. On peut les ouvrir, les lire, les corriger à la main. Ils disent qui tu es, comment tu écris, ce sur quoi tu travailles, et ce qu'<span class="acc" data-a="il" data-b="elle">il</span> a appris de ses erreurs.</p>
+<p>L'<strong>exécution</strong>, c'est une session. Elle démarre, elle lit le cerveau, elle travaille, elle écrit ce qu'elle a appris dans le cerveau, elle meurt. <strong>Elle est jetable.</strong> Rien de ce qui compte ne vit dedans.</p></div>
+<figure class="diagram"><svg viewBox="0 0 640 220" role="img" aria-label="Le cerveau, des fichiers versionnés, est lu par une session jetable qui écrit en retour dans le cerveau.">
+  <defs><marker id="m1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+  <g font-family="IBM Plex Mono, monospace" font-size="11">
+    <rect x="12" y="40" width="250" height="140" rx="10" fill="var(--creme)" stroke="var(--orange)" stroke-width="1.5"/>
+    <text x="24" y="28" fill="var(--orange-ink)" font-size="10" letter-spacing="1.6">LE CERVEAU</text>
+    <g fill="var(--ink)" font-family="Mulish, sans-serif" font-size="12.5">
+      <text x="32" y="70">Des fichiers texte</text>
+      <text x="32" y="92">Sauvegardés en ligne</text>
+      <text x="32" y="114">Lisibles par un humain</text>
+      <text x="32" y="136">Indépendants de l'IA</text>
+    </g>
+    <text x="32" y="164" fill="var(--orange-ink)" font-size="11" font-family="Mulish, sans-serif" font-weight="700">Permanent</text>
+    <g color="var(--vert)" stroke="currentColor" stroke-width="1.6" fill="none"><path d="M272 88 H366" marker-end="url(#m1)"/></g>
+    <text x="276" y="80" fill="var(--ink-2)" font-size="9.5" font-family="Mulish, sans-serif">est lu par</text>
+    <g color="var(--bleu)" stroke="currentColor" stroke-width="1.6" fill="none"><path d="M366 132 H274" marker-end="url(#m1)"/></g>
+    <text x="276" y="150" fill="var(--ink-2)" font-size="9.5" font-family="Mulish, sans-serif">écrit dans</text>
+    <rect x="376" y="40" width="250" height="140" rx="10" fill="var(--bleu-pale)" stroke="var(--bleu)" stroke-width="1.5"/>
+    <text x="388" y="28" fill="var(--bleu-ink)" font-size="10" letter-spacing="1.6">L'EXÉCUTION</text>
+    <g fill="var(--ink)" font-family="Mulish, sans-serif" font-size="12.5">
+      <text x="396" y="70">Une session</text>
+      <text x="396" y="92">Dans un terminal</text>
+      <text x="396" y="114">Elle démarre, travaille,</text>
+      <text x="396" y="136">elle meurt</text>
+    </g>
+    <text x="396" y="164" fill="var(--bleu-ink)" font-size="11" font-family="Mulish, sans-serif" font-weight="700">Jetable</text>
+  </g>
+</svg><figcaption>La session est jetable, le cerveau ne l'est pas. Change de modèle ou d'ordinateur, tant que le cerveau te suit, ton jumeau te suit.</figcaption></figure>
+<div class="note repere"><span class="lbl">La conséquence pratique</span><p>Ce qui n'est <strong>pas écrit dans un fichier</strong> est perdu à la fermeture de la fenêtre. C'est la loi du montage, et elle explique presque tous les comportements que tu observeras, pourquoi <span class="acc" data-a="il" data-b="elle">il</span> sauvegarde, pourquoi <span class="acc" data-a="il" data-b="elle">il</span> consigne, pourquoi <span class="acc" data-a="il" data-b="elle">il</span> te demande de corriger un fichier plutôt que sa réponse.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="un-cerveau-une-execution-et-rien-d-autre.je-peux-expliquer-a-quelqu-un-la-difference-entre-le-cerveau" data-n="c1"><span class="txt">Je peux expliquer à quelqu'un la différence entre le cerveau et l'exécution</span></label></div></div></div></section>
+<section id="le-contexte-le-seul-mot-technique-a-comp"><div class="wrap"><div class="sec-head"><p class="eyebrow">La clé de tout</p><h2>Le contexte, le seul mot technique à comprendre</h2><p class="lede">Si tu ne comprends que ce mot-là, tu comprendras tout le reste, y compris des comportements qui paraissent bizarres. Prends trois minutes ici, elles paient pour tout le document.</p></div><div class="sec-body"><div class="col stack"><p><strong><span class="acc" data-a="Ton jumeau" data-b="Ta jumelle">Ton jumeau</span> recommence à zéro à chaque conversation.</strong> Il ne se souvient de rien de la veille, rien de la session d'avant, rien de ce que tu lui as dit hier. Ce n'est pas un défaut qu'on va corriger, c'est ainsi que fonctionnent tous les modèles d'IA, sans exception.</p>
+<p>Alors comment peut-<span class="acc" data-a="il" data-b="elle">il</span> te connaître ? <strong>Parce qu'au début de chaque conversation, on lui glisse une pile de documents sous les yeux.</strong> Il les lit en entier, en quelques secondes, avant même que tu aies écrit ton premier mot.</p>
+<p><strong>Cette pile, c'est ce qu'on appelle le contexte.</strong></p></div>
+<figure class="diagram"><svg viewBox="0 0 640 260" role="img" aria-label="Le contexte est une pile de documents posée devant le jumeau au début de chaque conversation, de taille limitée.">
+  <g font-family="Mulish, sans-serif" font-size="12">
+    <rect x="60" y="18" width="330" height="34" rx="7" fill="var(--brique-pale)" stroke="var(--brique)" stroke-width="1.4"/>
+    <text x="74" y="40" font-size="11.5" font-weight="700" fill="var(--brique)">Ses instructions de base</text>
+    <text x="378" y="40" text-anchor="end" font-size="10.5" fill="var(--ink-3)" font-family="IBM Plex Mono, monospace">toujours</text>
+    <rect x="60" y="58" width="330" height="34" rx="7" fill="var(--creme)" stroke="var(--orange)" stroke-width="1.4"/>
+    <text x="74" y="80" font-size="11.5" font-weight="700" fill="var(--orange-ink)">Ton profil, en entier</text>
+    <text x="378" y="80" text-anchor="end" font-size="10.5" fill="var(--ink-3)" font-family="IBM Plex Mono, monospace">toujours</text>
+    <rect x="60" y="98" width="330" height="34" rx="7" fill="var(--creme)" stroke="var(--orange)" stroke-width="1.4"/>
+    <text x="74" y="120" font-size="11.5" font-weight="700" fill="var(--orange-ink)">La LISTE de ce qu'il a retenu</text>
+    <text x="378" y="120" text-anchor="end" font-size="10.5" fill="var(--ink-3)" font-family="IBM Plex Mono, monospace">une ligne chacune</text>
+    <rect x="60" y="138" width="330" height="34" rx="7" fill="var(--vert-pale)" stroke="var(--vert)" stroke-width="1.4"/>
+    <text x="74" y="160" font-size="11.5" font-weight="700" fill="var(--vert)">L'heure et l'endroit où tu es</text>
+    <text x="378" y="160" text-anchor="end" font-size="10.5" fill="var(--ink-3)" font-family="IBM Plex Mono, monospace">à chaque message</text>
+    <rect x="60" y="178" width="330" height="46" rx="7" fill="var(--bleu-pale)" stroke="var(--bleu)" stroke-width="1.4" stroke-dasharray="5 4"/>
+    <text x="74" y="200" font-size="11.5" font-weight="700" fill="var(--bleu-ink)">Votre conversation</text>
+    <text x="74" y="217" font-size="10.5" fill="var(--ink-2)">et les fichiers qu'il ouvre en travaillant</text>
+    <g stroke="var(--line-strong)" stroke-width="1.2" fill="none"><path d="M410 18 H430 M410 224 H430 M430 18 V224"/></g>
+    <text x="446" y="112" font-size="12" font-weight="700" fill="var(--ink)">La pile a une</text>
+    <text x="446" y="130" font-size="12" font-weight="700" fill="var(--ink)">taille MAXIMALE.</text>
+    <text x="446" y="154" font-size="10.5" fill="var(--ink-2)">Tout ce qu'on y met</text>
+    <text x="446" y="170" font-size="10.5" fill="var(--ink-2)">prend la place</text>
+    <text x="446" y="186" font-size="10.5" fill="var(--ink-2)">du reste.</text>
+    <text x="320" y="248" text-anchor="middle" font-size="10.5" fill="var(--ink-3)">Il lit tout ça avant que tu écrives ton premier mot.</text>
+  </g>
+</svg><figcaption>À chaque nouvelle conversation, la pile est reconstituée, lue en entier, puis la conversation s'y ajoute au fur et à mesure. À la fermeture, tout ce qui n'a pas été écrit dans un fichier disparaît.</figcaption></figure>
+<div class="note repere"><span class="lbl">Trois choses découlent de ce seul mot, et elles expliquent tout</span><p><strong>Pourquoi <span class="acc" data-a="il" data-b="elle">il</span> ne peut pas « tout savoir » d'un coup.</strong> Un cerveau bien nourri compte vite des centaines, puis des milliers de fichiers. La pile n'en contient qu'une petite partie. Le reste, <span class="acc" data-a="il" data-b="elle">il</span> doit aller le chercher, et c'est pour ça qu'une recherche existe.</p>
+<p><strong>Pourquoi on ne met pas tout dans ses instructions de base.</strong> Chaque phrase ajoutée là est relue à chaque conversation, de chaque personne, pour toujours. Ça occupe de la place et ça coûte. On n'y met donc que ce qui sert <strong>toujours</strong>.</p>
+<p><strong>Pourquoi ce qui n'est pas écrit est perdu.</strong> Ta conversation fait partie de la pile, et la pile est jetée à la fermeture. Ce qui a été écrit dans un fichier sera reposé sur la pile demain. Ce qui est resté dans la conversation, non.</p></div>
+<div class="note info"><span class="lbl">Le mot que tu entendras, et ce qu&#x27;il vaut</span><p>Cette pile se mesure en <strong>jetons</strong>, un mot du métier pour dire à peu près « morceaux de mots ». Un jeton vaut grossièrement trois quarts d'un mot français. Retiens seulement l'ordre de grandeur, les instructions de base et le profil occupent <strong>une quinzaine de pages</strong>, relues à chaque démarrage. C'est peu, et c'est pour ça qu'on se bat pour ce qui y entre.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="le-contexte-le-seul-mot-technique-a-comprendre.j-ai-compris-ce-qu-est-le-contexte-et-pourquoi-ce-qui-n-est-" data-n="c2"><span class="txt">J'ai compris ce qu'est le contexte, et pourquoi ce qui n'est pas écrit est perdu</span></label></div></div></div></section>
+<section id="claude-cowork-ton-jumeau-la-question-que"><div class="wrap"><div class="sec-head"><p class="eyebrow">La comparaison</p><h2>Claude, Cowork, ton jumeau, la question que tout le monde pose</h2><p class="lede">« J'utilise déjà Claude sur le web, et Cowork sait travailler sur mon ordinateur. Qu'est-ce que le jumeau apporte de plus ? » C'est la question la plus fréquente du programme, elle est légitime, et la réponse honnête n'est pas « le jumeau est meilleur partout ».</p></div><div class="sec-body"><div class="col stack"><h3>D'abord, tout ce que fait déjà l'application Claude</h3>
+<p>Il faut le dire honnêtement et complètement, parce que beaucoup l'ignorent et parce qu'une comparaison à charge se retourne contre celui qui l'écrit.</p>
+<p><strong>Elle a une mémoire, et elle est bonne.</strong> Elle retient des sujets au fil de tes conversations, sans que tu aies à dire « souviens-toi ». Tu peux la consulter, la corriger, en supprimer des morceaux dans les réglages. Elle se range par projet, et <strong>Cowork partage la même mémoire</strong> que le mode conversation.</p>
+<p><strong>Elle a des instructions permanentes.</strong> Sur les plans Team et Enterprise, une organisation peut poser des <strong>instructions suivies dans chaque conversation</strong>, qui priment sur les préférences personnelles. Un projet peut aussi porter les siennes, et se partager à toute l'organisation.</p>
+<p><strong>Elle travaille sans toi.</strong> Cowork sait exécuter des <strong>tâches planifiées qui tournent dans le nuage</strong>, à leur cadence, même ordinateur éteint et application fermée. Briefing quotidien, rapport hebdomadaire, avec tes connecteurs.</p>
+<p><strong>Et elle se connecte proprement.</strong> Les connecteurs passent par une authentification standard, Claude <strong>ne voit jamais ton mot de passe</strong> et hérite de tes propres permissions dans le service.</p>
+<p>Autrement dit, la plupart des différences qu'on croit évidentes n'existent pas. Il en reste <strong>quatre</strong>, et elles sont réelles.</p>
+<h3>Différence 1. Le cerveau est un dossier de fichiers, et il est à toi</h3>
+<p>C'est la différence de fond, et tout le reste en découle.</p>
+<p>La mémoire de l'application vit <strong>dans le produit</strong>. Elle est excellente, mais elle y reste. Le cerveau d'un jumeau est un <strong>dossier de fichiers texte</strong> que tu copies, emportes, ouvres dans n'importe quel éditeur, et confies à quelqu'un d'autre le jour où tu changes de rôle.</p>
+<p>Trois conséquences concrètes.</p>
+<ul><li><strong>Un historique daté et attribué.</strong> Chaque changement est enregistré. On peut demander « quand a-t-on décidé ça, et pourquoi », et obtenir la réponse.</li><li><strong>Rien ne s'efface par accident.</strong> Une correction malheureuse se retrouve et s'annule.</li><li><strong>Le changement de modèle ne coûte rien.</strong> Le cerveau est du texte. Si un autre modèle devient meilleur demain, il le lit tel quel.</li></ul>
+<h3>Différence 2. Ce qu'il y a à chercher, et comment on le retrouve</h3>
+<p>Une IA ne peut retrouver que ce qu'on lui a donné. <strong>C'est donc la matière qui décide, avant le moteur.</strong></p>
+<p>L'application cherche dans ce que tu as déposé et dans ce qu'elle a retenu de vos échanges. C'est utile, et c'est borné par ce que tu as pensé à lui donner.</p>
+<p><span class="acc" data-a="Ton jumeau" data-b="Ta jumelle">Ton jumeau</span> cherche dans <strong>tout ce que le programme a accumulé</strong>, les décisions consignées avec leur date, les méthodes écrites, et surtout les corrections avec <strong>le pourquoi de chacune</strong>. Ce corpus grossit à chaque session et <strong>rien n'en est jamais détruit</strong>, les archives font partie du champ de recherche, parce qu'archiver n'est pas oublier.</p>
+<p><strong>Et il sait vraiment y chercher.</strong> Trois façons menées en parallèle, les mots exacts, le sens, et les liens entre les fiches. La réponse n'est jamais « lis ce fichier », c'est « lis ce passage-là, à cet endroit ». On y revient en détail plus loin.</p></div>
+<div class="note piege"><span class="lbl">La méprise à éviter, et elle est répandue</span><p>On croit souvent que l'avantage serait d'avoir <strong>plus</strong> de contexte. C'est faux, et c'est même l'inverse. <strong>Un contexte gonflé dégrade les résultats</strong> : l'information juste s'y noie, et on paie ce volume à chaque échange.</p>
+<p>C'est pour ça que la liste de sa mémoire ne contient <strong>qu'une ligne par souvenir, jamais le contenu</strong>. Il va chercher la fiche entière seulement quand elle sert.</p>
+<p>L'avantage n'est pas la quantité, c'est <strong>la justesse</strong>, ce qui est toujours là est choisi par nous, et ce qui s'y ajoute est allé se chercher à l'endroit exact.</p></div>
+<div class="note repere"><span class="lbl">Le point qui ne se copie pas</span><p>Un moteur de recherche, tout le monde finira par en avoir un, et ils s'amélioreront tous. <strong>Ce qui ne se copie pas, c'est le corpus.</strong> Trois mois de décisions, de méthodes et de corrections consignées n'existent nulle part ailleurs et ne se rattrapent pas en achetant un produit.</p>
+<p>L'avantage n'est pas la mécanique de recherche. C'est <strong>ce qu'il y a à chercher</strong>, et il grossit pendant que tu travailles.</p></div>
+<div class="col stack"><h3>Différence 3. Il porte du CODE, pas seulement du texte</h3>
+<p>C'est la différence qui se sent le plus au quotidien.</p>
+<p>Une mémoire retient. Des instructions décrivent. <strong>Un jumeau exécute des outils écrits pour DES systèmes réels</strong>, et surtout <strong>pour leurs défauts</strong>.</p>
+<p>L'exemple qui vaut tous les discours. Le connecteur de courriel standard <strong>ne sait pas lire une pièce jointe</strong>, il en donne le nom, et se tait. Ça donne l'illusion d'avoir tout lu, alors que le contenu réel est souvent entièrement dans les documents joints. Le jumeau a donc un outil maison qui va chercher le texte à l'intérieur.</p>
+<p>Ton cerveau de départ en apporte une douzaine, écrits un par un à mesure que quelqu'un butait dessus, et le nombre grandit à chaque mise à jour. Envoyer un courriel sans que les liens soient déformés. Lire cinq comptabilités. Créer une facture. Signer un document. Sortir les heures d'une feuille de temps avant qu'un départ ne les efface.</p></div>
+<div class="note repere"><span class="lbl">La phrase à retenir de cette section</span><p><strong>La valeur n'est pas dans le modèle d'IA, elle est dans le comblement patient des trous entre le modèle et tes vrais systèmes.</strong> Le modèle, tout le monde l'a. Ces outils-là, non, et chacun a coûté une frustration à quelqu'un.</p>
+<p>Et comme ils vivent dans un gabarit commun, <strong>un trou bouché une fois est bouché pour tous ceux qui ont un jumeau</strong>, sans que personne ait à te renvoyer un fichier.</p></div>
+<div class="col stack"><h3>Différence 4. Le travail autonome écrit dans le cerveau</h3>
+<p>Les deux savent travailler sans toi. La différence est dans <strong>ce qu'il en reste</strong>.</p>
+<p>Une tâche planifiée produit un <strong>livrable</strong>, un rapport, un résumé, et c'est très bien. Quand le jumeau travaille seul, il produit un livrable <strong>et il écrit dans son cerveau</strong>, le dossier avancé, la décision consignée, la relance posée. La session du lendemain hérite de tout ça.</p>
+<p>C'est la différence entre un travail qui se répète et un travail qui <strong>s'accumule</strong>.</p></div>
+<div class="note info"><span class="lbl">Le coffre, et ce qu&#x27;il faut comprendre</span><p>Les connecteurs standards se connectent proprement, sans que tu donnes de mot de passe. Mais <strong>nos outils maison, eux, ont besoin de clés</strong>, un mot de passe d'application pour lire une boîte, une clé pour un service qui n'a pas de connecteur.</p>
+<p>Ces valeurs vivent dans un <strong>coffre</strong>, en dehors de tout ce qui se raconte. Le jumeau sait laquelle utiliser sans jamais l'afficher, et <strong>il ne te demandera jamais d'en coller une dans la conversation</strong>, une clé collée dans un échange est une clé brûlée, elle reste dans l'historique et se retrouve dans une capture d'écran. Si un jour il le fait, c'est un défaut, refuse et signale-le.</p></div>
+<div class="col stack"><h3>Le tableau, pour trancher d'un coup d'oeil</h3>
+<div class="tablewrap"><table><thead><tr><th></th><th>Claude web et Cowork</th><th>Ton jumeau</th></tr></thead><tbody><tr><td><strong>Mémoire entre conversations</strong></td><td>Oui, par sujets, consultable et modifiable</td><td>Oui, dans des fichiers que tu ouvres et corriges</td></tr><tr><td><strong>Instructions permanentes</strong></td><td>Oui, personnelles, par projet, et pour toute l'organisation</td><td>Oui, dans son cerveau</td></tr><tr><td><strong>Travaille sans toi</strong></td><td>Oui, tâches planifiées dans le nuage, poste éteint</td><td>Oui, et <strong>ce qu'il fait s'écrit dans le cerveau</strong></td></tr><tr><td><strong>Connexion aux services</strong></td><td>Authentification standard, ton mot de passe n'est jamais vu</td><td>Les mêmes connecteurs, <strong>plus un coffre</strong> pour nos outils maison</td></tr><tr><td><strong>Où vit la mémoire</strong></td><td>Dans le produit, liée au compte</td><td>Dans <strong>ton</strong> dossier, copiable et transférable</td></tr><tr><td><strong>Ce qu'il peut retrouver</strong></td><td>Ce que tu as déposé, et ce qu'il a retenu</td><td><strong>Tout le corpus accumulé</strong>, archives comprises</td></tr><tr><td><strong>Comment il le retrouve</strong></td><td>Recherche intégrée au produit</td><td>Un moteur qu'on possède, les mots, le sens, les liens, et le passage exact</td></tr><tr><td><strong>Change de modèle d'IA</strong></td><td>Elle reste dans ce produit</td><td>Le cerveau suit, il est en texte</td></tr><tr><td><strong>Outils sur tes systèmes</strong></td><td>Ce que les connecteurs savent faire</td><td><strong>Des outils</strong> écrits pour combler leurs trous, qui arrivent tout seuls</td></tr><tr><td><strong>Historique</strong></td><td>Les conversations</td><td>Chaque changement <strong>daté, attribué, réversible</strong></td></tr><tr><td><strong>Ce qu'un autre corrige</strong></td><td>Se partage par un projet ou des instructions</td><td><strong>Te revient sous forme d'outil</strong>, tout seul</td></tr><tr><td><strong>Mise en route</strong></td><td>Immédiate</td><td>Trois quarts d'heure, une fois</td></tr></tbody></table></div></div>
+<div class="note piege"><span class="lbl">Quand l&#x27;application est le BON choix, et il faut le dire</span><p>Le jumeau n'est pas meilleur partout, et prétendre le contraire te ferait perdre du temps.</p>
+<p><strong>Une question ponctuelle, une reformulation, un texte à dégrossir, une recherche sans lien avec tes dossiers</strong>, ouvre Claude et pose ta question. C'est plus rapide, il n'y a rien à installer, et tu n'as pas besoin de tout ce qui est décrit ici.</p>
+<p>Le jumeau prend l'avantage sur <strong>ce que tu refais souvent, avec tes propres outils et tes propres dossiers</strong>. C'est là que les méthodes écrites, les outils maison et le travail autonome se paient. Pour le reste, l'application fait très bien l'affaire.</p></div>
+<div class="note info"><span class="lbl">Et les deux ensemble, en pratique</span><p>La plupart des gens finissent par utiliser les deux. L'application pour penser vite et pour ce qui est ponctuel, le jumeau pour ce qui demande de connaître tes dossiers, tes outils et ta façon de travailler. Ce n'est pas un choix à trancher une fois pour toutes.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="claude-cowork-ton-jumeau-la-question-que-tout-le-monde-pose.je-sais-dire-dans-quel-cas-j-ouvre-claude-et-dans-quel-cas-j" data-n="c3"><span class="txt">Je sais dire dans quel cas j'ouvre Claude et dans quel cas je passe par mon jumeau</span></label></div></div></div></section>
+<section id="ce-qui-se-passe-quand-tu-lances-la-comma"><div class="wrap"><div class="sec-head"><p class="eyebrow">Le démarrage, pas à pas</p><h2>Ce qui se passe quand tu lances la commande</h2><p class="lede">Maintenant qu'on sait ce qu'est le contexte, voici ce qui remplit cette pile. Tu tapes une ligne, et six choses se produisent avant qu'<span class="acc" data-a="il" data-b="elle">il</span> te dise bonjour.</p></div><div class="sec-body"><div class="col stack"><p>Voici la ligne. C'est la même tous les jours, et c'est la seule.</p></div>
+<div class="copybloc"><div class="copybloc-head"><span class="t">La commande de tous les jours</span><button class="copy" type="button">Copier</button></div><pre>claude --dangerously-skip-permissions --remote-control</pre></div>
+<div class="col stack"><p><strong>Le premier mot lance <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span>.</strong> Le deuxième lui dit de ne pas te demander ton autorisation avant chaque geste, et le dernier, <code class="inline">--remote-control</code>, rend la session joignable depuis le web, ton téléphone et les autres sessions de ton poste, c'est ce qui permet aux agents de se parler entre eux. Sans cette option, <span class="acc" data-a="il" data-b="elle">il</span> te pose des dizaines de questions par session, tu finis par répondre oui sans lire, et ça ne protège plus personne. Tu gardes la responsabilité de <strong>regarder</strong>, et <code class="inline">Ctrl+C</code> l'arrête à tout instant. Ce qui ne change pas, <strong>rien ne sort sans ton accord</strong>, cette règle-là vit dans son cerveau et l'option n'y touche pas.</p></div>
+<div class="note info"><span class="lbl">Où on la tape, et l&#x27;astuce qui évite de la retaper</span><p>Dans le terminal, en bas de Visual Studio Code, ton dossier <code class="inline">jumeau</code> ouvert. Et le lendemain, tu ne la retapes pas, la <strong>flèche vers le haut</strong> de ton clavier rappelle la commande précédente. Flèche du haut, Entrée.</p></div>
+<figure class="diagram"><svg viewBox="0 0 660 330" role="img" aria-label="Séquence de démarrage : le harnais injecte les instructions, l'index de mémoire et les hooks, puis le jumeau synchronise, vérifie sa mémoire et se met à jour.">
+  <defs><marker id="m2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+  <g font-family="Mulish, sans-serif" font-size="12">
+    <rect x="10" y="22" width="300" height="290" rx="10" fill="var(--surface-2)" stroke="var(--line-strong)" stroke-width="1.4"/>
+    <text x="24" y="14" fill="var(--ink-2)" font-size="10" letter-spacing="1.4" font-family="IBM Plex Mono, monospace">POSÉ SUR LA PILE, AUTOMATIQUEMENT</text>
+    <g fill="var(--ink)">
+      <text x="28" y="54" font-weight="700">1. Ses instructions de base</text>
+      <text x="28" y="72" font-size="11" fill="var(--ink-2)">le fichier CLAUDE.md, sa constitution</text>
+      <text x="28" y="112" font-weight="700">2. La liste de ce qu'il a retenu</text>
+      <text x="28" y="130" font-size="11" fill="var(--ink-2)">un titre par souvenir, jamais le contenu</text>
+      <text x="28" y="170" font-weight="700">3. Ton profil, l'heure, le lieu</text>
+      <text x="28" y="188" font-size="11" fill="var(--ink-2)">posés par de petits programmes automatiques</text>
+      <text x="28" y="206" font-size="11" fill="var(--ink-2)">qu'on appelle des « hooks »</text>
+    </g>
+    <rect x="24" y="228" width="272" height="66" rx="8" fill="var(--creme)" stroke="var(--orange)" stroke-width="1.2"/>
+    <text x="36" y="250" fill="var(--orange-ink)" font-size="11" font-weight="700">Il ne peut pas les oublier.</text>
+    <text x="36" y="270" font-size="10.5" fill="var(--ink-2)">C'est posé devant lui, pas demandé.</text>
+    <text x="36" y="286" font-size="10.5" fill="var(--ink-2)">Les seules choses vraiment garanties.</text>
+    <g color="var(--ink-3)" stroke="currentColor" stroke-width="1.5" fill="none"><path d="M318 165 H346" marker-end="url(#m2)"/></g>
+    <rect x="352" y="22" width="298" height="290" rx="10" fill="var(--bleu-pale)" stroke="var(--bleu)" stroke-width="1.4"/>
+    <text x="366" y="14" fill="var(--bleu-ink)" font-size="10" letter-spacing="1.4" font-family="IBM Plex Mono, monospace">CE QU'IL FAIT LUI-MÊME, ENSUITE</text>
+    <g fill="var(--ink)">
+      <text x="370" y="54" font-weight="700">4. Il récupère son cerveau à jour</text>
+      <text x="370" y="72" font-size="11" fill="var(--ink-2)">celui d'hier soir, pas une vieille copie</text>
+      <text x="370" y="112" font-weight="700">5. Il vérifie où vit sa mémoire</text>
+      <text x="370" y="130" font-size="11" fill="var(--ink-2)">est-elle bien sauvegardée en ligne ?</text>
+      <text x="370" y="170" font-weight="700">6. Il se met à jour</text>
+      <text x="370" y="188" font-size="11" fill="var(--ink-2)">les outils améliorés depuis la veille</text>
+      <text x="370" y="206" font-size="11" fill="var(--ink-2)">et les automatismes qui lui manquaient</text>
+    </g>
+    <rect x="366" y="228" width="272" height="66" rx="8" fill="var(--vert-pale)" stroke="var(--vert)" stroke-width="1.2"/>
+    <text x="378" y="250" fill="var(--vert)" font-size="11" font-weight="700">Puis il te dit bonjour.</text>
+    <text x="378" y="270" font-size="10.5" fill="var(--ink-2)">Trente secondes, en silence si tout</text>
+    <text x="378" y="286" font-size="10.5" fill="var(--ink-2)">va bien. Il ne parle que des écarts.</text>
+  </g>
+</svg><figcaption>À gauche, ce que le PROGRAMME pose sur la pile avant que ton jumeau existe, il ne peut pas l'oublier. À droite, ses premiers gestes à lui, qu'il pourrait rater. Toute la différence est là.</figcaption></figure>
+<div class="col stack"><p><strong>La distinction entre les deux colonnes est ce qu'il faut retenir.</strong> Ce qui est posé sur la pile automatiquement, <span class="acc" data-a="il" data-b="elle">il</span> ne peut pas l'oublier, puisque c'est là avant qu'<span class="acc" data-a="il" data-b="elle">il</span> commence à réfléchir. Tout le reste, <span class="acc" data-a="il" data-b="elle">il</span> doit y penser, et un jumeau qui oublie un de ses premiers gestes travaille sur un cerveau périmé sans le savoir.</p>
+<p>C'est pour ça qu'on <strong>automatise</strong> ce qui doit être garanti au lieu de le lui demander. Le profil en est l'exemple le plus net.</p>
+<h3>Les six étapes, en français</h3>
+<p><strong>1. Ses instructions de base.</strong> Un fichier appelé <code class="inline">CLAUDE.md</code>, sa constitution. Ses réflexes, ses interdits, ses règles de forme. C'est le seul document qu'<span class="acc" data-a="il" data-b="elle">il</span> ne peut pas ne pas lire.</p>
+<p><strong>2. La liste de ce qu'<span class="acc" data-a="il" data-b="elle">il</span> a retenu.</strong> Pas les souvenirs eux-mêmes, seulement leur <strong>titre</strong>, une ligne chacun. Comme la table des matières d'un classeur. Quand une ligne lui semble utile, <span class="acc" data-a="il" data-b="elle">il</span> va ouvrir la fiche correspondante. C'est ce qui permet d'avoir trois cents souvenirs sans encombrer la pile.</p>
+<p><strong>3. Ton profil, l'heure et le lieu.</strong> Posés par de petits programmes automatiques qu'on appelle des <strong>hooks</strong>, le mot veut simplement dire qu'ils se déclenchent tout seuls à un moment précis, sans qu'on les appelle. L'heure est reprise à chaque message, parce qu'une IA n'a aucune horloge et se tromperait en disant « ce matin ».</p>
+<p><strong>4. <span class="acc" data-a="Il" data-b="Elle">Il</span> récupère son cerveau à jour.</strong> Ton cerveau est sauvegardé en ligne, et <span class="acc" data-a="il" data-b="elle">il</span> peut avoir été modifié depuis ta dernière session, par toi sur un autre ordinateur ou par un traitement automatique de la nuit. <span class="acc" data-a="Il" data-b="Elle">Il</span> redescend donc la version la plus récente avant de commencer. Sans ce geste, <span class="acc" data-a="il" data-b="elle">il</span> travaillerait sur la photo d'hier.</p>
+<p><strong>5. <span class="acc" data-a="Il" data-b="Elle">Il</span> vérifie où vit sa mémoire.</strong> Les souvenirs qu'<span class="acc" data-a="il" data-b="elle">il</span> écrit doivent atterrir dans le dossier sauvegardé, pas dans un coin de ton disque dur. <span class="acc" data-a="Il" data-b="Elle">Il</span> s'en assure et répare si besoin. La raison est simple, <strong>un ordinateur perdu ne doit jamais emporter la mémoire d'un jumeau</strong>.</p>
+<p><strong>6. <span class="acc" data-a="Il" data-b="Elle">Il</span> se met à jour.</strong> <span class="acc" data-a="Il" data-b="Elle">Il</span> va voir si ses outils ont été améliorés depuis la veille et récupère les nouveautés. Ton contenu à toi n'est jamais touché, seule la mécanique change.</p></div>
+<div class="note piege"><span class="lbl">Une consigne n&#x27;est pas un mécanisme</span><p>Un jumeau à qui l'on demande de lire son profil peut travailler une journée entière sur des dossiers sans l'avoir ouvert, et personne ne le voit, parce que rien ne casse. C'est pour ça que le profil est posé automatiquement sur la pile. <strong>Ce qui doit être garanti ne se demande pas, il s'automatise.</strong></p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="ce-qui-se-passe-quand-tu-lances-la-commande.je-sais-ce-qui-se-passe-entre-le-moment-ou-je-lance-la-comma" data-n="c4"><span class="txt">Je sais ce qui se passe entre le moment où je lance la commande et son bonjour</span></label></div></div></div></section>
+<section id="les-quatre-couches-de-memoire"><div class="wrap"><div class="sec-head"><p class="eyebrow">Le cadre</p><h2>Les quatre couches de mémoire</h2><p class="lede">Un cerveau humain ne garde pas chaque seconde en tête. Il consolide, l'épisode devient un principe, et l'épisode reste rappelable quand un indice le réveille. <span class="acc" data-a="Le jumeau" data-b="La jumelle">Le jumeau</span> est construit exactement ainsi, et c'est le vocabulaire du programme.</p></div><div class="sec-body"><figure class="diagram"><svg viewBox="0 0 640 300" role="img" aria-label="Quatre couches de mémoire : de travail, sémantique, épisodique, procédurale, de la plus petite et chère à la plus volumineuse.">
+  <g font-family="Mulish, sans-serif" font-size="12">
+    <rect x="180" y="16" width="290" height="56" rx="8" fill="var(--brique-pale)" stroke="var(--brique)" stroke-width="1.5"/>
+    <text x="196" y="38" font-weight="800" fill="var(--brique)">DE TRAVAIL</text>
+    <text x="196" y="58" font-size="11" fill="var(--ink-2)">Ses instructions, ton profil, l'heure</text>
+    <text x="628" y="42" text-anchor="end" font-size="10.5" font-family="IBM Plex Mono, monospace" fill="var(--ink-3)">~15 pages</text>
+    <text x="628" y="58" text-anchor="end" font-size="10" fill="var(--ink-3)">chargée d'office</text>
+    <rect x="140" y="82" width="370" height="56" rx="8" fill="var(--creme)" stroke="var(--orange)" stroke-width="1.5"/>
+    <text x="156" y="104" font-weight="800" fill="var(--orange-ink)">PAR LE SENS</text>
+    <text x="156" y="124" font-size="11" fill="var(--ink-2)">memory/, profile/, context/, les principes durables</text>
+    <text x="628" y="108" text-anchor="end" font-size="10.5" font-family="IBM Plex Mono, monospace" fill="var(--ink-3)">des centaines</text>
+    <text x="628" y="124" text-anchor="end" font-size="10" fill="var(--ink-3)">à la demande</text>
+    <rect x="90" y="148" width="440" height="56" rx="8" fill="var(--bleu-pale)" stroke="var(--bleu)" stroke-width="1.5"/>
+    <text x="106" y="170" font-weight="800" fill="var(--bleu-ink)">ÉPISODIQUE</text>
+    <text x="106" y="190" font-size="11" fill="var(--ink-2)">dossiers/ et l'historique, les événements datés</text>
+    <text x="628" y="174" text-anchor="end" font-size="10.5" font-family="IBM Plex Mono, monospace" fill="var(--ink-3)">des milliers</text>
+    <text x="628" y="190" text-anchor="end" font-size="10" fill="var(--ink-3)">jamais détruite</text>
+    <rect x="40" y="214" width="490" height="56" rx="8" fill="var(--vert-pale)" stroke="var(--vert)" stroke-width="1.5"/>
+    <text x="56" y="236" font-weight="800" fill="var(--vert)">PROCÉDURALE</text>
+    <text x="56" y="256" font-size="11" fill="var(--ink-2)">playbooks/, skills, tools/, le COMMENT, exécutable</text>
+    <text x="330" y="290" font-size="10.5" fill="var(--ink-3)" text-anchor="middle">Elle ne se raconte pas, elle s'exécute.</text>
+  </g>
+</svg><figcaption>Plus on monte, plus c'est cher et plus c'est rare. Une information mal placée coûte, trop haut elle gaspille du contexte à chaque session, trop bas elle est introuvable au moment de décider.</figcaption></figure>
+<dl class="lex"><div><dt>Le contexte</dt><dd>La pile de documents posée devant <span class="acc" data-a="lui" data-b="elle">lui</span> à chaque conversation. Il la lit en entier avant que tu parles, et elle a une taille maximale.</dd></div><div><dt>Un jeton</dt><dd>L'unité qui mesure cette pile. Environ trois quarts d'un mot. Les instructions de base plus le profil en occupent une quinzaine de pages.</dd></div><div><dt>La mémoire de travail</dt><dd>Ce qu'<span class="acc" data-a="il" data-b="elle">il</span> a en tête à l'instant, c'est-à-dire le contenu de cette pile. Elle coûte à chaque échange, donc <strong>n'y vivent que les règles toujours actives</strong>.</dd></div><div><dt>La mémoire sémantique</dt><dd>Les faits et principes détachés de leur épisode. Chaque correction que tu lui fais devient une règle durable, <strong>avec le pourquoi</strong>. C'est ce qui te réplique.</dd></div><div><dt>La mémoire épisodique</dt><dd>Les événements vécus, datés. Volumineuse, <strong>jamais détruite</strong>, archiver n'est pas oublier. On l'atteint par un indice, pas en la relisant.</dd></div><div><dt>La mémoire procédurale</dt><dd>Le savoir-faire. Un playbook, un skill, un outil. Ça ne se raconte pas, ça s'exécute.</dd></div></dl>
+<div class="col stack"><h3>Les quatre mécanismes qui les relient</h3>
+<p>Les couches ne suffisent pas. Ce sont les mécanismes qui font la réplication.</p></div>
+<div class="cartes"><div class="carte"><h4>La consolidation <span class="tag">l&#x27;épisode devient un principe</span></h4><p>Chez l'humain, c'est l'hippocampe qui rejoue la journée pendant la nuit. Ici, ce sont les runs de consolidation et <strong>chaque correction que tu fais</strong> qui devient une règle écrite. C'est elle qui te réplique, <strong>la dixième décision se prend seule parce que les neuf premières ont été consolidées</strong>.</p></div><div class="carte"><h4>Le rappel indicé <span class="tag">un indice réveille le souvenir</span></h4><p>La recherche du cerveau, la carte de navigation, <code class="inline">git log</code>. Tu n'as pas besoin de te souvenir où est l'information, seulement d'en avoir un bout.</p></div><div class="carte"><h4>L'oubli actif <span class="tag">sortir du chemin chaud sans perdre</span></h4><p>Les journaux anciens quittent la mémoire de travail mais restent dans l'épisodique. L'équivalent du tri du sommeil. <strong>On oublie pour décider mieux, on ne détruit jamais.</strong></p></div><div class="carte"><h4>La métacognition <span class="tag">savoir ce qu&#x27;on sait</span></h4><p>Le catalogue de ses outils, la carte de son cerveau, sa feuille de route. Savoir ce qu'<span class="acc" data-a="il" data-b="elle">il</span> sait, ce qu'<span class="acc" data-a="il" data-b="elle">il</span> sait faire, et ce qui lui manque.</p></div></div>
+<div class="note piege"><span class="lbl">La règle d&#x27;arbitrage, et pourquoi elle compte</span><p>Quand une information arrive, la vraie question est <strong>où elle vit</strong>. Une règle toujours active monte en mémoire de travail, et elle coûte alors à chaque session de chacun. Un principe durable devient une fiche. Un événement daté va au dossier. Un savoir-faire devient un outil.</p>
+<p>Se tromper coûte des deux côtés. <strong>Trop haut, on gaspille du contexte à chaque démarrage. Trop bas, l'information est introuvable au moment de décider.</strong></p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="les-quatre-couches-de-memoire.devant-une-information-nouvelle-je-sais-dire-ou-elle-devrait" data-n="c5"><span class="txt">Devant une information nouvelle, je sais dire où elle devrait vivre</span></label></div></div></div></section>
+<section id="chaque-repertoire-et-a-quoi-il-sert"><div class="wrap"><div class="sec-head"><p class="eyebrow">L'anatomie</p><h2>Chaque répertoire, et à quoi il sert</h2><p class="lede">Ouvre ton dossier <code class="inline">jumeau</code> dans Visual Studio Code et tu verras exactement ça. Rien n'est décoratif.</p></div><div class="sec-body"><div class="col stack"><div class="tablewrap"><table><thead><tr><th>Répertoire</th><th>Ce qu'il porte</th><th>Couche</th></tr></thead><tbody><tr><td><code class="inline">CLAUDE.md</code></td><td><strong>Le seul fichier qu'<span class="acc" data-a="il" data-b="elle">il</span> ne peut pas ne pas lire.</strong> Ses réflexes, ses garde-fous, ses règles de forme</td><td>Travail</td></tr><tr><td><code class="inline">profile/</code></td><td>Qui tu es, ce que tu vises, comment tu écris. <strong>Injecté au démarrage</strong></td><td>Travail</td></tr><tr><td><code class="inline">memory/</code></td><td>Une fiche par fait durable, plus <code class="inline">MEMORY.md</code> qui les indexe. Le fruit de tes corrections</td><td>Sémantique</td></tr><tr><td><code class="inline">context/</code></td><td>Ton organisation, tes données, ta marque. Ce qui ne change pas tous les jours</td><td>Sémantique</td></tr><tr><td><code class="inline">dossiers/</code></td><td>Tes sujets en cours, ceux que tu décides de lui confier. Le journal de ce qui s'est décidé</td><td>Épisodique</td></tr><tr><td><code class="inline">playbooks/</code></td><td>Les méthodes de travail, que <span class="acc" data-a="il" data-b="elle">il</span> va consulter tout seul quand la situation se présente</td><td>Procédurale</td></tr><tr><td><code class="inline">.claude/skills/</code></td><td>Des procédures que <strong>tu</strong> déclenches par leur nom, comme <code class="inline">/consolidation</code></td><td>Procédurale</td></tr><tr><td><code class="inline">tools/</code></td><td>Les scripts qui lui donnent des mains</td><td>Procédurale</td></tr><tr><td><code class="inline">architecture/</code></td><td>La documentation de sa propre plomberie, écrite par <span class="acc" data-a="lui" data-b="elle">lui</span> pour <span class="acc" data-a="lui" data-b="elle">lui</span></td><td>Sémantique</td></tr><tr><td><code class="inline">outillage/</code></td><td>Le catalogue de ce qu'<span class="acc" data-a="il" data-b="elle">il</span> sait faire, à lire <strong>avant</strong> de conclure qu'une chose est impossible</td><td>Métacognition</td></tr><tr><td><code class="inline">var/</code></td><td>Des fichiers de travail temporaires, jamais sauvegardés en ligne. On peut les jeter, ils se refabriquent tout seuls</td><td>aucune</td></tr></tbody></table></div></div>
+<div class="note repere"><span class="lbl">C&#x27;est TOI qui décides de sa portée</span><p>Ton cerveau de départ est <strong>neutre</strong>. Il ne présume pas que <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> servira au travail, à ta vie personnelle, ou aux deux. <strong>La portée t'appartient</strong>, parce que le dossier t'appartient, il est sur ton compte, en privé, et personne d'autre n'y a accès.</p>
+<p>Beaucoup finissent par y mettre les deux, et rangent alors leurs dossiers en deux espaces séparés. Ce n'est pas obligatoire, c'est simplement commode quand la même journée mêle un devis et un rendez-vous chez le médecin.</p>
+<p><strong>La seule règle qui vaille</strong>, si tu mélanges les deux, <span class="acc" data-a="il" data-b="elle">il</span> tient compte de ta vie personnelle pour arbitrer ton temps et ta charge, mais <strong>rien n'en sort jamais</strong> dans un message professionnel. La cloison n'est pas dans le rangement, elle est dans ce qui part.</p>
+<p>C'est là une vraie différence avec les jumeaux montés à l'intérieur d'une entreprise, ceux-là sont des outils de travail, sans volet personnel, parce que leur dossier appartient à l'entreprise et peut être repris. Le tien, non.</p></div>
+<div class="col stack"><h3>Un playbook et un skill, ce n'est pas la même chose</h3>
+<p>Les deux contiennent une méthode de travail, et c'est là que la confusion commence. <strong>La différence n'est pas ce qu'il y a dedans, c'est QUI le déclenche.</strong></p></div>
+<div class="cartes"><div class="carte"><h4>Un playbook <span class="tag">il le consulte</span></h4><p>C'est un <strong>livre de recettes sur l'étagère</strong>. « Voici comment on prépare une rencontre avec un responsable », « voici comment on traite un courriel ». <span class="acc" data-a="Il" data-b="Elle">Il</span> reconnaît la situation, <span class="acc" data-a="il" data-b="elle">il</span> va lire la bonne page, <span class="acc" data-a="il" data-b="elle">il</span> applique. Tu n'as rien à demander, et tu peux en écrire un toi-même pour ta façon de travailler.</p><p class="quand">Quand la situation se présente, de sa propre initiative.</p></div><div class="carte"><h4>Un skill <span class="tag">tu le déclenches</span></h4><p>C'est un <strong>bouton</strong>. Tu l'appelles par son nom, et la méthode complète entre d'un coup dans la conversation, avec ses étapes dans l'ordre. <span class="acc" data-a="Il" data-b="Elle">Il</span> ne choisit pas de le lire, <span class="acc" data-a="il" data-b="elle">il</span> l'exécute du début à la fin.</p><p class="quand">Au moment précis où tu tapes son nom, comme <code class="inline">/consolidation</code>.</p></div></div>
+<div class="col stack"><p><strong>Pourquoi les deux existent, et quand on choisit l'un ou l'autre.</strong></p>
+<p>Un <strong>playbook</strong> convient quand la méthode doit s'appliquer au bon moment sans que tu y penses, et quand elle peut varier d'une personne à l'autre. C'est de la connaissance disponible.</p>
+<p>Un <strong>skill</strong> convient quand la procédure a des <strong>étapes qu'on ne doit pas sauter</strong>, et qu'elle doit se dérouler <strong>pareil chez tout le monde</strong>. C'est pour ça que les skills descendent du gabarit, identiques chez chaque jumeau, alors qu'un playbook peut t'appartenir.</p></div>
+<div class="note info"><span class="lbl">Un exemple qui rend la différence évidente</span><p><code class="inline">/consolidation</code> est un skill, et il ne pouvait pas être un playbook. C'est la clôture de session, celle qui trie ce qui a été appris et l'écrit au bon endroit. Si <span class="acc" data-a="il" data-b="elle">il</span> pouvait « oublier de la consulter », elle ne servirait à rien , or c'est précisément à la fin d'une session, quand tout le monde est pressé, qu'on saute une étape. Tu tapes son nom, la procédure entre en entier, et elle se déroule dans l'ordre.</p>
+<p>À l'inverse, la façon de préparer une rencontre est un playbook. <span class="acc" data-a="Il" data-b="Elle">Il</span> doit y penser tout seul quand tu dis « prépare mon lundi », et ta façon de faire peut différer de celle d'un collègue.</p></div>
+<div class="col stack"><h3>CLAUDE.md, et pourquoi il ne doit pas grossir</h3>
+<p>C'est la constitution. Il est chargé <strong>en entier, à chaque session, pour toujours</strong>. Ça en fait l'endroit le plus puissant et le plus cher du cerveau.</p></div>
+<div class="note piege"><span class="lbl">Le piège du fichier qui grossit</span><p>Tout ce qu'on y met coûte à chaque démarrage, chez chaque personne. Et il y a pire, quand <code class="inline">CLAUDE.md</code> recopie ce qui vit ailleurs, <strong>il masque le vieillissement de l'autre fichier</strong>. C'est arrivé, un <code class="inline">CLAUDE.md</code> avait fini par recopier une partie du profil, et le profil a donc pourri des mois sans le moindre symptôme, un autre fichier portait la charge à sa place.</p>
+<p>La règle qui en découle, et elle vaut pour tout le cerveau, <strong>un fichier porte ce dont il est la source, et pointe vers la source des autres.</strong> Deux fichiers qui disent la même chose finissent toujours par se contredire.</p></div>
+<div class="col stack"><h3>Le profil, le socle</h3>
+<p>Quatre fichiers, injectés au démarrage. Ils disent qui tu es, ce que tu vises, comment tu écris, et ta vie hors travail si tu veux qu'<span class="acc" data-a="il" data-b="elle">il</span> la couvre.</p>
+<p><strong>Un jumeau vaut exactement ce que vaut son profil.</strong> C'est la partie du cerveau qui fait la différence entre un assistant générique et quelqu'un qui écrit comme toi et arbitre comme toi.</p></div>
+<div class="note repere"><span class="lbl">Le profil porte le STABLE, il pointe vers le reste</span><p>Les personnes, les structures, les mandats permanents, ta façon de décider, tout ça est stable et vit dans le profil. Un chiffre d'objectif, un état de santé, un montant, une échéance <strong>bougent</strong>, ils vivent dans leur dossier et le profil ne fait qu'y renvoyer.</p>
+<p>C'est la discipline qui empêche un profil de se périmer. Un profil qui recopie un état est faux le lendemain ; un profil qui pointe reste juste.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="chaque-repertoire-et-a-quoi-il-sert.je-sais-a-quoi-sert-chaque-repertoire-et-ce-qui-distingue-un" data-n="c6"><span class="txt">Je sais à quoi sert chaque répertoire, et ce qui distingue un skill d'un playbook</span></label></div></div></div></section>
+<section id="comment-il-retrouve-une-information"><div class="wrap"><div class="sec-head"><p class="eyebrow">Le rappel indicé</p><h2>Comment <span class="acc" data-a="il" data-b="elle">il</span> retrouve une information</h2><p class="lede">Un cerveau qui vit finit par compter des milliers de fichiers. Impossible de tout lire à chaque question, et lire au hasard coûte cher pour rien. Voici comment <span class="acc" data-a="il" data-b="elle">il</span> trouve.</p></div><div class="sec-body"><figure class="diagram"><svg viewBox="0 0 660 340" role="img" aria-label="Une question emprunte trois chemins, lexical, sémantique et graphe, qui sont fusionnés pour rendre les meilleures sections.">
+  <defs><marker id="m3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+  <g font-family="Mulish, sans-serif" font-size="12">
+    <rect x="240" y="10" width="180" height="42" rx="8" fill="var(--surface-2)" stroke="var(--line-strong)" stroke-width="1.4"/>
+    <text x="330" y="36" text-anchor="middle" font-weight="700" fill="var(--ink)">Ta question</text>
+    <g color="var(--ink-3)" stroke="currentColor" stroke-width="1.4" fill="none">
+      <path d="M270 54 L130 84" marker-end="url(#m3)"/>
+      <path d="M330 54 L330 84" marker-end="url(#m3)"/>
+      <path d="M390 54 L530 84" marker-end="url(#m3)"/>
+    </g>
+    <rect x="14" y="92" width="216" height="104" rx="9" fill="var(--creme)" stroke="var(--orange)" stroke-width="1.4"/>
+    <text x="28" y="114" font-weight="800" fill="var(--orange-ink)" font-size="11.5">PAR LES MOTS</text>
+    <text x="28" y="134" font-size="11" fill="var(--ink-2)">Les mots exacts que tu as tapés</text>
+    <text x="28" y="152" font-size="11" fill="var(--ink-2)">Accents et pluriels sans importance</text>
+    <text x="28" y="176" font-size="10.5" fill="var(--ink-3)">« reunion » trouve « réunion »</text>
+    <rect x="240" y="92" width="180" height="104" rx="9" fill="var(--bleu-pale)" stroke="var(--bleu)" stroke-width="1.4"/>
+    <text x="254" y="114" font-weight="800" fill="var(--bleu-ink)" font-size="11.5">SÉMANTIQUE</text>
+    <text x="254" y="134" font-size="11" fill="var(--ink-2)">L'idée, même sans un mot commun</text>
+    <text x="254" y="152" font-size="11" fill="var(--ink-2)">Calculé sur TON ordinateur</text>
+    <text x="254" y="176" font-size="10.5" fill="var(--ink-3)">rien ne sort de la machine</text>
+    <rect x="430" y="92" width="216" height="104" rx="9" fill="var(--vert-pale)" stroke="var(--vert)" stroke-width="1.4"/>
+    <text x="444" y="114" font-weight="800" fill="var(--vert)" font-size="11.5">PAR LES LIENS</text>
+    <text x="444" y="134" font-size="11" fill="var(--ink-2)">Les fiches qui se citent entre elles</text>
+    <text x="444" y="152" font-size="11" fill="var(--ink-2)">Ce qui touche de près au sujet</text>
+    <text x="444" y="176" font-size="10.5" fill="var(--ink-3)">et qu'on aurait raté autrement</text>
+    <g color="var(--ink-3)" stroke="currentColor" stroke-width="1.4" fill="none">
+      <path d="M122 200 L300 232" marker-end="url(#m3)"/>
+      <path d="M330 200 L330 232" marker-end="url(#m3)"/>
+      <path d="M538 200 L360 232" marker-end="url(#m3)"/>
+    </g>
+    <rect x="200" y="240" width="260" height="44" rx="8" fill="var(--surface-2)" stroke="var(--line-strong)" stroke-width="1.4"/>
+    <text x="330" y="267" text-anchor="middle" font-weight="700" fill="var(--ink)">Les trois listes sont fusionnées</text>
+    <g color="var(--ink-3)" stroke="currentColor" stroke-width="1.4" fill="none"><path d="M330 286 L330 302" marker-end="url(#m3)"/></g>
+    <text x="330" y="326" text-anchor="middle" font-size="12.5" fill="var(--ink)" font-weight="700">Les meilleurs passages, et où les lire</text>
+  </g>
+</svg><figcaption>Trois façons de chercher, menées en parallèle. Chacune rattrape ce que les autres ratent. La réponse n'est jamais « lis ce fichier », c'est « lis ce passage-là, à cet endroit ».</figcaption></figure>
+<div class="col stack"><p><strong>Le chemin sémantique mérite un mot</strong>, parce que c'est celui qui surprend. <span class="acc" data-a="Ton jumeau" data-b="Ta jumelle">Ton jumeau</span> transforme chaque section du cerveau en une liste de nombres qui représente son <strong>sens</strong>. Ta question subit le même traitement, et <span class="acc" data-a="il" data-b="elle">il</span> compare. C'est ce qui lui permet de trouver la bonne fiche quand tu poses une question qui <strong>n'a aucun mot en commun</strong> avec elle.</p></div>
+<div class="note info"><span class="lbl">Ce calcul se fait chez toi, entièrement</span><p>Le modèle qui transforme le texte en nombres tourne <strong>sur ton ordinateur</strong>, sans serveur, sans appel réseau. Ni tes fiches ni tes questions ne sortent de la machine pour être indexées. Et seules les sections <strong>modifiées</strong> sont recalculées, donc c'est rapide.</p>
+<p>Si ce modèle n'est pas installé, la recherche <strong>dégrade en lexical seul et le dit</strong>, elle ne fait jamais semblant.</p></div>
+<div class="note repere"><span class="lbl">Cette base n&#x27;est jamais la vérité</span><p>Elle est <strong>fabriquée à partir de tes fichiers</strong>, jamais l'inverse. Si tu l'effaces, <span class="acc" data-a="il" data-b="elle">il</span> la refait tout seul en une dizaine de secondes à la prochaine question. La vérité, ce sont toujours tes fichiers texte, la base n'est qu'un raccourci pour les retrouver vite.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="comment-il-retrouve-une-information.je-sais-comment-il-retrouve-une-information-et-que-le-calcul" data-n="c7"><span class="txt">Je sais comment <span class="acc" data-a="il" data-b="elle">il</span> retrouve une information, et que le calcul se fait sur mon poste</span></label></div></div></div></section>
+<section id="comment-ce-qu-il-apprend-remonte"><div class="wrap"><div class="sec-head"><p class="eyebrow">La consolidation</p><h2>Comment ce qu'<span class="acc" data-a="il" data-b="elle">il</span> apprend remonte</h2><p class="lede">C'est la question qui compte le plus, parce que c'est celle qui décide si ton jumeau s'améliore ou s'il stagne.</p></div><div class="sec-body"><div class="col stack"><p>Trois choses se passent, et aucune n'est automatique par magie.</p>
+<p><strong>Tu le corriges dans un fichier, pas dans la conversation.</strong> Quand <span class="acc" data-a="il" data-b="elle">il</span> se trompe de ton ou de méthode, demande-lui de corriger le <strong>fichier</strong> concerné. Une correction faite seulement dans la réponse est perdue à la fermeture. Une correction écrite dans une fiche ne se refait jamais.</p>
+<p><strong><span class="acc" data-a="Il" data-b="Elle">Il</span> sauvegarde quand il y a un bloc de valeur.</strong> Pas à chaque phrase, ce serait du bruit. Un livrable terminé, une décision prise, un dossier avancé. Chaque sauvegarde est datée et retrouvable, c'est ta mémoire épisodique qui s'écrit.</p>
+<p><strong><span class="acc" data-a="Il" data-b="Elle">Il</span> clôture la session.</strong> C'est le seul moment où ce qui a été appris dans la conversation est trié et rangé au bon endroit. Sans ça, la fenêtre se ferme et tout ce qui n'était pas écrit disparaît.</p></div>
+<div class="note piege"><span class="lbl">Le mécanisme qui protège tout le reste</span><p>La mémoire du jumeau <strong>vit dans le dossier sauvegardé en ligne</strong>, pas dans un recoin de ton disque dur. C'est vérifié à chaque démarrage, et réparé si besoin.</p>
+<p>La raison est simple, et c'est une règle du programme, <strong>deux ordinateurs, ou un ordinateur perdu, ne doivent jamais coûter la mémoire d'un jumeau.</strong> Ce qui n'est sauvegardé nulle part n'existe que par accident.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="comment-ce-qu-il-apprend-remonte.je-sais-ce-que-je-dois-faire-concretement-pour-qu-il-s-ameli" data-n="c8"><span class="txt">Je sais ce que je dois faire, concrètement, pour qu'<span class="acc" data-a="il" data-b="elle">il</span> s'améliore</span></label></div></div></div></section>
+<section id="le-coffre-a-outils"><div class="wrap"><div class="sec-head"><p class="eyebrow">Ses mains</p><h2>Le coffre à outils</h2><p class="lede">Un modèle qui ne fait que parler ne sert pas à grand-chose. Ce qui rend <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> utile, ce sont ses bras, et il y en a deux sortes.</p></div><div class="sec-body"><div class="cartes"><div class="carte"><h4>Les connecteurs <span class="tag">MCP</span></h4><p>Courriel, agenda, fichiers, messagerie, tâches, et selon les cas comptabilité ou CRM. Ils se branchent et ils fonctionnent, mais <strong>ils ont des limites</strong>, et ces limites sont souvent silencieuses.</p><p class="quand">Ce que le marché fournit.</p></div><div class="carte"><h4>Les scripts maison <span class="tag">tools/</span></h4><p>Une douzaine au départ, entretenus en commun et complétés au fil du temps. <strong>Chacun comble une limite précise d'un connecteur.</strong> C'est là que se trouve la valeur, pas dans le modèle.</p><p class="quand">Là où est le vrai travail.</p></div></div>
+<div class="note piege"><span class="lbl">La leçon la plus utile de tout ce document</span><p>Le connecteur de courriel <strong>ne sait pas lire une pièce jointe</strong>. Il donne le nom du fichier et se tait, ce qui donne l'illusion d'avoir tout lu, alors que le contenu réel est souvent entièrement dans les pièces jointes. D'où un lecteur maison qui va chercher le texte des documents joints.</p>
+<p>Le même connecteur <strong>enrobe tous les liens</strong> dans une URL de redirection, donc tout courriel porteur d'un lien part par un script d'envoi maison.</p>
+<p><strong>La valeur n'est pas dans le modèle, elle est dans le comblement patient des trous entre le modèle et tes vrais systèmes.</strong> Et chaque trou comblé une fois sert à tous les jumeaux, parce que les outils remontent au gabarit.</p></div>
+<div class="note info"><span class="lbl">Il se met à jour tout seul</span><p>À chaque démarrage, <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> va voir le gabarit et récupère les outils améliorés depuis la dernière fois. Ton contenu n'est jamais touché, seule la mécanique descend. Tu n'as rien à réclamer et tu ne peux pas prendre de retard.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="le-coffre-a-outils.je-sais-que-la-valeur-est-dans-les-outils-qui-comblent-les-t" data-n="c9"><span class="txt">Je sais que la valeur est dans les outils qui comblent les trous des connecteurs, pas dans le modèle</span></label></div></div></div></section>
+<section id="lancer-une-session-qui-sert-a-quelque-ch"><div class="wrap"><div class="sec-head"><p class="eyebrow">En pratique</p><h2>Lancer une session qui sert à quelque chose</h2><p class="lede">La mécanique est en place. Ce qui reste, c'est ta façon de t'en servir, et là il y a quelques réflexes qui changent tout.</p></div><div class="sec-body"><div class="cartes"><div class="carte"><h4>Une session, un sujet <span class="tag">le cadrage</span></h4><p>Une conversation qui saute d'un dossier à l'autre produit du travail moyen partout. Ouvre une session par sujet, <span class="acc" data-a="il" data-b="elle">il</span> chargera le bon contexte et ira plus loin.</p></div><div class="carte"><h4>Dis-lui d'où partir <span class="tag">le point d&#x27;entree</span></h4><p>« Regarde le dossier X » ou « lis le fil de courriel de Y » vaut mieux que de le laisser chercher. Tu lui donnes l'indice, son rappel fait le reste.</p></div><div class="carte"><h4>Corrige tout de suite <span class="tag">la boucle</span></h4><p>Une erreur de ton, une méthode qui ne te convient pas, dis-le sur le moment et demande que ça aille dans le fichier. C'est trente secondes qui ne se repaieront jamais.</p></div><div class="carte"><h4>Clôture <span class="tag">la fin</span></h4><p>Termine par <code class="inline">/consolidation</code>. C'est le moment où ce que la session a appris est trié, écrit et sauvegardé. Une session non clôturée laisse ses apprentissages mourir avec la fenêtre.</p></div></div>
+<div class="col stack"><h3>Bien prompter, en quatre réflexes</h3>
+<p><strong>Donne le but, pas seulement la tâche.</strong> « Prépare un brief pour ma rencontre avec X, je veux décider si on continue le projet » produit autre chose que « résume-moi le dossier X ». <span class="acc" data-a="Il" data-b="Elle">Il</span> sait arbitrer quand <span class="acc" data-a="il" data-b="elle">il</span> connaît l'enjeu.</p>
+<p><strong>Dis ce que tu ne veux pas.</strong> Les contraintes valent autant que la demande. Une longueur, un ton, un destinataire à ne pas mentionner, une source à ne pas utiliser.</p>
+<p><strong>Demande-lui de vérifier plutôt que d'affirmer.</strong> « Va voir dans les vraies données » et « dis-moi ce dont tu n'es pas sûr » changent complètement la qualité de ce que tu reçois. <span class="acc" data-a="Il" data-b="Elle">Il</span> a le droit de dire qu'<span class="acc" data-a="il" data-b="elle">il</span> ne sait pas, c'est même une règle de son cerveau.</p>
+<p><strong>Laisse-le te répondre par une question.</strong> Quand <span class="acc" data-a="il" data-b="elle">il</span> demande une précision au lieu de deviner, c'est le comportement voulu, pas une faiblesse. L'invention est le seul défaut qu'on ne peut pas rattraper.</p></div>
+<div class="note repere"><span class="lbl">Ce qui ne changera jamais</span><p><strong>Rien ne sort sans ton accord.</strong> Un courriel, un message, une écriture dans un outil, <span class="acc" data-a="il" data-b="elle">il</span> prépare un brouillon et <span class="acc" data-a="il" data-b="elle">il</span> attend. Cette règle vit dans son cerveau et aucune option technique ne la contourne. Si <span class="acc" data-a="il" data-b="elle">il</span> agit sans demander, c'est un défaut, et il faut le signaler.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="lancer-une-session-qui-sert-a-quelque-chose.je-sais-lancer-une-session-qui-sert-a-quelque-chose-et-la-cl" data-n="c10"><span class="txt">Je sais lancer une session qui sert à quelque chose, et la clôturer</span></label></div></div></div></section>
+<section id="ce-document-va-changer"><div class="wrap"><div class="sec-head"><p class="eyebrow">Pour finir</p><h2>Ce document va changer</h2><p class="lede">La mécanique décrite ici est jeune et elle bouge toutes les semaines.</p></div><div class="sec-body"><div class="col stack"><p>Ce qui est décrit ici est un <strong>état</strong>, pas une vérité définitive. Le profil posé au démarrage, la recherche par le sens, les automatismes qui se branchent seuls, chacun est arrivé après une friction, et d'autres suivront.</p>
+<p>Deux choses en découlent pour toi.</p>
+<p><strong>Si ce que tu observes ne correspond pas à ce document, dis-le.</strong> Ça veut dire soit que la mécanique a avancé sans que le document suive, soit qu'il y a un défaut chez toi. Les deux méritent d'être sus.</p>
+<p><strong>Et le plus important</strong>, presque toutes les améliorations décrites ici sont nées d'une friction rencontrée par quelqu'un qui s'en servait. Pas d'une idée en réunion. <strong>Ton agacement est de la matière première.</strong></p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="ce-document-va-changer.j-ai-colle-le-prompt-ci-dessous-dans-une-conversation-avec-t" data-n="c11"><span class="txt">J'ai collé le prompt ci-dessous dans une conversation, avec <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> ou dans l'application Claude, et j'ai posé ma première question sur la mécanique</span></label></div>
+<div class="copybloc accomp"><div class="accomp-head"><span class="lbl">Avec <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span></span><h3>Te faire expliquer la mécanique par ton jumeau</h3><p>Pour vérifier chez toi ce que cette formation décrit, et poser tes questions à <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> sur sa propre mécanique, copie ce prompt et colle-le au début d'une nouvelle conversation. Si tu n'as pas encore de jumeau, colle-le dans l'application Claude, il te répondra sur le principe.</p><button class="copy accomp-btn" type="button">Copier le prompt</button></div><details class="accomp-prompt"><summary>Voir le prompt</summary><pre>Tu es mon jumeau numérique. Je viens de lire la formation qui explique ta
+mécanique, et je veux vérifier avec toi, chez moi, que ce qu&#x27;elle décrit est
+vrai, puis te poser mes questions. Tu n&#x27;as pas lu la formation, tout ce qu&#x27;il
+te faut est ici.
+
+CE QUE LA FORMATION DIT DE TOI
+
+1. Tu es un cerveau plus une exécution. Le cerveau, un dossier de fichiers
+   texte qui m&#x27;appartient, sauvegardé en ligne dans mon dépôt. L&#x27;exécution,
+   une session jetable qui lit le cerveau, travaille, écrit ce qu&#x27;elle a
+   appris dans le cerveau, puis meurt. Ce qui n&#x27;est pas écrit dans un fichier
+   est perdu à la fermeture.
+2. Le contexte est la pile de documents posée devant toi au début de chaque
+   conversation, de taille limitée. Tes instructions de base, mon profil, la
+   liste de ce que tu as retenu, l&#x27;heure et le lieu, puis notre conversation.
+3. Au démarrage, six choses se passent. Tes instructions de base, la liste de
+   tes souvenirs et mon profil sont posés sur la pile automatiquement. Puis tu
+   récupères ton cerveau à jour, tu vérifies où vit ta mémoire, tu te mets à
+   jour, et tu me dis bonjour.
+4. Quatre couches de mémoire. De travail (la pile), sémantique (les principes
+   durables, memory/, profile/, context/), épisodique (les événements datés,
+   dossiers/ et l&#x27;historique), procédurale (playbooks, skills, outils).
+5. Tu retrouves une information par trois chemins menés en parallèle, les
+   mots exacts, le sens, les liens entre les fiches, et le calcul du sens se
+   fait sur mon poste.
+6. Ce que tu apprends remonte par trois gestes. Je te corrige dans un fichier,
+   tu sauvegardes quand il y a un bloc de valeur, et la session se clôture
+   par /consolidation.
+7. Rien ne sort sans mon accord, quelle que soit l&#x27;option de la commande qui
+   te lance.
+
+CE QUE JE TE DEMANDE
+
+1. Vérifie chez moi, pour de vrai, chacun des sept points, et dis-moi pour
+   chacun ce qui est vrai, ce qui est différent, et ce que tu n&#x27;as pas pu
+   vérifier. Montre-moi où vit ma mémoire, ce que tu as fait à ton démarrage,
+   et fais une recherche dans ton cerveau sur un sujet que je te donnerai.
+2. Si quelque chose ne correspond pas à la formation, dis-le-moi en une
+   phrase et dis-le à Éric Bourbeau par courriel, ebourbeau@x-telia.com, avec un
+   objet qui commence par le mot Jumeau, c&#x27;est ainsi que la formation se corrige.
+3. Réponds ensuite à mes questions, une à la fois, dans mes mots, sans jargon
+   que tu n&#x27;aies pas expliqué d&#x27;abord.
+
+COMMENT TU TRAVAILLES AVEC MOI
+
+Une étape à la fois. Une question à la fois. Tu ne me fais rien taper. Tu dis
+ce que tu n&#x27;as pas vérifié au lieu de le présenter comme un fait. Rien de
+sortant sans mon accord.
+
+Commence par me dire, en trois lignes, où vit ton cerveau chez moi, quand tu
+l&#x27;as synchronisé pour la dernière fois, et si ta mémoire est bien sauvegardée
+en ligne.</pre></details></div></div></div></section>
+</main>
+<footer><div class="wrap col stack">
+<div class="guichet stack-s"><p class="eyebrow">Une question sur ce document</p><p>Ce document décrit une mécanique <strong>vivante</strong>, il va changer. Si quelque chose ne correspond pas à ce que tu observes chez toi, dis-le, ça veut souvent dire que la mécanique a bougé ou qu'elle a un défaut. Écris à Éric Bourbeau, <code class="inline">ebourbeau@x-telia.com</code>, avec un objet qui commence par le mot Jumeau, ou demande à <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> de le faire pour toi, il sait.</p></div>
+<p class="colophon">Adapté de la formation ouverte de Yapla (Pascal Jarry) · La mécanique du jumeau numérique · version 3 · mise à jour 2026-09-19</p>
+</div></footer>
+<script>
+(function(){
+  var body=document.body, PFX="f-la-mecanique-du-jumeau-n-";
+  function get(k){try{return localStorage.getItem(PFX+k)}catch(e){return null}}
+  function set(k,v){try{localStorage.setItem(PFX+k,v)}catch(e){}}
+
+  
+  document.querySelectorAll('[data-dim]').forEach(function(b){
+    b.addEventListener('click',function(){appliquer(b.dataset.dim,b.dataset.val)});
+  });
+  function appliquer(dim,val){
+    body.setAttribute('data-v-'+dim,val);
+    document.querySelectorAll('[data-dim="'+dim+'"]').forEach(function(x){
+      x.setAttribute('aria-pressed', x.dataset.val===val?'true':'false');
+    });
+    set('v-'+dim,val);
+  }
+  
+
+  
+  function accorder(f){
+    document.querySelectorAll('.acc').forEach(function(s){
+      s.textContent = f==='b' ? s.dataset.b : s.dataset.a;
+    });
+    document.querySelectorAll('[data-acc]').forEach(function(x){
+      x.setAttribute('aria-pressed', x.dataset.acc===f?'true':'false');
+    });
+    set('acc',f);
+  }
+  if(document.querySelector('.acc')||document.querySelector('[data-acc]')){
+    accorder(get('acc')||'a');
+    document.querySelectorAll('[data-acc]').forEach(function(b){
+      b.addEventListener('click',function(){accorder(b.dataset.acc)});
+    });
+  }
+
+  
+  var boxes=[].slice.call(document.querySelectorAll('input[type=checkbox][data-k]'));
+  var fill=document.getElementById('pfill'), cnt=document.getElementById('pcount');
+  function rafraichir(){
+    var n=boxes.filter(function(b){return b.checked}).length;
+    if(fill) fill.style.width=(boxes.length?n/boxes.length*100:0)+'%';
+    if(cnt) cnt.textContent=n+' / '+boxes.length;
+    document.querySelectorAll('.step[data-step]').forEach(function(st){
+      var c=st.querySelector('input[type=checkbox][data-k]');
+      st.setAttribute('data-done', c&&c.checked?'true':'false');
+    });
+  }
+  boxes.forEach(function(b){
+    var v=get(b.dataset.k);
+    if(v===null && b.dataset.n){          
+      var ancien=get(b.dataset.n);
+      if(ancien!==null){ v=ancien; set(b.dataset.k,ancien); }
+    }
+    if(v==='1') b.checked=true;
+    b.addEventListener('change',function(){set(b.dataset.k,b.checked?'1':'0');rafraichir()});
+  });
+  rafraichir();
+
+  
+  document.querySelectorAll('.copy').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      
+      var t=btn.closest('.copybloc').querySelector('pre').textContent;
+      function ok(){btn.textContent='Copie';btn.setAttribute('data-state','ok');
+        setTimeout(function(){btn.textContent='Copier';btn.removeAttribute('data-state')},1800)}
+      function repli(){
+        var a=document.createElement('textarea');a.value=t;a.style.position='fixed';
+        a.style.opacity='0';document.body.appendChild(a);a.select();
+        try{document.execCommand('copy');ok()}catch(e){btn.textContent='Selectionne et copie'}
+        document.body.removeChild(a);
+      }
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(t).then(ok,repli);
+      } else { repli(); }
+    });
+  });
+})();
+</script>
+</body>
+</html>

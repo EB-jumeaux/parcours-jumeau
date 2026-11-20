@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Le Chef de mon jumeau numérique</title>
+<meta name="description" content="À la fin, un Chef tourne sur ton poste en continu, fait les tâches que tu lui confies quand elles sont dues, te rapporte ce qui a bougé et renaît seul chaque nuit. Ton jumeau l&#x27;installe sur ta demande, à partir de ce que le gabarit livre déjà.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;800;900&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+
+
+:root{
+  --ground:#FFFDFD;
+  --surface:#FFFFFF;
+  --surface-2:#F7F4F0;
+  --line:#E6E0D8;
+  --line-strong:#CFC6B9;
+  --ink:#2E3238;
+  --ink-2:#5E656E;
+  --ink-3:#8A919A;
+  --orange:#FF7B14;
+  --orange-ink:#B85300;
+  --creme:#FFF1E4;
+  --bleu:#337AB7;
+  --bleu-ink:#255C8C;
+  --bleu-pale:#F1F5FD;
+  --vert:#2E7D5B;
+  --vert-pale:#EAF5EF;
+  --brique:#A63D2F;
+  --brique-pale:#FBEDEA;
+  --shadow:0 1px 2px rgba(46,50,56,.05), 0 8px 24px -12px rgba(46,50,56,.18);
+  --radius:10px;
+  --mono:"IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --sans:"Mulish", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#14161A; --surface:#1B1E23; --surface-2:#22262C;
+    --line:#2F343B; --line-strong:#434A54;
+    --ink:#E9E7E4; --ink-2:#AAB1BA; --ink-3:#7C848E;
+    --orange:#FF9243; --orange-ink:#FFB075; --creme:#2B2018;
+    --bleu:#6FABDE; --bleu-ink:#96C4EC; --bleu-pale:#1A2430;
+    --vert:#5FBF92; --vert-pale:#16251F;
+    --brique:#E8877A; --brique-pale:#2B1A17;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#14161A; --surface:#1B1E23; --surface-2:#22262C;
+  --line:#2F343B; --line-strong:#434A54;
+  --ink:#E9E7E4; --ink-2:#AAB1BA; --ink-3:#7C848E;
+  --orange:#FF9243; --orange-ink:#FFB075; --creme:#2B2018;
+  --bleu:#6FABDE; --bleu-ink:#96C4EC; --bleu-pale:#1A2430;
+  --vert:#5FBF92; --vert-pale:#16251F;
+  --brique:#E8877A; --brique-pale:#2B1A17;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--ground);color:var(--ink);
+  font-family:var(--sans);font-size:17px;line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.col{max-width:730px}
+
+
+h1,h2,h3,h4{text-wrap:balance;margin:0;font-weight:800;letter-spacing:-.015em;line-height:1.15}
+h1{font-size:clamp(2.3rem,5.6vw,3.8rem);font-weight:900;letter-spacing:-.035em}
+h2{font-size:clamp(1.6rem,3.4vw,2.2rem)}
+h3{font-size:1.22rem}
+h4{font-size:1rem}
+p{margin:0}
+a{color:var(--bleu-ink);text-decoration-thickness:1px;text-underline-offset:2px}
+strong{font-weight:800}
+.eyebrow{font-family:var(--mono);font-size:.72rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.16em;color:var(--ink-3)}
+.lede{font-size:1.14rem;color:var(--ink-2);line-height:1.6}
+.small{font-size:.9rem;color:var(--ink-2)}
+.stack{display:flex;flex-direction:column;gap:1.1rem}
+.stack-s{display:flex;flex-direction:column;gap:.6rem}
+
+
+header.hero{
+  border-bottom:1px solid var(--line);
+  background:radial-gradient(120% 90% at 8% -10%, var(--creme) 0%, transparent 58%), var(--ground);
+}
+.hero-inner{padding:clamp(2.8rem,6.5vw,5rem) 0 clamp(2.2rem,4vw,3.2rem);
+  display:flex;flex-direction:column;gap:1.5rem}
+.hero h1 .k{display:block;color:var(--orange-ink)}
+.hero-meta{display:flex;flex-wrap:wrap;gap:.5rem 1.6rem;font-family:var(--mono);
+  font-size:.8rem;color:var(--ink-2);padding-top:.4rem;border-top:1px solid var(--line)}
+.hero-meta b{color:var(--ink);font-weight:600}
+
+
+.settings{position:sticky;top:0;z-index:40;
+  background:color-mix(in srgb, var(--ground) 88%, transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.settings-inner{display:flex;flex-wrap:wrap;align-items:center;gap:.9rem 1.4rem;padding:.7rem 0}
+.seg{display:flex;align-items:center;gap:.55rem}
+.seg-label{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--ink-3)}
+.seg-btns{display:flex;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:999px;padding:2px}
+.seg-btns button{font-family:var(--sans);font-size:.84rem;font-weight:600;color:var(--ink-2);
+  background:none;border:0;padding:.28rem .78rem;border-radius:999px;cursor:pointer}
+.seg-btns button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.seg-btns button:focus-visible{outline:2px solid var(--bleu);outline-offset:2px}
+.progress{margin-left:auto;display:flex;align-items:center;gap:.6rem;
+  font-family:var(--mono);font-size:.76rem;color:var(--ink-2)}
+.progress-track{width:110px;height:6px;border-radius:999px;background:var(--surface-2);
+  border:1px solid var(--line);overflow:hidden}
+.progress-fill{height:100%;width:0;background:var(--orange);transition:width .3s ease}
+
+
+section{padding:clamp(2.4rem,5vw,4rem) 0;border-bottom:1px solid var(--line)}
+.sec-head{display:flex;flex-direction:column;gap:.5rem;margin-bottom:2rem;max-width:730px}
+.sec-body{display:flex;flex-direction:column;gap:1.6rem}
+
+
+.cartes{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem}
+.carte{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:1.3rem 1.4rem;box-shadow:var(--shadow)}
+.carte h4{display:flex;align-items:baseline;gap:.55rem;margin-bottom:.45rem;flex-wrap:wrap}
+.carte .tag{font-family:var(--mono);font-size:.66rem;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--bleu-ink);background:var(--bleu-pale);
+  border-radius:4px;padding:.1rem .38rem}
+.carte p{font-size:.95rem;color:var(--ink-2)}
+.carte .quand{margin-top:.7rem;font-size:.84rem;font-family:var(--mono);color:var(--ink-3)}
+
+
+dl.lex{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:.1rem 2rem;margin:0;max-width:900px}
+dl.lex > div{padding:.85rem 0;border-top:1px solid var(--line)}
+dl.lex dt{font-weight:800;font-size:.98rem}
+dl.lex dd{margin:.15rem 0 0;font-size:.93rem;color:var(--ink-2)}
+
+
+.step{display:grid;grid-template-columns:64px 1fr;gap:0 1.6rem;position:relative}
+.step + .step{margin-top:2.6rem}
+.rail{display:flex;flex-direction:column;align-items:center;gap:.6rem}
+.rail .num{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;
+  font-family:var(--mono);font-weight:600;font-size:1.05rem;background:var(--surface);
+  color:var(--ink);border:1.5px solid var(--line-strong)}
+.step[data-done="true"] .rail .num{background:var(--orange);border-color:var(--orange);color:#fff}
+.rail .line{flex:1;width:1.5px;background:var(--line);min-height:20px}
+.step-body{padding-bottom:.4rem;max-width:730px;display:flex;flex-direction:column;gap:1.1rem}
+.step-head{display:flex;flex-direction:column;gap:.35rem}
+.step-head .where{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--orange-ink)}
+.step-body ol,.sec-body ol{margin:0;padding-left:1.3rem;display:flex;flex-direction:column;gap:.55rem}
+.step-body ol li::marker,.sec-body ol li::marker{font-weight:800;color:var(--ink-3)}
+.step-body ul,.sec-body ul{margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:.4rem}
+
+
+.copybloc{border:1px solid var(--line-strong);border-radius:var(--radius);
+  overflow:hidden;background:var(--surface-2)}
+.copybloc-head{display:flex;align-items:center;gap:.8rem;padding:.6rem .85rem;
+  border-bottom:1px solid var(--line);background:var(--surface)}
+.copybloc-head .t{font-family:var(--mono);font-size:.74rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ink-2)}
+.copy{margin-left:auto;font-family:var(--sans);font-size:.8rem;font-weight:700;
+  background:var(--orange);color:#fff;border:0;border-radius:6px;
+  padding:.34rem .8rem;cursor:pointer}
+.copy:hover{filter:brightness(1.06)}
+.copy:focus-visible{outline:2px solid var(--bleu);outline-offset:2px}
+.copy[data-state="ok"]{background:var(--vert)}
+.copybloc pre{margin:0;padding:1rem .95rem;overflow-x:auto;font-family:var(--mono);
+  font-size:.83rem;line-height:1.6;color:var(--ink);white-space:pre-wrap;word-break:break-word}
+
+.copybloc.accomp{border:2px solid var(--orange);background:var(--creme);
+  box-shadow:0 8px 28px rgba(255,123,20,.12)}
+.accomp-head{padding:1.4rem 1.5rem 1.2rem;display:flex;flex-direction:column;gap:.55rem}
+.accomp-head .lbl{font-family:var(--mono);font-size:.72rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.14em;color:var(--orange-ink)}
+.accomp-head h3{margin:0;font-size:1.35rem;line-height:1.25;color:var(--ink)}
+.accomp-head p{margin:0;font-size:1rem;line-height:1.55;color:var(--ink-2);max-width:60ch}
+.copy.accomp-btn{margin:.5rem 0 0;align-self:flex-start;font-size:1rem;
+  padding:.7rem 1.4rem;border-radius:8px}
+.accomp-prompt{border-top:1px solid var(--line);background:var(--surface)}
+.accomp-prompt summary{cursor:pointer;padding:.6rem 1.5rem;font-family:var(--mono);
+  font-size:.74rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-2)}
+.accomp-prompt pre{max-height:24rem}
+code.inline{font-family:var(--mono);font-size:.86em;background:var(--surface-2);
+  border:1px solid var(--line);border-radius:5px;padding:.08em .35em}
+
+
+.note{border-radius:var(--radius);padding:.95rem 1.05rem;font-size:.94rem;
+  border:1px solid;display:flex;flex-direction:column;gap:.4rem}
+.note .lbl{font-family:var(--mono);font-size:.7rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.12em}
+.note.piege{background:var(--brique-pale);border-color:color-mix(in srgb,var(--brique) 32%, transparent)}
+.note.piege .lbl{color:var(--brique)}
+.note.reussi{background:var(--vert-pale);border-color:color-mix(in srgb,var(--vert) 30%, transparent)}
+.note.reussi .lbl{color:var(--vert)}
+.note.info{background:var(--bleu-pale);border-color:color-mix(in srgb,var(--bleu) 28%, transparent)}
+.note.info .lbl{color:var(--bleu-ink)}
+.note.reperе,.note.repere{background:var(--creme);border-color:color-mix(in srgb,var(--orange) 30%, transparent)}
+.note.repere .lbl{color:var(--orange-ink)}
+.note.neutre{background:var(--surface-2);border-color:var(--line-strong)}
+.note.neutre .lbl{color:var(--ink-3)}
+
+
+.check{display:flex;gap:.7rem;align-items:flex-start;background:var(--creme);
+  border:1px solid color-mix(in srgb,var(--orange) 26%, transparent);
+  border-radius:var(--radius);padding:.8rem .95rem;cursor:pointer}
+.check input{margin:.28rem 0 0;width:17px;height:17px;accent-color:var(--orange);
+  flex:none;cursor:pointer}
+.check .txt{font-size:.95rem;font-weight:600}
+.check .txt em{display:block;font-style:normal;font-weight:400;color:var(--ink-2);
+  font-size:.9rem;margin-top:.1rem}
+.check:has(input:checked){background:var(--vert-pale);
+  border-color:color-mix(in srgb,var(--vert) 30%, transparent)}
+.check:has(input:checked) .txt{text-decoration:line-through;
+  text-decoration-color:var(--ink-3);color:var(--ink-2)}
+.check:has(input:checked) .txt em{text-decoration:none}
+.checks{display:flex;flex-direction:column;gap:.7rem;max-width:730px}
+
+
+.faq{display:flex;flex-direction:column;gap:.55rem;max-width:840px}
+details.dx{border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--surface);overflow:hidden}
+details.dx[open]{border-color:var(--line-strong);box-shadow:var(--shadow)}
+details.dx summary{cursor:pointer;padding:.85rem 1rem;font-weight:700;font-size:.98rem;
+  display:flex;gap:.7rem;align-items:baseline;list-style:none}
+details.dx summary::-webkit-details-marker{display:none}
+details.dx summary::before{content:"+";font-family:var(--mono);font-weight:600;
+  color:var(--orange);flex:none;width:1ch}
+details.dx[open] summary::before{content:"\2013"}
+details.dx summary:focus-visible{outline:2px solid var(--bleu);outline-offset:-2px}
+.dx-body{padding:0 1rem 1rem 2.4rem;display:flex;flex-direction:column;gap:.7rem;font-size:.95rem}
+.dx-body .quote{font-family:var(--mono);font-size:.82rem;background:var(--surface-2);
+  border-left:2px solid var(--brique);padding:.5rem .7rem;color:var(--ink-2);
+  border-radius:0 5px 5px 0;overflow-x:auto}
+.dx-body .geste{font-weight:700}
+.dx-body .src{font-size:.82rem;color:var(--ink-3);font-family:var(--mono)}
+
+
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--surface);max-width:900px}
+table{border-collapse:collapse;width:100%;font-size:.93rem;min-width:460px}
+th,td{text-align:left;padding:.7rem .9rem;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--ink-3);font-weight:600}
+tr:last-child td{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink-2)}
+
+
+figure.diagram{margin:0;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:1.5rem 1.2rem 1.1rem;box-shadow:var(--shadow);max-width:900px}
+figure.diagram svg{display:block;width:100%;height:auto;max-width:640px;margin:0 auto}
+figcaption{margin-top:1rem;font-size:.88rem;color:var(--ink-2);text-align:center;
+  max-width:52ch;margin-inline:auto}
+
+
+
+
+figure.capture{margin:2rem 0;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:1rem;box-shadow:var(--shadow);
+  width:fit-content;max-width:min(730px,100%)}
+figure.capture img{display:block;width:auto;height:auto;max-width:100%;
+  border-radius:calc(var(--radius) - 4px);border:1px solid var(--line)}
+figure.capture figcaption{margin-top:.9rem}
+
+
+footer{padding:clamp(2.4rem,5vw,3.6rem) 0 4rem;background:var(--surface-2)}
+footer .guichet{border-left:3px solid var(--orange);padding-left:1.1rem}
+.colophon{border-top:1px solid var(--line);padding-top:1.2rem;font-size:.85rem;color:var(--ink-3);
+  font-family:var(--mono)}
+
+
+
+
+@media (max-width:720px){
+  body{font-size:16px}
+  .step{grid-template-columns:40px 1fr;gap:0 1rem}
+  .rail .num{width:36px;height:36px;font-size:.9rem}
+  .dx-body{padding-left:1rem}
+  .progress{width:100%;margin-left:0;order:5}
+}
+@media print{
+  .settings,.copy{display:none}
+  body{font-size:11pt;background:#fff}
+  section{page-break-inside:auto;border-bottom:0}
+  .step{page-break-inside:avoid}
+  details.dx{page-break-inside:avoid}
+  details.dx summary::before{content:""}
+  .dx-body{display:block!important}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}
+
+body:not([data-v-mon-poste]) .v-mon-poste-mac{display:none}
+body[data-v-mon-poste="windows"] .v-mon-poste-mac{display:none}
+body[data-v-mon-poste="mac"] .v-mon-poste-windows{display:none}
+</style>
+<meta name="robots" content="noindex, nofollow"><style>
+:root{--eb-bg:#ffffff;--ink:#1b1f24;--ink-2:#4b5563;--line:#e3e6ea;--accent:#2f5d8a;--accent-ink:#ffffff;--accent-pale:#eef3f8;
+--ok:#1f6f43;--ok-pale:#f1f8f3;--warn:#a85a07;--warn-pale:#fdf6ec;--code-bg:#f5f6f8;
+--sans:Mulish,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Consolas,monospace}
+.eb-bandeau{background:var(--eb-bg);border-bottom:1px solid var(--line)}
+.eb-bandeau-in{max-width:1080px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px 22px;
+ padding:12px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px))}
+.eb-nom{font:800 16px/1.3 var(--sans);color:var(--ink);text-decoration:none}
+.eb-nav{display:flex;flex-wrap:wrap;gap:6px 16px;min-width:0}
+.eb-nav a{color:var(--ink-2);font:600 14px/1.4 var(--sans);text-decoration:none}
+.eb-nav a:hover,.eb-nav a[aria-current]{color:var(--accent)}
+.eb-nav a[aria-current]{text-decoration:underline;text-underline-offset:4px}
+.eb-langue{margin-left:auto;color:var(--accent);font:700 14px/1.4 var(--sans);text-decoration:none}
+.eb-nav a:focus-visible,.eb-nom:focus-visible,.eb-langue:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style></head>
+<body><header class="eb-bandeau"><div class="eb-bandeau-in"><a class="eb-nom" href="index.html">Jumeaux et jumelles EB</a><nav class="eb-nav"><a href="index.html">Par où commencer</a><a href="comprendre-mon-jumeau-numerique.html">1. La mécanique du jumeau</a><a href="creer-mon-compte-github.html">2. Mon compte GitHub</a><a href="demarrer-mon-jumeau-numerique.html">3. Créer mon jumeau</a><a href="le-chef-de-mon-jumeau.html" aria-current=page>Pour aller plus loin : le Chef</a></nav><a class="eb-langue" href="en/le-chef-de-mon-jumeau.html" hreflang="en">English</a></div></header>
+<header class="hero"><div class="wrap hero-inner">
+<p class="eyebrow">Le programme des jumeaux numériques</p>
+<h1>Le <span class="k">Chef</span> de mon jumeau numérique</h1>
+<p class="lede col">À la fin, un Chef tourne sur ton poste en continu, fait les tâches que tu lui confies quand elles sont dues, te rapporte ce qui a bougé et renaît seul chaque nuit. <span class="acc" data-a="Ton jumeau" data-b="Ta jumelle">Ton jumeau</span> l'installe sur ta demande, à partir de ce que le gabarit livre déjà.</p>
+<div class="hero-meta"><span><strong>Environ 30 min</strong> de manipulation, puis l'heure de ta première tâche et une nuit pour voir le portier</span><span><strong>Aucune commande</strong> à taper</span><span><strong>Windows et Mac</strong></span><span><strong>Un prompt</strong> à la fin pour te faire accompagner</span></div>
+</div></header>
+<div class="settings"><div class="wrap settings-inner"><div class="seg"><span class="seg-label">Mon poste</span><div class="seg-btns" role="group" aria-label="Mon poste"><button type="button" data-dim="mon-poste" data-val="windows" aria-pressed="true">Windows</button><button type="button" data-dim="mon-poste" data-val="mac" aria-pressed="false">Mac</button></div></div><div class="seg"><span class="seg-label">On dit</span><div class="seg-btns" role="group" aria-label="Accord"><button type="button" data-acc="a" aria-pressed="true">Jumeau</button><button type="button" data-acc="b" aria-pressed="false">Jumelle</button></div></div><div class="progress"><span>Avancement</span><div class="progress-track"><div class="progress-fill" id="pfill"></div></div><span id="pcount">0 / 0</span></div></div></div>
+<main>
+<section id="ce-qu-est-le-chef"><div class="wrap"><div class="sec-head"><p class="eyebrow">Le concept</p><h2>Ce qu'est le Chef</h2><p class="lede">Une session qui reste ouverte et renaît chaque nuit. Elle travaille à heures fixes, sans que tu l'ouvres, et te rend compte.</p></div><div class="sec-body"><div class="note info"><span class="lbl">Ce que cette formation suppose</span><p>Tu as installé <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> et tu travailles avec <span class="acc" data-a="lui" data-b="elle">lui</span> depuis quelques semaines. Si ce n'est pas le cas, commence par « Créer mon jumeau numérique ».</p></div>
+<div class="col stack"><p>Une session ordinaire de <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> ne fait rien tant que tu ne lui écris pas, et elle oublie tout ce qu'elle n'a pas écrit dans un fichier quand tu la fermes. Ce qui doit revenir chaque matin ou chaque lundi dépend donc de toi.</p>
+<p>Le <strong>Chef</strong> est une session de <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> qui tourne en continu sur ton poste. Il fait un passage par heure, de 6 h à 22 h, fait les tâches que tu lui as confiées quand elles sont dues, consigne ce qu'il a fait et te parle seulement quand quelque chose a changé ou attend ta décision. Tu lui parles comme à un numéro deux, qui a lu ce que tu n'as pas eu le temps de lire.</p></div>
+<dl class="lex"><div><dt>Une session</dt><dd>Une conversation ouverte avec Claude sur ton poste. Elle ne sait rien des autres sessions, et ce qu'elle n'a pas écrit dans un fichier disparaît à sa fermeture.</dd></div><div><dt>Un agent</dt><dd>Une session qui porte un nom et un mandat. Le nom sert d'adresse, on peut lui écrire.</dd></div><div><dt>Le Chef</dt><dd>L'agent qui tient la coordination. Il tourne en continu, fait tes tâches à heures fixes et te rend compte.</dd></div><div><dt>Un mandat</dt><dd>Le fichier qui dit à un agent ce qu'il fait, ce qu'il tranche seul, ce qu'il remonte et ce qu'il ne fait jamais.</dd></div></dl>
+<figure class="diagram"><svg viewBox="0 0 680 300" role="img" aria-label="Toi en haut, le Chef au milieu avec son registre de tâches et son journal, et en pointillé des agents possibles en bas.">
+  <defs><marker id="fl1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+  <g font-family="Mulish, sans-serif" font-size="12">
+    <rect x="250" y="14" width="180" height="44" rx="9" fill="var(--brique-pale)" stroke="var(--brique)" stroke-width="1.5"/>
+    <text x="340" y="41" text-anchor="middle" font-weight="800" fill="var(--brique)">Toi</text>
+    <rect x="210" y="104" width="260" height="56" rx="9" fill="var(--creme)" stroke="var(--orange)" stroke-width="1.6"/>
+    <text x="340" y="127" text-anchor="middle" font-weight="800" fill="var(--orange-ink)">Le Chef</text>
+    <text x="340" y="146" text-anchor="middle" font-size="11" fill="var(--ink-2)">fait, consigne, rend compte</text>
+    <rect x="20" y="112" width="150" height="40" rx="8" fill="var(--surface-2)" stroke="var(--line-strong)" stroke-width="1.3"/>
+    <text x="95" y="136" text-anchor="middle" font-weight="700" fill="var(--ink)">Ses tâches</text>
+    <rect x="510" y="112" width="150" height="40" rx="8" fill="var(--surface-2)" stroke="var(--line-strong)" stroke-width="1.3"/>
+    <text x="585" y="136" text-anchor="middle" font-weight="700" fill="var(--ink)">Son journal</text>
+    <g fill="none" stroke="var(--line-strong)" stroke-width="1.2" stroke-dasharray="4 4">
+      <rect x="140" y="222" width="160" height="46" rx="8"/>
+      <rect x="380" y="222" width="160" height="46" rx="8"/>
+    </g>
+    <g fill="var(--ink-3)" text-anchor="middle" font-size="11">
+      <text x="220" y="250">un agent, plus tard</text>
+      <text x="460" y="250">un agent, plus tard</text>
+    </g>
+    <g stroke="var(--ink-3)" stroke-width="1.3" fill="none" marker-end="url(#fl1)" color="var(--ink-3)">
+      <path d="M340,58 L340,100"/>
+      <path d="M170,132 L206,132"/>
+      <path d="M470,132 L506,132"/>
+    </g>
+    <g stroke="var(--line-strong)" stroke-width="1.1" fill="none" stroke-dasharray="3 3">
+      <path d="M300,160 L230,218"/>
+      <path d="M380,160 L450,218"/>
+    </g>
+    <text x="470" y="84" font-size="10.5" fill="var(--ink-3)">tâches et questions</text>
+    <text x="210" y="84" font-size="10.5" fill="var(--ink-3)" text-anchor="end">ce qui a bougé, ce qui attend</text>
+  </g>
+</svg><figcaption>Tu confies des tâches au Chef et tu lui parles. Il les fait à l'heure dite, consigne au journal et te rapporte. Plus tard, il pourra tenir des agents, qui lui rendront compte à lui.</figcaption></figure>
+<div class="note repere"><span class="lbl">Le Chef ne remplace pas tes sessions</span><p>Tu continues d'ouvrir <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> comme d'habitude pour travailler. Le Chef s'occupe de ce qui revient à heures fixes et de ce qui doit tenir sans toi.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="ce-qu-est-le-chef.je-sais-a-quoi-sert-le-chef-et-en-quoi-il-differe-d-une-sess" data-n="c1"><span class="txt">Je sais à quoi sert le Chef, et en quoi il diffère d'une session ordinaire</span></label></div></div></div></section>
+<section id="la-journee-du-chef"><div class="wrap"><div class="sec-head"><p class="eyebrow">Le détail</p><h2>La journée du Chef</h2><p class="lede">Une naissance, un passage par heure, une renaissance la nuit.</p></div><div class="sec-body"><div class="col stack"><p><strong>À sa naissance</strong>, le Chef relit son registre et son journal. C'est voulu, il naît sans mémoire de sa session précédente, et ces deux fichiers lui disent où il en est. Il vérifie que la tâche planifiée de la coordination est posée, puis il t'accueille par trois choses, ce qui a bougé, ce qui attend ta décision et ce qu'il propose.</p>
+<p><strong>Une fois par heure, de 6 h à 22 h</strong>, il passe. Il regarde quelles tâches sont dues, fait celles-là et seulement celles-là, les consigne, puis vérifie que tout est en place. Il ne te parle que si quelque chose a changé. Un Chef qui parlerait toutes les heures pour ne rien dire serait une session de plus à lire.</p>
+<p><strong>Vers 4 h</strong>, le portier lui demande de consigner son travail et de terminer, attend qu'il réponde qu'il est prêt, ferme sa session et la relance. Une session qui vivrait des semaines finirait par oublier et coûter cher à chaque tour.</p></div>
+<figure class="diagram"><svg viewBox="0 0 680 190" role="img" aria-label="Une ligne de temps de 0 h à 24 h. Le portier vers 4 h, le passage horaire de 6 h à 22 h, la tâche planifiée toutes les cinq minutes sur toute la journée.">
+  <g font-family="Mulish, sans-serif" font-size="11">
+    <line x1="40" y1="120" x2="640" y2="120" stroke="var(--line-strong)" stroke-width="1.5"/>
+    <g fill="var(--ink-3)" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10">
+      <text x="40" y="140">0 h</text>
+      <text x="140" y="140">4 h</text>
+      <text x="190" y="140">6 h</text>
+      <text x="340" y="140">12 h</text>
+      <text x="590" y="140">22 h</text>
+      <text x="640" y="140">24 h</text>
+    </g>
+    <rect x="190" y="70" width="400" height="34" rx="7" fill="var(--creme)" stroke="var(--orange)" stroke-width="1.4"/>
+    <text x="390" y="92" text-anchor="middle" font-weight="700" fill="var(--orange-ink)">Un passage par heure, et le réveil</text>
+    <rect x="98" y="22" width="84" height="34" rx="7" fill="var(--brique-pale)" stroke="var(--brique)" stroke-width="1.4"/>
+    <text x="140" y="44" text-anchor="middle" font-weight="700" fill="var(--brique)">Le portier</text>
+    <line x1="140" y1="56" x2="140" y2="116" stroke="var(--brique)" stroke-width="1.3" stroke-dasharray="3 3"/>
+    <text x="340" y="172" text-anchor="middle" fill="var(--ink-2)">La tâche planifiée passe toutes les cinq minutes, jour et nuit</text>
+  </g>
+</svg><figcaption>Une journée du Chef. La tâche planifiée passe toutes les cinq minutes. De 6 h à 22 h, le Chef passe une fois par heure et le réveil le relance s'il est tombé. Vers 4 h, le portier le fait terminer puis renaître.</figcaption></figure>
+<div class="cartes"><div class="carte"><h4>Le registre des agents <span class="tag">coordination/agents.tsv</span></h4><p>La liste des agents, avec leur dossier, leur mandat et leur modèle. À l'installation, il ne contient que le Chef. Le registre fait foi sur les noms, la mémoire d'une session non.</p><p class="quand">Relu à chaque naissance</p></div><div class="carte"><h4>Le mandat du Chef <span class="tag">coordination/agents/Chef.md</span></h4><p>Une partie commune, que les mises à jour du gabarit tiennent à jour, puis une partie à toi, « Tes tâches propres », que les mises à jour ne touchent jamais, pour ce qui n'est qu'à toi, comme ta façon de lui parler. Les tâches à heures fixes vont dans ton registre de tâches.</p><p class="quand">Donné au Chef à sa naissance</p></div><div class="carte"><h4>Le journal <span class="tag">coordination/journal.md</span></h4><p>Ce qui s'est passé et ce qui a été décidé, une entrée datée et courte. C'est la mémoire du Chef d'une naissance à l'autre.</p><p class="quand">Lu à chaque naissance</p></div><div class="carte"><h4>La tâche planifiée <span class="tag">toutes les 5 minutes</span></h4><p>Une seule tâche planifiée du système pour toute la coordination. Elle passe quand tu te connectes à ton ordinateur, puis toutes les cinq minutes, et décide s'il faut relancer le Chef ou passer le portier. Sans elle, rien ne renaît après un redémarrage du poste.</p><p class="quand">En continu, sans fenêtre</p></div><div class="carte"><h4>Le réveil <span class="tag">une fois par heure</span></h4><p>Si le Chef est tombé dans la journée, la tâche planifiée le relance dans l'heure, sans jamais fermer une session vivante.</p><p class="quand">De 6 h à 22 h</p></div><div class="carte"><h4>Le fuseau <span class="tag">coordination/fuseau.txt</span></h4><p>L'heure de référence du Chef. Le portier et les passages se règlent sur elle, jamais sur l'horloge du poste. Un portable en voyage garde ainsi l'heure de <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span>.</p><p class="quand">Lu à chaque passage</p></div><div class="carte"><h4>Un seul poste <span class="tag">coordination/hote.tsv</span></h4><p>Le Chef vit sur un seul poste, le premier où tu l'installes. Sur un autre poste, rien ne s'installe ni ne se lance, et une ligne le dit.</p><p class="quand">Écrit à l'installation</p></div></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="la-journee-du-chef.je-sais-ce-que-le-chef-fait-a-sa-naissance-a-chaque-heure-et" data-n="c2"><span class="txt">Je sais ce que le Chef fait à sa naissance, à chaque heure et la nuit</span></label></div></div></div></section>
+<section id="ses-taches-a-heures-fixes"><div class="wrap"><div class="sec-head"><p class="eyebrow">Ce que tu lui confies</p><h2>Ses tâches à heures fixes</h2><p class="lede">Une tâche, c'est une ligne dans son registre. Il ne fait que celles qui sont dues.</p></div><div class="sec-body"><div class="col stack"><p>Les tâches du Chef vivent dans des fichiers, jamais dans sa tête ni dans une conversation. À chaque passage, un outil lit ces fichiers et lui dit lesquelles sont dues. Il ne fait que celles-là, puis note qu'elles sont faites pour ne pas les refaire.</p></div>
+<div class="cartes"><div class="carte"><h4>Le registre commun <span class="tag">coordination/taches-du-chef/registre-commun.tsv</span></h4><p>Ce que tout Chef fait. Il peut être vide. Il reçoit les tâches communes que le gabarit ajoute et il est réécrit à chaque mise à jour, n'y écris rien.</p><p class="quand">Descend du gabarit</p></div><div class="carte"><h4>Ton registre <span class="tag">coordination/taches-du-chef/registre.tsv</span></h4><p>Tes tâches. Chaque ligne dit son nom, sa cadence (chaque heure, chaque jour, chaque semaine), l'heure à partir de laquelle elle est due et la consigne. Tu ne l'écris pas toi-même, tu demandes au Chef ou à <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span>.</p><p class="quand">À toi, jamais touché par le gabarit</p></div></div>
+<div class="col stack"><p>Une tâche est une <strong>commande</strong> ou une <strong>consigne</strong>. La commande lance un outil qui tourne seul, sans rien consommer. La consigne, le Chef la fait lui-même, en lisant ce qu'il faut et en consignant ce qu'il a trouvé. Commence par une consigne simple, qui lit ton cerveau et ne sort rien.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="ses-taches-a-heures-fixes.je-sais-ou-vivent-les-taches-du-chef-et-qu-il-ne-fait-que-ce" data-n="c3"><span class="txt">Je sais où vivent les tâches du Chef, et qu'il ne fait que celles qui sont dues</span></label></div></div></div></section>
+<section id="ce-qu-il-coute-et-ce-qu-il-ne-fait-jamai"><div class="wrap"><div class="sec-head"><p class="eyebrow">Avant d'installer</p><h2>Ce qu'il coûte, et ce qu'il ne fait jamais</h2><p class="lede">Le Chef tourne sur ton abonnement Claude, sous un plafond. Et il a des interdits que son mandat fixe.</p></div><div class="sec-body"><div class="col stack"><p>Le Chef est une session qui vit en continu. Chacun de ses passages consomme ton abonnement Claude, comme une session que tu ouvrirais toi-même. C'est pour cette raison que rien ne s'installe tout seul. Le Chef arrive avec le gabarit, mais il reste inerte tant que tu ne demandes pas à <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> de l'installer.</p>
+<p>Il travaille sous un <strong>plafond quotidien de consommation</strong>, réglé dans ton coffre de secrets, qui compte aussi les sous-agents qu'il lance. Quand il l'atteint, il arrête ses tâches jusqu'au lendemain, le note au journal une seule fois et continue de surveiller. Chaque tâche faite laisse une ligne dans le journal du mois, <code class="inline">coordination/taches-du-chef/</code>, avec ce qu'elle a coûté.</p></div>
+<div class="cartes"><div class="carte"><h4>Rien ne sort sans ton accord <span class="tag">sans exception</span></h4><p>Aucun courriel, aucun message, aucune écriture dans un outil extérieur sans ton feu vert explicite. Le Chef prépare, tu décides.</p></div><div class="carte"><h4>Il ne crée rien sans toi <span class="tag">sa limite</span></h4><p>Il ne crée pas d'agent, ne modifie pas un mandat et ne touche pas au registre des agents sans ta demande. Il ne fait pas non plus une tâche que l'outil n'a pas déclarée due.</p></div><div class="carte"><h4>Il dit ce qu'il n'a pas vérifié <span class="tag">l&#x27;honnêteté</span></h4><p>Un outil qui échoue rend le sujet inconnu, jamais vide. Il n'écrit pas qu'une chose marche parce qu'elle devrait marcher.</p></div></div>
+<div class="note neutre"><span class="lbl">Ce qui n&#x27;a pas été mesuré</span><p>La consommation réelle d'un Chef sur un abonnement personnel n'a pas été mesurée. Si ton abonnement atteint sa limite, mets le Chef en pause (section « Le suspendre, le retirer, changer de poste ») et demande à <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> de le signaler à l'adresse de l'encadré en fin de page.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="ce-qu-il-coute-et-ce-qu-il-ne-fait-jamais.je-sais-que-le-chef-consomme-mon-abonnement-claude-et-que-ri" data-n="c4"><span class="txt">Je sais que le Chef consomme mon abonnement Claude, et que rien ne s'installe ni ne sort sans ma demande</span></label></div></div></div></section>
+<section id="l-installer"><div class="wrap"><div class="sec-head"><p class="eyebrow">La configuration</p><h2>L'installer</h2><p class="lede">À la fin, le Chef tourne sur ton poste et t'accueille. Tout se fait par prompts, dans une session de <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span>, sans commande à taper.</p></div><div class="step" data-step="1"><div class="rail"><div class="num">1</div><div class="line"></div></div><div class="step-body"><div class="step-head"><span class="where">Une session de <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span>, onglet Code, environnement Jumeau</span><h3>Préparer le poste</h3><p class="small"><span class="acc" data-a="Ton jumeau" data-b="Ta jumelle">Ton jumeau</span> vérifie les trois choses dont le Chef a besoin et installe ce qui manque.</p></div><p>Le Chef ne vit pas dans l'application Claude. Il vit dans un terminal, <span class="v-mon-poste-windows">une fenêtre de Windows Terminal nommée Coordination</span><span class="v-mon-poste-mac">une session tmux nommée Coordination</span>, où il tourne avec Claude Code en ligne de commande, l'outil <code class="inline">claude</code>. L'application Claude ne le pose pas forcément sur ton poste.</p>
+<p>Il faut aussi déclarer le fuseau, l'heure sur laquelle se règlent le portier et les passages.</p>
+<div class="copybloc v-mon-poste-windows"><div class="copybloc-head"><span class="t">Le prompt de préparation · Windows</span><button class="copy" type="button">Copier</button></div><pre>Je veux installer le Chef de ma coordination. Avant, prépare mon poste,
+une chose à la fois, et dis-moi ce que tu trouves à chaque fois.
+
+1. Vérifie que l&#x27;outil claude, Claude Code en ligne de commande, est
+   installé sur ce poste. S&#x27;il manque, installe-le par l&#x27;installateur
+   officiel d&#x27;Anthropic, puis dis-moi comment le connecter à mon compte
+   Claude. C&#x27;est moi qui me connecte, dans mon navigateur.
+2. Vérifie que Windows Terminal est installé. S&#x27;il manque, installe-le.
+3. Vérifie que coordination/fuseau.txt existe dans mon cerveau. S&#x27;il
+   manque, propose-moi mon fuseau horaire sous son nom standard (par
+   exemple America/Toronto ou Europe/Paris), et écris-le sur mon oui.
+
+N&#x27;installe pas encore le Chef lui-même.</pre></div>
+<div class="copybloc v-mon-poste-mac"><div class="copybloc-head"><span class="t">Le prompt de préparation · Mac</span><button class="copy" type="button">Copier</button></div><pre>Je veux installer le Chef de ma coordination. Avant, prépare mon poste,
+une chose à la fois, et dis-moi ce que tu trouves à chaque fois.
+
+1. Vérifie que l&#x27;outil claude, Claude Code en ligne de commande, est
+   installé sur ce poste. S&#x27;il manque, installe-le par l&#x27;installateur
+   officiel d&#x27;Anthropic, puis dis-moi comment le connecter à mon compte
+   Claude. C&#x27;est moi qui me connecte, dans mon navigateur.
+2. Vérifie que Homebrew est installé. S&#x27;il manque, dis-moi ce qu&#x27;il faut
+   faire. L&#x27;installation du Chef s&#x27;en sert pour poser tmux.
+3. Vérifie que coordination/fuseau.txt existe dans mon cerveau. S&#x27;il
+   manque, propose-moi mon fuseau horaire sous son nom standard (par
+   exemple America/Toronto ou Europe/Paris), et écris-le sur mon oui.
+
+N&#x27;installe pas encore le Chef lui-même.</pre></div>
+<div class="note info"><span class="lbl">Une connexion de plus, une seule fois</span><p>Claude Code en ligne de commande a sa propre connexion à ton compte Claude, distincte de celle de l'application. Elle se fait une fois, dans ton navigateur, avec ton compte habituel. Tu ne donnes jamais ton mot de passe à <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span>.</p></div>
+<div class="note reussi"><span class="lbl">C'est réussi quand</span><p><span class="acc" data-a="Ton jumeau" data-b="Ta jumelle">Ton jumeau</span> te confirme trois choses, l'outil <code class="inline">claude</code> est installé et connecté à ton compte, <span class="v-mon-poste-windows">Windows Terminal est présent</span><span class="v-mon-poste-mac">Homebrew est présent</span>, et ton fuseau est écrit dans <code class="inline">coordination/fuseau.txt</code>.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="preparer-le-poste.mon-poste-est-pret-l-outil-claude-est-connecte-et-mon-fuseau" data-n="c5"><span class="txt">Mon poste est prêt, l'outil claude est connecté et mon fuseau est déclaré</span></label></div></div></div>
+<div class="step" data-step="2"><div class="rail"><div class="num">2</div><div class="line"></div></div><div class="step-body"><div class="step-head"><span class="where">La même session</span><h3>Voir ce qui serait installé</h3><p class="small">Un essai à blanc. <span class="acc" data-a="Ton jumeau" data-b="Ta jumelle">Ton jumeau</span> te montre tout ce que l'installation ferait, sans rien toucher.</p></div><div class="copybloc"><div class="copybloc-head"><span class="t">Le prompt de l&#x27;essai à blanc</span><button class="copy" type="button">Copier</button></div><pre>Installe la coordination de mes agents, avec le Chef. Commence par un
+essai à blanc, montre-moi ce qui serait posé sur mon poste et dans mon
+cerveau, sans rien toucher, et explique-moi chaque ligne.</pre></div>
+<p><span class="acc" data-a="Ton jumeau" data-b="Ta jumelle">Ton jumeau</span> lance l'installation en mode essai, qui ne pose rien, ne lance rien et n'écrit rien. La réponse liste ce que la vraie installation ferait.</p>
+<ul><li>Ce poste devient le seul qui porte le Chef.</li><li>Quatre fichiers naissent dans ton cerveau, le registre des agents (<code class="inline">coordination/agents.tsv</code>) et sa copie lisible (<code class="inline">coordination/registre-des-agents.md</code>), le journal et le mandat du Chef.</li><li>La tâche planifiée est posée sur le système.</li><li>Le Chef est lancé par la tâche planifiée, à son premier passage.</li></ul>
+<div class="note reussi"><span class="lbl">C'est réussi quand</span><p>Tu as la liste devant toi, et chaque ligne a été expliquée. Rien n'a changé sur ton poste.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="voir-ce-qui-serait-installe.j-ai-lu-l-essai-a-blanc-et-rien-n-a-change-sur-mon-poste" data-n="c6"><span class="txt">J'ai lu l'essai à blanc, et rien n'a changé sur mon poste</span></label></div></div></div>
+<div class="step" data-step="3"><div class="rail"><div class="num">3</div></div><div class="step-body"><div class="step-head"><span class="where">La même session</span><h3>Installer, et rencontrer le Chef</h3><p class="small">Sur ton oui, <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> installe. Le Chef s'ouvre et t'accueille.</p></div><div class="copybloc"><div class="copybloc-head"><span class="t">Le prompt d&#x27;installation</span><button class="copy" type="button">Copier</button></div><pre>C&#x27;est bon, installe la coordination de mes agents pour de vrai. Dis-moi
+ensuite où je trouve le Chef pour lui parler.</pre></div>
+<p>{Mon poste: Une fenêtre de Windows Terminal nommée Coordination s'ouvre, avec un onglet Chef. C'est là que tu parles au Chef, en écrivant dans cet onglet comme dans une session ordinaire. | Le Chef naît dans une fenêtre de la session tmux Coordination, qui tourne sans écran. Demande à <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> de t'ouvrir le Terminal sur la fenêtre du Chef. C'est là que tu lui parles.}</p>
+<p>Le Chef relit son registre et son journal, vérifie que la tâche planifiée est posée, puis t'accueille.</p>
+<div class="note info"><span class="lbl">Installe entre 6 h et 22 h</span><p>Le Chef naît au premier réveil de la tâche planifiée, et le réveil ne passe qu'entre 6 h et 22 h, à l'heure de ton fuseau. Installé à 23 h, il naît à 6 h le lendemain. ::: Le premier jour, rien n'a bougé, et il le dit en une ligne.</p>
+<p>:::piege Un Chef qui naît deux fois Une ancienne installation peut avoir laissé des tâches planifiées par agent. Avec la nouvelle tâche en plus, le Chef naît deux fois. L'installation retire ces anciennes tâches. Si tu vois deux onglets au même nom, demande à <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> de vérifier les tâches de la coordination.</p></div>
+<div class="note neutre"><span class="lbl">Ce qui n&#x27;a pas encore été vérifié</span><p>L'installation a été éprouvée en essai à blanc et sur une copie de cerveau. Cette installation a déjà servi chez des proches d'Éric Bourbeau, sur PC et sur Mac. Si une étape ne se passe pas comme décrit ici, demande à <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> de l'écrire à l'adresse de l'encadré en fin de page.</p></div>
+<div class="note reussi"><span class="lbl">C'est réussi quand</span><p>Le Chef t'a écrit dans <span class="v-mon-poste-windows">son onglet de Windows Terminal</span><span class="v-mon-poste-mac">sa fenêtre du Terminal</span>, et tu lui as répondu.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="installer-et-rencontrer-le-chef.le-chef-est-installe-il-s-est-ouvert-et-je-lui-ai-repondu" data-n="c7"><span class="txt">Le Chef est installé, il s'est ouvert et je lui ai répondu</span></label></div></div></div></div></section>
+<section id="lui-confier-une-premiere-tache"><div class="wrap"><div class="sec-head"><p class="eyebrow">La configuration</p><h2>Lui confier une première tâche</h2><p class="lede">Une tâche simple, qui lit ton cerveau et ne sort rien, à une heure fixe.</p></div><div class="sec-body"><div class="col stack"><p>Choisis une tâche qui revient et qui suit toujours la même méthode. Un bon premier essai lit ce qui est déjà dans ton cerveau et ne touche à rien d'extérieur. Par exemple, chaque lundi à 9 h, le point sur tes dossiers en cours, ce qui a avancé la semaine passée et ce qui attend une décision.</p></div>
+<div class="copybloc"><div class="copybloc-head"><span class="t">Le prompt à donner au Chef</span><button class="copy" type="button">Copier</button></div><pre>Je veux te confier une première tâche à heures fixes. Ce qu&#x27;elle fait,
+&lt;ce que tu veux, en une phrase&gt;. Quand, &lt;par exemple chaque lundi à 9 h&gt;.
+
+Écris-la dans mon registre de tâches, coordination/taches-du-chef/
+registre.tsv, comme une consigne que tu fais toi-même. Montre-moi la ligne
+avant de l&#x27;enregistrer. Elle ne sort rien, elle lit mon cerveau et me
+rapporte. Dis-moi ensuite quand tu la feras pour la première fois.</pre></div>
+<div class="col stack"><p>Le Chef écrit la ligne, te la montre, l'enregistre sur ton oui et te dit à quel passage elle sera due. À ce passage, il la fait, la consigne et te rapporte.</p></div>
+<div class="note info"><span class="lbl">Corriger dans le fichier</span><p>Quand le résultat ne te convient pas, demande au Chef de corriger la consigne dans le registre, pas seulement sa réponse. Sinon, il refait la même chose la fois suivante.</p></div>
+<div class="note reussi"><span class="lbl">C'est réussi quand</span><p>Au premier passage après l'heure prévue, le Chef te rapporte le résultat de la tâche sans que tu lui aies rien demandé. Le passage peut tarder, jusqu'à près de deux heures.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="lui-confier-une-premiere-tache.j-ai-confie-une-premiere-tache-au-chef-et-il-l-a-faite-au-pr" data-n="c8"><span class="txt">J'ai confié une première tâche au Chef, et il l'a faite au premier passage après son heure</span></label></div></div></div></section>
+<section id="la-preuve"><div class="wrap"><div class="sec-head"><p class="eyebrow">Ce qui démontre que ça tient</p><h2>La preuve</h2><p class="lede">Le Chef est vivant, fait ses tâches et renaît seul la nuit suivante.</p></div><div class="sec-body"><div class="col stack"><p><strong>Il vit.</strong> Demande à <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span>, dans une session ordinaire, « donne-moi l'état de ma coordination ». <span class="acc" data-a="Il" data-b="Elle">Il</span> te répond que le Chef est vivant.</p>
+<p><strong>Il tient ses tâches.</strong> Demande au Chef « montre-moi ce que tu as fait aujourd'hui et ce que ça a coûté ». Il lit le journal du mois de ses tâches et te répond, tâche par tâche.</p>
+<p><strong>Le lendemain matin.</strong> La nuit, le portier l'a fait terminer puis renaître. Le matin, le Chef est dans son <span class="v-mon-poste-windows">onglet</span><span class="v-mon-poste-mac">fenêtre</span>, né vers 4 h, et son accueil t'attend. Demande à <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> « qu'est-ce que la coordination a fait cette nuit ? », <span class="acc" data-a="il" data-b="elle">il</span> lit le journal de la tâche planifiée, distinct du journal du Chef, et te le dit.</p></div>
+<div class="note reussi"><span class="lbl">C'est réussi quand</span><p>Le lendemain matin, le Chef est vivant, né vers 4 h, et il t'a écrit sans que tu aies rien relancé.</p></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="la-preuve.le-lendemain-matin-le-portier-a-relance-le-chef-sans-moi" data-n="c9"><span class="txt">Le lendemain matin, le portier a relancé le Chef sans moi</span></label></div></div></div></section>
+<section id="le-suspendre-le-retirer-changer-de-poste"><div class="wrap"><div class="sec-head"><p class="eyebrow">Garder la main</p><h2>Le suspendre, le retirer, changer de poste</h2><p class="lede">Le Chef se suspend, se retire ou déménage par une phrase à <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span>.</p></div><div class="sec-body"><div class="cartes"><div class="carte"><h4>Le mettre en pause <span class="tag">coordination/en-pause.tsv</span></h4><p>Dis à <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> « mets le Chef en pause et ferme sa session ». En pause, il n'est ni réveillé ni relancé. Une session déjà ouverte continue de tourner et de consommer tant qu'on ne la ferme pas. Il reprend quand tu demandes de lever la pause.</p><p class="quand">Une absence, une limite d'abonnement atteinte</p></div><div class="carte"><h4>Le relancer <span class="tag">/relancer-agents</span></h4><p>Dis à <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> « relance les agents ». Le Chef consigne, termine et renaît. S'il travaille, il n'est pas dérangé, il est relancé dès qu'il a fini.</p><p class="quand">Après une mise à jour du gabarit, ou quand tout semble figé</p></div><div class="carte"><h4>Le retirer du poste <span class="tag">la tâche planifiée</span></h4><p>Dis à <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> « retire la coordination de ce poste et ferme le Chef ». <span class="acc" data-a="Il" data-b="Elle">Il</span> retire la tâche planifiée et ferme la session du Chef. Ton registre, ton mandat, tes tâches et ton journal restent dans ton cerveau, prêts pour une installation future.</p><p class="quand">Tu n'en veux plus sur ce poste</p></div><div class="carte"><h4>Changer de poste <span class="tag">coordination/hote.tsv</span></h4><p>Le Chef ne vit que sur un poste. Ouvre d'abord <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> une fois sur le nouveau poste, pour qu'<span class="acc" data-a="il" data-b="elle">il</span> le connaisse. Puis, sur l'ancien, demande-lui de retirer la coordination, de fermer le Chef et d'inscrire le nouveau poste dans <code class="inline">coordination/hote.tsv</code>. Installe ensuite le Chef sur le nouveau, comme la première fois.</p><p class="quand">Un nouvel ordinateur</p></div></div>
+<div class="checks"><label class="check"><input type="checkbox" data-k="le-suspendre-le-retirer-changer-de-poste.je-sais-mettre-le-chef-en-pause-le-retirer-et-changer-de-pos" data-n="c10"><span class="txt">Je sais mettre le Chef en pause, le retirer et changer de poste</span></label></div></div></div></section>
+<section id="quand-tu-ajouteras-des-agents"><div class="wrap"><div class="sec-head"><p class="eyebrow">La suite</p><h2>Quand tu ajouteras des agents</h2><p class="lede">Le Chef peut tenir d'autres agents. Ce n'est pas l'objet de cette page.</p></div><div class="sec-body"><div class="col stack"><p>Un agent est une session de plus, avec son nom et son mandat, qui travaille sur un chantier et rend compte au Chef, jamais à toi. Le Chef le lance, le surveille, le relance et te rapporte ce qu'il fait. Chaque agent consomme lui aussi ton abonnement.</p>
+<p>Tout ce que ça demande est déjà installé avec le Chef, le registre des agents, le socle commun de leurs mandats, le lanceur. Un article à venir expliquera comment ajouter un agent et comment les sessions se parlent entre elles. D'ici là, le Chef seul suffit.</p></div></div></div></section>
+<section id="si-ca-coince"><div class="wrap"><div class="sec-head"><p class="eyebrow">Autodiagnostic</p><h2>Si ça coince</h2><p class="lede">Cherche ton symptôme, applique le geste. Deux tentatives au maximum. Ensuite <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> écrit à l'adresse de l'encadré en fin de page, et tu attends sans rien réparer.</p></div><div class="sec-body"><details class="dx"><summary>On me dit que « claude » est introuvable sur ce poste</summary><div class="dx-body"><div class="quote">« claude » est introuvable sur ce poste</div><p>Le Chef tourne avec Claude Code en ligne de commande, que l'application Claude n'installe pas forcément.</p><p class="geste">Reprends l'étape « Préparer le poste ». Si l'outil est installé mais toujours introuvable, ferme puis rouvre l'application Claude et refais l'essai à blanc.</p></div></details>
+<details class="dx"><summary>Le message dit que le fuseau n'est pas déclaré</summary><div class="dx-body"><div class="quote">fuseau du jumeau non declare</div><p>Le portier et les passages se règlent sur ce fichier. Sans lui, la tâche planifiée ne se pose pas.</p><p class="geste">Demande à <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> d'écrire ton fuseau horaire dans coordination/fuseau.txt, sous son nom standard, puis relance l'installation.</p></div></details>
+<details class="dx v-mon-poste-windows"><summary>Le message dit que Windows Terminal n'est pas installé</summary><div class="dx-body"><div class="quote">Windows Terminal n&#x27;est pas installé sur ce poste</div><p>Le Chef vit dans un de ses onglets.</p><p class="geste">Demande à <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> d'installer Windows Terminal, puis relance l'installation.</p></div></details>
+<details class="dx v-mon-poste-mac"><summary>L'installation de tmux échoue</summary><div class="dx-body"><div class="quote">installation de tmux</div><p>Ou une erreur qui mentionne brew. Sur Mac, le Chef vit dans tmux, que l'installation pose par Homebrew.</p><p class="geste">Demande à <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> de vérifier que Homebrew est installé et à jour, puis relance l'installation.</p></div></details>
+<details class="dx"><summary>Rien ne s'installe, et une ligne dit qu'un autre poste porte la coordination</summary><div class="dx-body"><p>Un seul poste porte le Chef, le premier où tu l'as installé.</p><p class="geste">Installe le Chef sur le poste que la ligne nomme, ou, si tu as changé d'ordinateur, suis la carte « Changer de poste ».</p></div></details>
+<details class="dx"><summary>Je vois deux onglets ou deux fenêtres au nom du Chef</summary><div class="dx-body"><p>Une ancienne tâche planifiée le fait naître une seconde fois, ou une session fermée brutalement a laissé une trace.</p><p class="geste">Demande à <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> de vérifier les tâches de la coordination et de retirer les anciennes. Ne ferme rien toi-même.</p></div></details>
+<details class="dx"><summary>Après un redémarrage du poste, le Chef n'est pas revenu</summary><div class="dx-body"><p>La tâche planifiée passe quand tu te connectes à ton ordinateur, puis toutes les cinq minutes. Le réveil ne relance le Chef qu'une fois par heure, entre 6 h et 22 h à l'heure de ton fuseau.</p><p class="geste">Attends le prochain passage du réveil, une fois par heure de 6 h à 22 h. Après 22 h, le Chef revient au réveil de 6 h. S'il n'est toujours pas là, demande à <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> de vérifier que la tâche planifiée est posée.</p></div></details>
+<details class="dx"><summary>Le Chef n'a pas fait la tâche que je lui ai confiée</summary><div class="dx-body"><p>Une tâche n'est due qu'à partir de son heure, et pas avant 6 h. Une heure mal écrite, ou un plafond du jour atteint, la repousse.</p><p class="geste">Demande-lui de te montrer la ligne de la tâche dans ton registre et ce que l'outil a déclaré dû à son dernier passage.</p></div></details>
+<details class="dx"><summary>Le Chef me parle toutes les heures pour ne rien dire</summary><div class="dx-body"><p>Son mandat lui demande le silence quand rien n'a bougé.</p><p class="geste">Dis-lui de relire la section de son mandat sur la façon de te parler, et de ne te parler que si quelque chose a changé.</p></div></details>
+<details class="dx"><summary>Une erreur s'affiche et je ne la comprends pas</summary><div class="dx-body"><p class="geste">Copie le message exact et donne-le à <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span>. Quand <span class="acc" data-a="il" data-b="elle">il</span> ne trouve pas, c'est <span class="acc" data-a="lui" data-b="elle">lui</span> qui écrit, comme le dit l'encadré en fin de page.</p></div></details></div></div></section>
+<section id="les-mots-du-chef"><div class="wrap"><div class="sec-head"><p class="eyebrow">Lexique</p><h2>Les mots du Chef</h2></div><div class="sec-body"><dl class="lex"><div><dt>Session</dt><dd>Une conversation ouverte avec Claude sur ton poste.</dd></div><div><dt>Agent</dt><dd>Une session qui porte un nom et un mandat. Le nom est son adresse.</dd></div><div><dt>Chef</dt><dd>L'agent qui tient la coordination. Il tourne en continu, fait tes tâches à heures fixes et te rend compte.</dd></div><div><dt>Mandat</dt><dd>Le fichier qui dit à un agent ce qu'il fait, ce qu'il tranche seul, ce qu'il remonte et ce qu'il ne fait jamais.</dd></div><div><dt>Registre des agents</dt><dd>La liste des agents, <code class="inline">coordination/agents.tsv</code>. Il fait foi sur les noms.</dd></div><div><dt>Registre des tâches</dt><dd>Les tâches du Chef, une ligne chacune, dans <code class="inline">coordination/taches-du-chef/registre.tsv</code>.</dd></div><div><dt>Journal</dt><dd>Ce qui s'est passé et ce qui a été décidé, relu par le Chef à chaque naissance.</dd></div><div><dt>Tâche planifiée</dt><dd>La tâche du système qui passe toutes les cinq minutes et décide du réveil et du portier.</dd></div><div><dt>Réveil</dt><dd>Une fois par heure, de 6 h à 22 h, la relance du Chef s'il est tombé.</dd></div><div><dt>Portier</dt><dd>Vers 4 h, la fin propre puis la renaissance du Chef.</dd></div><div><dt>Fuseau</dt><dd>L'heure de référence du Chef, <code class="inline">coordination/fuseau.txt</code>.</dd></div><div><dt>Sous-agent</dt><dd>Une session secondaire à qui le Chef confie un travail ponctuel, et qui lui rapporte.</dd></div><div><dt>Essai à blanc</dt><dd>Une installation qui montre tout ce qu'elle ferait sans rien faire.</dd></div></dl>
+<div class="copybloc accomp"><div class="accomp-head"><span class="lbl">Avec <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span></span><h3>Te faire accompagner pour installer ton Chef</h3><p>Pour que <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span> t'accompagne, étape par étape, copie ce prompt et colle-le au début d'une nouvelle session de <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span>. <span class="acc" data-a="Il" data-b="Elle">Il</span> n'a pas besoin d'avoir lu cette page.</p><button class="copy accomp-btn" type="button">Copier le prompt</button></div><details class="accomp-prompt"><summary>Voir le prompt</summary><pre>Tu m&#x27;accompagnes, étape par étape, pour installer le Chef de ma
+coordination sur mon poste et lui confier une première tâche. Voici ce
+qu&#x27;on installe, les pièces, les règles, la méthode, et comment tu dois
+travailler avec moi.
+
+CE QU&#x27;ON INSTALLE
+
+Le Chef, une session Claude Code qui tourne en continu sur mon poste. Il
+passe une fois par heure de 6 h à 22 h, fait les tâches que je lui ai
+confiées quand elles sont dues, les consigne et me parle seulement quand
+quelque chose a changé ou attend ma décision. Vers 4 h, le portier le fait
+terminer proprement puis renaître. Le gabarit livre déjà tout ce
+qu&#x27;il faut, rien n&#x27;est à bâtir à la main. Rien ne s&#x27;installe sans
+ma demande, parce que le Chef consomme mon abonnement Claude.
+
+LES PIÈCES
+
+1. Le registre des agents coordination/agents.tsv, qui ne contient que le
+   Chef à l&#x27;installation, et sa copie lisible
+   coordination/registre-des-agents.md.
+2. Le mandat du Chef coordination/agents/Chef.md. Une partie commune tenue
+   par les mises à jour du gabarit, puis « Tes tâches propres », à moi.
+3. Le journal coordination/journal.md, que le Chef relit à chaque
+   naissance.
+4. Les registres de tâches dans coordination/taches-du-chef/. Le registre
+   commun descend du gabarit et ne se touche pas. Mon registre,
+   registre.tsv, porte mes tâches, une ligne chacune (nom, cadence, heure,
+   marqueur, type, action). Le type est script (une commande, sans coût)
+   ou modele (une consigne que le Chef fait lui-même).
+5. La tâche planifiée du système, une seule, qui passe quand je me
+   connecte à mon ordinateur, puis toutes les cinq minutes. Elle relance le Chef s&#x27;il est
+   tombé (une fois par heure, de 6 h à 22 h) et passe le portier vers 4 h.
+6. Le fuseau coordination/fuseau.txt, l&#x27;heure de référence, sous son nom
+   standard (par exemple America/Toronto).
+7. Le poste unique coordination/hote.tsv. Le Chef vit sur un seul poste,
+   le premier où on l&#x27;installe.
+8. Le terminal du Chef. Sous Windows, un onglet Chef dans une fenêtre de
+   Windows Terminal nommée Coordination. Sur Mac, une fenêtre de la
+   session tmux Coordination, tmux posé par Homebrew. Le Chef tourne avec
+   l&#x27;outil claude, Claude Code en ligne de commande, connecté à mon compte.
+
+LES RÈGLES
+
+- Je ne te donne jamais un mot de passe. Je connecte moi-même l&#x27;outil
+  claude à mon compte, dans mon navigateur.
+- Tu ne supprimes rien, jamais, même pour réparer.
+- Le Chef ne fait rien sortir sans mon accord, ne crée pas d&#x27;agent et ne
+  modifie pas un mandat sans ma demande. Il ne fait que les tâches que
+  l&#x27;outil déclare dues, sous un plafond quotidien de consommation.
+- Mettre le Chef en pause ne ferme pas sa session. Pour qu&#x27;il cesse de
+  consommer, on le met en pause et on ferme sa session.
+- Une première tâche lit mon cerveau et ne sort rien.
+
+LA MÉTHODE, DANS L&#x27;ORDRE
+
+1. Préparer le poste. Vérifier que l&#x27;outil claude est installé et connecté
+   à mon compte (sinon l&#x27;installer par l&#x27;installateur officiel d&#x27;Anthropic
+   et me guider pour la connexion). Sous Windows, vérifier Windows
+   Terminal. Sur Mac, vérifier Homebrew. Vérifier que
+   coordination/fuseau.txt existe, sinon me proposer mon fuseau et
+   l&#x27;écrire sur mon oui. Réussi quand les trois sont confirmés.
+2. L&#x27;essai à blanc. Lancer python tools/chef_par_defaut.py --essai-a-blanc
+   et m&#x27;expliquer chaque ligne. Réussi quand j&#x27;ai compris ce qui serait
+   posé, et que rien n&#x27;a changé.
+3. L&#x27;installation, sur mon oui. Lancer python tools/chef_par_defaut.py,
+   puis me dire où je trouve le Chef. Le Chef naît au premier réveil de
+   la tâche planifiée, entre 6 h et 22 h seulement. Réussi quand le Chef
+   m&#x27;a écrit et que je lui ai répondu.
+4. La première tâche. Je dis au Chef ce que je veux et quand. Il écrit la
+   ligne dans mon registre.tsv, me la montre, l&#x27;enregistre sur mon oui et
+   me dit à quel passage elle sera due. Réussi quand il me rapporte son
+   résultat au premier passage après son heure, qui peut tarder.
+5. La preuve. python tools/coordination.py etat montre le Chef vivant. Le
+   journal du mois dans coordination/taches-du-chef/ porte la ligne de la
+   tâche. Le lendemain matin, le portier l&#x27;a relancé, ce que dit tic.log
+   dans le dossier de travail de la coordination.
+
+COMMENT TU TRAVAILLES AVEC MOI
+
+- Une étape à la fois. Tu ne passes à la suivante que quand j&#x27;ai vu le
+  signe de réussite de celle-ci.
+- Une question à la fois.
+- Tu m&#x27;expliques chaque mot avant de l&#x27;employer, et tu ne me fais rien
+  taper.
+- Quand quelque chose échoue, tu me montres le message d&#x27;erreur exact.
+  Deux tentatives au maximum, ensuite tu écris à Éric Bourbeau
+  (ebourbeau@x-telia.com, objet qui commence par Jumeau) et on attend.
+- Tu dis ce que tu n&#x27;as pas vérifié. Cette installation a déjà servi chez des proches d'Éric Bourbeau.
+- Si une consigne de cette méthode se révèle fausse sur mon poste, tu me
+  le dis au lieu de contourner.
+
+Commence par me demander sur quel système je suis, Windows ou Mac, et ce
+que j&#x27;aimerais que le Chef fasse pour moi à heures fixes.</pre></details></div></div></div></section>
+</main>
+<footer><div class="wrap col stack">
+<div class="guichet stack-s"><p class="eyebrow">Si tu es bloqué, demande à ton jumeau</p><p><strong>Commence par demander à <span class="acc" data-a="ton jumeau" data-b="ta jumelle">ton jumeau</span>.</strong> Décris-lui ce qui se passe et colle-lui le message d'erreur exact. La plupart du temps, <span class="acc" data-a="il" data-b="elle">il</span> trouve. <strong>Quand <span class="acc" data-a="il" data-b="elle">il</span> ne trouve pas, c'est <span class="acc" data-a="lui" data-b="elle">lui</span> qui écrit à Pascal Jarry, pas toi</strong>, à <code class="inline">pascaljarry@yapla.com</code>, avec un objet qui commence par le mot Jumeau. Jumeau-Pascal-Jarry relève cette boîte et répond. Ne réessaie pas dix fois et ne supprime rien en attendant.</p></div>
+<p class="colophon">Adapté de la formation ouverte de Yapla (Pascal Jarry) · Le Chef de mon jumeau numérique · version 1 · mise à jour 2026-10-28</p>
+</div></footer>
+<script>
+(function(){
+  var body=document.body, PFX="f-le-chef-de-mon-jumeau-nu-";
+  function get(k){try{return localStorage.getItem(PFX+k)}catch(e){return null}}
+  function set(k,v){try{localStorage.setItem(PFX+k,v)}catch(e){}}
+
+  
+  document.querySelectorAll('[data-dim]').forEach(function(b){
+    b.addEventListener('click',function(){appliquer(b.dataset.dim,b.dataset.val)});
+  });
+  function appliquer(dim,val){
+    body.setAttribute('data-v-'+dim,val);
+    document.querySelectorAll('[data-dim="'+dim+'"]').forEach(function(x){
+      x.setAttribute('aria-pressed', x.dataset.val===val?'true':'false');
+    });
+    set('v-'+dim,val);
+  }
+  appliquer('mon-poste', get('v-mon-poste') || 'windows');
+
+  
+  function accorder(f){
+    document.querySelectorAll('.acc').forEach(function(s){
+      s.textContent = f==='b' ? s.dataset.b : s.dataset.a;
+    });
+    document.querySelectorAll('[data-acc]').forEach(function(x){
+      x.setAttribute('aria-pressed', x.dataset.acc===f?'true':'false');
+    });
+    set('acc',f);
+  }
+  if(document.querySelector('.acc')||document.querySelector('[data-acc]')){
+    accorder(get('acc')||'a');
+    document.querySelectorAll('[data-acc]').forEach(function(b){
+      b.addEventListener('click',function(){accorder(b.dataset.acc)});
+    });
+  }
+
+  
+  var boxes=[].slice.call(document.querySelectorAll('input[type=checkbox][data-k]'));
+  var fill=document.getElementById('pfill'), cnt=document.getElementById('pcount');
+  function rafraichir(){
+    var n=boxes.filter(function(b){return b.checked}).length;
+    if(fill) fill.style.width=(boxes.length?n/boxes.length*100:0)+'%';
+    if(cnt) cnt.textContent=n+' / '+boxes.length;
+    document.querySelectorAll('.step[data-step]').forEach(function(st){
+      var c=st.querySelector('input[type=checkbox][data-k]');
+      st.setAttribute('data-done', c&&c.checked?'true':'false');
+    });
+  }
+  boxes.forEach(function(b){
+    var v=get(b.dataset.k);
+    if(v===null && b.dataset.n){          
+      var ancien=get(b.dataset.n);
+      if(ancien!==null){ v=ancien; set(b.dataset.k,ancien); }
+    }
+    if(v==='1') b.checked=true;
+    b.addEventListener('change',function(){set(b.dataset.k,b.checked?'1':'0');rafraichir()});
+  });
+  rafraichir();
+
+  
+  document.querySelectorAll('.copy').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      
+      var t=btn.closest('.copybloc').querySelector('pre').textContent;
+      function ok(){btn.textContent='Copie';btn.setAttribute('data-state','ok');
+        setTimeout(function(){btn.textContent='Copier';btn.removeAttribute('data-state')},1800)}
+      function repli(){
+        var a=document.createElement('textarea');a.value=t;a.style.position='fixed';
+        a.style.opacity='0';document.body.appendChild(a);a.select();
+        try{document.execCommand('copy');ok()}catch(e){btn.textContent='Selectionne et copie'}
+        document.body.removeChild(a);
+      }
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(t).then(ok,repli);
+      } else { repli(); }
+    });
+  });
+})();
+</script>
+</body>
+</html>
